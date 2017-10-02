@@ -86,11 +86,11 @@ new Vue({
     // fetch menu from server
     this
       .$http
-      .get('/menu')
+      .get('/settings/menu')
       .then(({data}) => {
         this
           .$store
-          .commit('setMenu', data)
+          .commit('setMenu', data.menu)
       })
     this
       .$store

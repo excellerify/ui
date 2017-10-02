@@ -17,6 +17,7 @@
     "i": "^0.3.5",
     "indicative": "^2.2.1",
     "randomstring": "^1.1.5",
+    "v-validate": "^0.1.4",
     "vee-validate": "^2.0.0-rc.17",
     "vue": "^2.3.3",
     "vue-authenticate": "^1.2.7",

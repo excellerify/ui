@@ -42,11 +42,6 @@ v-flex(xs12)
   v-text-field(v-else-if="field.type == 'email'", v-model='model', v-bind='field', field="$t(field.label)", :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", v-validate="{'required': field.required, 'email': true}")
   //- default input
   v-text-field(v-else, v-model='model', v-bind='field', :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", :multiLine="field.type == 'textarea'", :v-validate="{required: field.required}")
-
-  p {{field}}
-  p {{errors}}
-
-  span(:v-if="errors.items[0]", class="form-control-feedback") {{ errors.items[0].msg }}
 </template>
 
 <script>

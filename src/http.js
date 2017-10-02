@@ -41,9 +41,9 @@ http.interceptors.response.use(function (response) {
     }
   }
 
-  if (error.response.status === 401 || error.response.status === 403) {
-    global.store.dispatch('clearAuth')
-  }
+  // if (error.response.status === 401 || error.response.status === 403) {
+  //   global.store.dispatch('clearAuth')
+  // }
 
   // Do something with response error
   return Promise.reject(error)
