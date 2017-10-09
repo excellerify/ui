@@ -90,7 +90,7 @@ new Vue({
       .then(({data}) => {
         this
           .$store
-          .commit('setMenu', data.menu)
+          .commit('setMenu', data)
       })
     this
       .$store

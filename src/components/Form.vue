@@ -77,7 +77,7 @@ export default {
     }
 
   },
-  data () {
+  data() {
     return {
       model: this.value,
       hasError: false,
@@ -87,7 +87,7 @@ export default {
   },
 
   computed: {
-    group () {
+    group() {
       if (!this.groupBy) {
         return null
       }
@@ -106,23 +106,23 @@ export default {
           children[ref][k] = field
         }
       }
-      return {parents, children}
+      return { parents, children }
     },
 
-    autoSubmit () {
+    autoSubmit() {
       return !!this.action
     }
   },
   watch: {
-    'value' (val) {
+    'value'(val) {
       this.model = val
     },
     'model': 'updateFields'
   },
   methods: {
 
-    getGroupedFields () { },
-    getFieldError (fieldName) {
+    getGroupedFields() { },
+    getFieldError(fieldName) {
       for (let k in this.errors) {
         let error = this.errors[k]
         if (error.field === fieldName) {
@@ -130,11 +130,11 @@ export default {
         }
       }
     },
-    updateFields () {
+    updateFields() {
 
     },
 
-    onSubmit () {
+    onSubmit() {
       const valid = global.validator.make(this.model, this.rules, this.messages)
       if (valid.passes()) {
         this.$emit('input', this.model)
@@ -146,21 +146,22 @@ export default {
         this.$http[this.method](this.action, this.model).then(({ data }) => {
           this.$emit('success', data)
           this.hasError = false
-        }).catch(({ response }) => {
-          let { status, data } = response
+        }).catch(({response}) => {
+          debugger
+          const status = response.status
+
           this.hasError = true
-          if (data.message) {
-            this.errors = [data]
+          if (response.data.error.message) {
+            this.errors = [response.data.error]
           }
           switch (status) {
             case 422:
-
-              this.errors = data
+              this.errors = response.data.error
               break
             default:
-
           }
-          this.$emit('error', status, data)
+
+          this.$emit('error', status, response.data.error)
         })
       } else {
         const errors = valid.getErrors()
@@ -171,11 +172,11 @@ export default {
       }
     }
   },
-  mounted () {
+  mounted() {
     // this.$bus.showMessage('success', 'success')
 
   },
-  created () {
+  created() {
     // global.validator.extend('unique', function (data, field, message, args, get) {
     //   return new Promise(function (resolve, reject) {
     //     // const fieldValue = get(data, field)

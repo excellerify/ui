@@ -48,6 +48,8 @@ div()
 </template>
 
 <script>
+import config from '../../config'
+
 const getDefaultData = () => {
   return {
     deleteModal: false,
@@ -58,7 +60,7 @@ const getDefaultData = () => {
       messages: {}
     },
     filters: {
-      model: {},
+      limit: config.grid.limit,
       fields: null
     },
     loading: false,
@@ -122,14 +124,14 @@ export default {
       this.isShowEdit = true
     },
     preFetch() {
-      let sort = this.pagination.sortBy
-      if (this.pagination.descending) {
-        sort = '-' + sort
-      }
-      this.$route.query.query = JSON.stringify(this.filters.model)
-      this.$route.query.sort = sort
-      this.$route.query.perPage = this.pagination.rowsPerPage
-      this.$route.query.page = this.pagination.page
+      // let sort = this.pagination.sortBy
+      // if (this.pagination.descending) {
+      //   sort = '-' + sort
+      // }
+      this.$route.query.filter = JSON.stringify(this.filters)
+      // this.$route.query.sort = sort
+      // this.$route.query.perPage = this.pagination.rowsPerPage
+      // this.$route.query.page = this.pagination.page
     },
     updateRoute() {
       this.$route.query.keepLayout = true
