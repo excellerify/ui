@@ -17,12 +17,12 @@ div()
             template(v-for="(value, action) in actions")
               v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router,primary,fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                 v-icon {{action.icon ? action.icon : action}}
-            v-btn(v-if="options.update",dark,primary,fab,small,:to="{name: 'edit', params: {resource,id:props.item.id}}")
+            v-btn(v-if="options.update",dark,primary,fab,small,:to="{name: 'edit', params: {id:props.item.id}}")
               v-icon edit
             //-- also you can try this: inline edit
             //-- v-btn(v-if="options.edit",dark,fab,success,small,@click.native.stop="showEdit(props.item)")
             //--   v-icon() edit
-            v-dialog(v-if="options.delete", id="modal" v-model="deleteModal")
+            v-dialog(v-if="options.delete", id="modal" v-model="deleteModal[props.item.id]")
               v-btn(slot="activator", dark, error, fab, small)
                 v-icon() delete
               v-card
@@ -30,8 +30,8 @@ div()
                       p(class="text-xs-center") Are you sure?
                   v-card-actions
                     v-spacer
-                    v-btn(small,@click.native="deleteModal=false") No
-                    v-btn(small,@click="remove(props.item)") Yes
+                    v-btn(small,@click.native="deleteModal[props.item.id]=false") No
+                    v-btn(small,@click="remove(props.item.id)") Yes
 
             v-btn(v-if="options.lock",fab,small,@click="lock(props.item)")
               v-icon() lock
@@ -48,11 +48,11 @@ div()
 </template>
 
 <script>
-import config from '../../config'
+import config from '../config'
 
 const getDefaultData = () => {
   return {
-    deleteModal: false,
+    deleteModal: [],
     form: {
       model: {},
       fields: {},
@@ -60,8 +60,7 @@ const getDefaultData = () => {
       messages: {}
     },
     filters: {
-      limit: config.grid.limit,
-      fields: null
+      limit: config.grid.limit
     },
     loading: false,
     columns: [], // fetch grid setup params from server if `columns` is empty
@@ -124,14 +123,7 @@ export default {
       this.isShowEdit = true
     },
     preFetch() {
-      // let sort = this.pagination.sortBy
-      // if (this.pagination.descending) {
-      //   sort = '-' + sort
-      // }
       this.$route.query.filter = JSON.stringify(this.filters)
-      // this.$route.query.sort = sort
-      // this.$route.query.perPage = this.pagination.rowsPerPage
-      // this.$route.query.page = this.pagination.page
     },
     updateRoute() {
       this.$route.query.keepLayout = true
@@ -219,10 +211,10 @@ export default {
         this.pagination.totalItems = data.count
       })
     },
-    remove(item) {
-      this.$http.delete(`${this.resource}/${item.id}`).then(({ data }) => {
+    remove(itemId) {
+      this.$http.delete(`${this.resource}/${itemId}`).then(({ data }) => {
         this.fetchData()
-        this.deleteModal = false
+        this.deleteModal[itemId] = false
       })
     },
     next() {

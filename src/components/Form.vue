@@ -147,19 +147,18 @@ export default {
           this.$emit('success', data)
           this.hasError = false
         }).catch(({response}) => {
-          debugger
           const status = response.status
 
           this.hasError = true
           if (response.data.error.message) {
             this.errors = [response.data.error]
           }
-          switch (status) {
-            case 422:
-              this.errors = response.data.error
-              break
-            default:
-          }
+          // switch (status) {
+          //   case 422:
+          //     this.errors = [response.data.error]
+          //     break
+          //   default:
+          // }
 
           this.$emit('error', status, response.data.error)
         })

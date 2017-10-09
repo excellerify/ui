@@ -12,7 +12,7 @@
     <v-card>
       <v-data-table v-bind:headers="columns" v-model="data.data" hide-actions>
         <template slot="items" scope="props">
-          <td :class="column.left? 'text-xs-left' : 'text-xs-center'" v-for="column in columns" v-bind:key="column[0]">
+          <td :class="column.left? 'text-xs-left' : 'text-xs-center'" v-for="column in columns" v-bind:key="column">
             {{getColumnData(props.item, column.value)}}
           </td>
           <td v-if="actions" width="180">
