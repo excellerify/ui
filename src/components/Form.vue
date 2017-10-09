@@ -153,12 +153,6 @@ export default {
           if (response.data.error.message) {
             this.errors = [response.data.error]
           }
-          // switch (status) {
-          //   case 422:
-          //     this.errors = [response.data.error]
-          //     break
-          //   default:
-          // }
 
           this.$emit('error', status, response.data.error)
         })

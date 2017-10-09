@@ -30,8 +30,8 @@ div()
                       p(class="text-xs-center") Are you sure?
                   v-card-actions
                     v-spacer
-                    v-btn(small,@click.native="deleteModal[props.item.id]=false") No
-                    v-btn(small,@click="remove(props.item.id)") Yes
+                    v-btn(small,@click.native="deleteModal = []") No
+                    v-btn(small,@click.native="remove(props.item.id)") Yes
 
             v-btn(v-if="options.lock",fab,small,@click="lock(props.item)")
               v-icon() lock
@@ -213,8 +213,7 @@ export default {
     },
     remove(itemId) {
       this.$http.delete(`${this.resource}/${itemId}`).then(({ data }) => {
-        this.fetchData()
-        this.deleteModal[itemId] = false
+        this.refresh()
       })
     },
     next() {
