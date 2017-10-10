@@ -129,7 +129,7 @@ export default {
     preFetch() {
       const filters = {}
 
-      if (!this.filters.model) {
+      if (this.filters.model) {
         this._.forEach(this.filters.model, function(val, key) {
           filters[key] = {
             like: `%${val}%`
@@ -138,8 +138,7 @@ export default {
       }
 
       const offset = (this.pagination.page - 1) * (this.filters.limit)
-
-      this.$route.query.filter = JSON.stringify({ where: filters, limit: this.filters.limit, offset })
+      this.$route.query.filter = { where: filters, limit: this.filters.limit, offset }
     },
     updateRoute() {
       this.$route.query.keepLayout = true
@@ -153,11 +152,6 @@ export default {
     doSearch() {
       this.pagination.page = 1
       this.fetchData()
-    },
-    filter(val, search) {
-      return true
-      // this.search = search
-      // this.fetchData()
     },
     refresh() {
       Object.assign(this.$data, getDefaultData())
@@ -185,7 +179,7 @@ export default {
         tag = 'img'
       }
       if (tag) {
-        value = `<${tag} src="${value}" class="crud-grid-thumb" controls />`
+        value = `<div class="avatar lighten-4"><${tag} src="${value}" class="crud-grid-thumb" controls /></div>`
       }
       return value
     },
@@ -224,12 +218,13 @@ export default {
     },
     fetchData() {
       this.preFetch()
+
       this.$http.get(`${this.resource}`, { params: this.$route.query }).then(({ data }) => {
         this.items = data
-      })
 
-      this.$http.get(`${this.resource}/count`).then(({ data }) => {
-        this.pagination.totalItems = data.count
+        this.$http.get(`${this.resource}/count`, { params: this.$route.query.filter }).then(({ data }) => {
+          this.pagination.totalItems = data.count
+        })
       })
     },
     remove(itemId) {

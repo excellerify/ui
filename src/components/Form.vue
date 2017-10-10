@@ -146,7 +146,7 @@ export default {
         this.$http[this.method](this.action, this.model).then(({ data }) => {
           this.$emit('success', data)
           this.hasError = false
-        }).catch(({response}) => {
+        }).catch(({ response }) => {
           const status = response.status
 
           this.hasError = true
