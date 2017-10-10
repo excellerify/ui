@@ -11,7 +11,7 @@ const config = {
   },
   api: apiBaseUrl,
   grid: {
-    limit: 20
+    limit: 10
   }
   // locale: 'en', //en
   // api: 'http://192.168.1.108:3333/admin/api'

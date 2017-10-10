@@ -2,9 +2,13 @@ import Vue from 'vue'
 
 import VueAuthenticate from 'vue-authenticate'
 import VeeValidate from 'vee-validate'
+import lodash from 'lodash'
+import VueLodash from 'vue-lodash'
+
 Vue.use(Vuetify)
 Vue.use(VueAuthenticate)
 Vue.use(VeeValidate)
+Vue.use(VueLodash, lodash)
 
 Vue.use(VueAuthenticate, {
   baseUrl: 'http://localhost:3000', // Your API domain

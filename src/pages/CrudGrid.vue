@@ -13,7 +13,7 @@ div()
       template(slot='items', scope='props')
         tr
           td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
-          td(v-if='actions', width='220')
+          td(v-if='actions', width='auto')
             template(v-for="(value, action) in actions")
               v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router,primary,fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                 v-icon {{action.icon ? action.icon : action}}
@@ -24,7 +24,7 @@ div()
             //--   v-icon() edit
             v-dialog(v-if="options.delete", id="modal" v-model="deleteModal[props.item.id]")
               v-btn(slot="activator", dark, error, fab, small)
-                v-icon() delete
+                v-icon delete
               v-card
                   v-card-text
                       p(class="text-xs-center") Are you sure?
@@ -34,10 +34,10 @@ div()
                     v-btn(small,@click.native="remove(props.item.id)") Yes
 
             v-btn(v-if="options.lock",fab,small,@click="lock(props.item)")
-              v-icon() lock
+              v-icon lock
 
-            v-btn(v-else,fab,small,@click="customAction(props.item)")
-              v-icon() lock
+            v-btn(v-if="options.custom",fab,small,@click="customAction(props.item)")
+              v-icon {{options.custom.icon}}
     .jc
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
@@ -57,7 +57,6 @@ const getDefaultData = () => {
   return {
     deleteModal: [],
     form: {
-      model: {},
       fields: {},
       rules: {},
       messages: {}
@@ -86,6 +85,7 @@ const getDefaultData = () => {
     items: []
   }
 }
+
 export default {
 
   data: getDefaultData,
@@ -106,6 +106,7 @@ export default {
     '$route.params': 'refresh'
     // '$route.query': 'updateRoute'
   },
+
   methods: {
     fetchForm(item) {
       this.$http.get(`${this.resource}/form`, {
@@ -126,7 +127,19 @@ export default {
       this.isShowEdit = true
     },
     preFetch() {
-      this.$route.query.filter = JSON.stringify(this.filters)
+      const filters = {}
+
+      if (!this.filters.model) {
+        this._.forEach(this.filters.model, function(val, key) {
+          filters[key] = {
+            like: `%${val}%`
+          }
+        })
+      }
+
+      const offset = (this.pagination.page - 1) * (this.filters.limit)
+
+      this.$route.query.filter = JSON.stringify({ where: filters, limit: this.filters.limit, offset })
     },
     updateRoute() {
       this.$route.query.keepLayout = true
@@ -186,7 +199,12 @@ export default {
           }
           this.columns = data.columns || {}
           this.actions = data.actions || {}
+
+          // keep limit
+          const limit = data.filters.limit || this.filters.limit
           this.filters = data.filters || {}
+          this.filters.limit = limit
+
           this.options = data.options || {}
 
           if (this.options && this.options.sort) {
@@ -220,10 +238,10 @@ export default {
       })
     },
     next() {
-      // console.log('next')
       this.pagination.page++
     }
   },
+
   computed: {
     resource() {
       return this.$route.params.resource
