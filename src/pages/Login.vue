@@ -10,6 +10,9 @@ div
           v-form(v-model='model', @submit='doLogin', :fields='fields', submitButtonText="Login")
             .flex.pb-2
               small {{$t("* Indicates required field")}}
+      v-card-row
+        v-alert.py-2(error, v-model='hasError')
+          div {{error.message}}
       //- v-card-row
       //-   v-card-text.pt-2
       //-     google-signin
@@ -34,15 +37,16 @@ export default {
         username: { label: 'Username', required: true },
         password: { label: 'Password', type: 'password', required: true }
       },
-      show: true
+      show: true,
+      hasError: false,
+      error: {
+        message: ''
+      }
     }
   },
   computed: {
     token() {
-      return global
-        .helper
-        .ls
-        .get('token')
+      return global.helper.ls.get('token')
     }
   },
   methods: {
@@ -53,7 +57,17 @@ export default {
           password: this.model.password
         }).then(response => {
           global.store.dispatch('doLogin', { user: response.data.userId, token: response.data.id, expireTime: response.data.ttl })
-        }, err => console.log(err))
+        }, ({ response }) => {
+          this.hasError = true
+
+          if (response.status === 401 || response.status === 403) {
+            this.error.message = 'invalid username or password'
+            this.$emit('error', response.status, [{ message: 'invalid username or password' }])
+          } else {
+            this.error = response.data.error
+            this.$emit('error', response.status, response.data.error)
+          }
+        })
     },
     doLogout() {
       this.$http

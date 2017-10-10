@@ -35,6 +35,9 @@ div()
 
             v-btn(v-if="options.lock",fab,small,@click="lock(props.item)")
               v-icon() lock
+
+            v-btn(v-else,fab,small,@click="customAction(props.item)")
+              v-icon() lock
     .jc
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
