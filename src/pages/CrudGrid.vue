@@ -15,6 +15,10 @@ div()
             template(v-for="(value, action) in actions")
               v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router,primary,fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                 v-icon {{action.icon ? action.icon : action}}
+
+            v-btn(v-if="options.view",fab,dark,small,class="green",:to="{name: 'view', params: {id:props.item.id}}")
+              v-icon visibility
+
             v-btn(v-if="options.update",dark,primary,fab,small,:to="{name: 'edit', params: {id:props.item.id}}")
               v-icon edit
             //-- also you can try this: inline edit
@@ -38,6 +42,8 @@ div()
               v-icon {{options.custom.icon}}
     .jc
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
+
+  //- TODO move delete dialog here @sofyanhadia
 
   v-dialog(v-model="isShowEdit", width="70%")
     v-card
