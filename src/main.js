@@ -60,13 +60,11 @@ import validator from 'Validator'
 global.validator = validator
 
 import VForm from './components/Form.vue'
-import VGrid from './components/Grid.vue'
 import VField from './components/Field.vue'
 
 // import Modal from './components/Modal' Vue.use(Modal)
 
 Vue.component('v-form', VForm)
-Vue.component('v-grid', VGrid)
 Vue.component('v-field', VField)
 
 /* eslint-disable no-new */

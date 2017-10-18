@@ -13,7 +13,7 @@ v-flex(xs12)
           :label='option.text',
         )
       p {{$t(field.label)}}
-  //- if input type is date or timr
+  //- if input type is date or time
   template(v-else-if="['date', 'datetime', 'time'].indexOf(field.type) > -1")
     v-menu
       v-text-field(slot='activator', v-model='model', :label="$t(field.label)")
@@ -36,10 +36,21 @@ v-flex(xs12)
         @vdropzone-sending="onUploading"
         @vdropzone-success="onUploadSuccess")
         input(type='hidden', v-model='model')
+
   //- if hidden
   input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model')
+
   //- if email
   v-text-field(v-else-if="field.type == 'email'", v-model='model', v-bind='field', field="$t(field.label)", :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", v-validate="{'required': field.required, 'email': true}")
+
+  //- if table
+  template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
+    label {{field.label}}
+    v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
+      template(slot="items", scope="props")
+        tr
+          td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
+
   //- default input
   v-text-field(v-else, v-model='model', v-bind='field', :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", :multiLine="field.type == 'textarea'", :v-validate="{required: field.required}")
 </template>
@@ -59,6 +70,10 @@ export default {
       required: false
     },
     value: {
+      required: false
+    },
+    width: {
+      type: Number,
       required: false
     }
   },
@@ -88,6 +103,15 @@ export default {
     onUploadSuccess(file, response) {
       const filename = response.result.files.file[0].name
       this.$emit('input', `${config.api}Files/${this.resource}/download/${filename}`)
+    },
+    getColumnData(row, field) {
+      // process fields like `type.name`
+      let [l1, l2] = field.split('.')
+      if (l2) {
+        return row[l1] ? row[l1][l2] : null
+      } else {
+        return row[l1]
+      }
     }
   }
 }
