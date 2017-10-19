@@ -45,11 +45,12 @@ v-flex(xs12)
 
   //- if table
   template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
-    label {{field.label}}
-    v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
-      template(slot="items", scope="props")
-        tr
-          td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
+   div(class="mb-4")
+      label {{field.label}}
+      v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
+        template(slot="items", scope="props")
+          tr
+            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
 
   //- default input
   v-text-field(v-else, v-model='model', v-bind='field', :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", :multiLine="field.type == 'textarea'", :v-validate="{required: field.required}")
