@@ -28,6 +28,7 @@ const router = new Router({
     route('/', 'Main', null, [
       route('/', 'Home', 'home', null, true),
       route('/crud/:resource', 'CrudGrid', 'grid', null, true),
+      route('/crud/:resource/:id/view', 'ViewForm', 'view', null, true),
       route('/crud/:resource/:id/edit', 'CrudForm', 'edit', null, true),
       route('/crud/:resource/create', 'CrudForm', 'create', null, true),
       route('/crud/:resource/:id/:action', 'CrudForm', 'action', null, true),

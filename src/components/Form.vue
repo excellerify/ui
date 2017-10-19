@@ -10,7 +10,7 @@ div
           v-card-text
             v-field(v-for='(field, name) in fields', :key='name', :name="name", :field="field", v-model="model[name]")
 
-    v-layout(v-bind="{[inline? 'row': 'column']: true}", v-if="!groupBy")
+    v-layout(v-bind="{[inline? 'row': 'column wrap']: true}", v-if="!groupBy")
 
       v-field(v-for='(field, name) in fields', :key='name', :name="name", :field="field", v-model="model[name]")
 
