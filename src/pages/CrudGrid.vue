@@ -1,7 +1,9 @@
 <template lang="pug">
 div()
   v-layout
-    v-flex(md12)
+    v-flex(md1)
+
+    v-flex(md6)
       v-form.row.jr(:inline='true', v-model='filters.model', v-if="filters.fields", :fields='filters.fields', @submit='doSearch', submitButtonText='Search', submitButtonIcon='search')
   v-card
     div
@@ -34,12 +36,6 @@ div()
                     v-spacer
                     v-btn(small,@click.native="deleteModal = []") No
                     v-btn(small,@click.native="remove(props.item.id)") Yes
-
-            v-btn(v-if="options.lock",fab,small,@click="lock(props.item)")
-              v-icon lock
-
-            v-btn(v-if="options.custom",fab,small,@click="customAction(props.item)")
-              v-icon {{options.custom.icon}}
     .jc
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
