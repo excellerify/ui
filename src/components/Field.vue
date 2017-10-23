@@ -22,7 +22,7 @@ v-flex(xs12)
   div(:class="inputGroupClass",v-else-if="field.type == 'html'")
     label {{$t(field.label)}}
     div.pt-2
-      quill-editor(v-model='model')
+      quill-editor(v-model='model', :options="editorOption")
   //- if input type is file
   //- TODO dropzone
   div(:class="inputGroupClass",v-else-if="['file', 'pdf', 'image', 'video'].includes(field.type)")
@@ -79,7 +79,19 @@ export default {
   },
   data() {
     return {
-      inputGroupClass: 'input-group input-group--dirty input-group--text-field'
+      inputGroupClass: 'input-group input-group--dirty input-group--text-field',
+      editorOption: {
+        modules: {
+          toolbar:
+          [['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          ['blockquote', 'code-block'],
+          [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+          [{'list': 'ordered'}, { 'list': 'bullet' }],
+          [{'indent': '-1'}, { 'indent': '+1' }],
+          [{ 'align': [] }]]
+        }
+      }
     }
   },
   computed: {
