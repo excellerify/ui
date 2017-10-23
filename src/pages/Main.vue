@@ -1,6 +1,6 @@
 <template lang="pug">
 v-app(:dark="dark",standalone)
-  v-navigation-drawer(v-model='drawer',:mini-variant="mini", persistent,enable-resize-watcher, :dark="dark")
+  v-navigation-drawer(v-model='drawer',:mini-variant="mini", persistent,enable-resize-watcher, :dark="dark", app)
     .pa-3.text-xs-center(v-show="!mini")
       div.display-1 Excellerify
       div(style="padding-left:5em")
@@ -34,7 +34,7 @@ v-app(:dark="dark",standalone)
           v-list-tile-action(v-if='item.subAction')
             v-icon.success--text {{ item.subAction }}
 
-  v-toolbar.darken-1(fixed,dark,:class="theme")
+  v-toolbar.darken-1(fixed,dark,:class="theme", app)
     v-toolbar-side-icon(dark, @click.stop='drawer = !drawer')
     v-toolbar-title {{$t(pageTitle)}}
     v-spacer
@@ -50,11 +50,12 @@ v-app(:dark="dark",standalone)
       v-list
         v-list-tile(v-for="n in colors", :key="n", :class="n",@mouseover.native="theme = n")
   main
-    v-container.pa-4(fluid)
-        v-alert(v-bind='message', v-model='message.body', dismissible) {{message.body}}
-        .py-2
-          v-slide-y-transition(mode='out-in')
-            router-view
+    v-content
+      v-container(fluid)
+          v-alert(v-bind='message', v-model='message.body', dismissible) {{message.body}}
+          .py-2
+            v-slide-y-transition(mode='out-in')
+              router-view
 </template>
 
 <script>
