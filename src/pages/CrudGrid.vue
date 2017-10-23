@@ -1,9 +1,7 @@
 <template lang="pug">
 div()
   v-layout
-    v-flex(md1)
-
-    v-flex(md6)
+    v-flex(xs12)
       v-form.row.jr(:inline='true', v-model='filters.model', v-if="filters.fields", :fields='filters.fields', @submit='doSearch', submitButtonText='Search', submitButtonIcon='search')
   v-card
     div
