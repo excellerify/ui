@@ -11,11 +11,10 @@ v-layout
 <script>
 
 export default {
-
   data() {
     return {
       model: {},
-      fields: {},
+      fields: null,
       rules: {},
       messages: {}
     }
@@ -27,7 +26,6 @@ export default {
     id() {
       return this.$route.params.id
     }
-
   },
   watch: {
     '$route': 'fetch',

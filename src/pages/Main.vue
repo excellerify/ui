@@ -1,6 +1,6 @@
 <template lang="pug">
 v-app(:dark="dark",standalone)
-  v-navigation-drawer(v-model='drawer',:mini-variant.sync="mini", persistent,enable-resize-watcher, :dark="dark")
+  v-navigation-drawer(v-model='drawer',:mini-variant="mini", persistent,enable-resize-watcher, :dark="dark")
     .pa-3.text-xs-center(v-show="!mini")
       div.display-1 Excellerify
       div(style="padding-left:5em")
@@ -33,8 +33,9 @@ v-app(:dark="dark",standalone)
             v-list-tile-title {{ $t(item.title) }}
           v-list-tile-action(v-if='item.subAction')
             v-icon.success--text {{ item.subAction }}
+
   v-toolbar.darken-1(fixed,dark,:class="theme")
-    v-toolbar-side-icon(dark, @click.native.stop='drawer = !drawer')
+    v-toolbar-side-icon(dark, @click.stop='drawer = !drawer')
     v-toolbar-title {{$t(pageTitle)}}
     v-spacer
     v-menu(offset-y)
