@@ -1,7 +1,18 @@
 <template lang="pug">
 v-flex(xs12)
+  //- if select2
   v-select(v-if="['select', 'select2'].includes(field.type)", :items='field.choices', v-model='model', v-bind='field')
-  template(v-else-if="['radios', 'radio', 'checkboxes'].indexOf(field.type) > -1")
+
+  //- if radio
+  v-layout(v-else-if="['radios', 'radio'].indexOf(field.type) > -1", row)
+    div.input-group
+      label {{$t(field.label)}}
+      v-flex(xs12)
+        v-radio-group(v-model="model", column, wrap)
+          v-radio(v-for='option in field.choices', :key="option.value", :label="option.text" :value="option.value")
+
+  //- if checkboxes
+  template(v-else-if="['checkboxes'].indexOf(field.type) > -1")
     v-layout(row, wrap, class="input-group")
       label {{$t(field.label)}}
       v-flex(v-bind="{[field.width]: true}", xs12)

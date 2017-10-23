@@ -171,15 +171,11 @@ export default {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.')
       let value = row[l1]
-      let tag = null
       if (l2) {
         value = row[l1] ? row[l1][l2] : null
       }
       if (field.type === 'image') {
-        tag = 'img'
-      }
-      if (tag) {
-        value = `<div class="avatar lighten-4"><${tag} src="${value}" class="crud-grid-thumb" controls /></div>`
+        value = `<v-avatar size="36px"><img src="${value}" class="crud-grid-thumb" controls /></v-avatar>`
       }
       return value
     },
