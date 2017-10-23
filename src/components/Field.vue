@@ -1,18 +1,19 @@
 <template lang="pug">
 v-flex(xs12)
   v-select(v-if="['select', 'select2'].includes(field.type)", :items='field.choices', v-model='model', v-bind='field')
-  template(v-else-if="['radios', 'checkboxes'].indexOf(field.type) > -1")
-    v-layout(row, wrap)
-      v-flex(v-bind="{[field.width]: true}",xs12, v-for='option in field.choices',:key="field.value")
-        component(
-          v-model='model',
-          hide-details,
-          :is="field.type == 'radios' ? 'v-radio' : 'v-checkbox'",
-          :key='option.value',
-          :value='option.value',
-          :label='option.text',
-        )
-      p {{$t(field.label)}}
+  template(v-else-if="['radios', 'radio', 'checkboxes'].indexOf(field.type) > -1")
+    v-layout(row, wrap, class="input-group")
+      label {{$t(field.label)}}
+      v-flex(v-bind="{[field.width]: true}", xs12)
+        span(v-for='option in field.choices', :key="field.value")
+          component(
+            v-model='model',
+            hide-details,
+            :is="field.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
+            :key='option.value',
+            :value='option.value',
+            :label='option.text',
+          )
   //- if input type is date or time
   template(v-else-if="['date', 'datetime', 'time'].indexOf(field.type) > -1")
     v-menu
@@ -45,11 +46,15 @@ v-flex(xs12)
 
   //- if table
   template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
-    label {{field.label}}
-    v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
-      template(slot="items", scope="props")
-        tr
-          td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
+   v-layout(row, wrap, class="input-group")
+      div(v-if="readonly===false")
+        v-btn(primary,fab,small,dark,absolute,right,class="green")
+          v-icon add
+      label {{field.label}}
+      v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
+        template(slot="items", scope="props")
+          tr
+            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
 
   //- default input
   v-text-field(v-else, v-model='model', v-bind='field', :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", :multiLine="field.type == 'textarea'", :v-validate="{required: field.required}")
@@ -75,6 +80,9 @@ export default {
     width: {
       type: Number,
       required: false
+    },
+    readonly: {
+      type: Boolean
     }
   },
   data() {
