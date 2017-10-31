@@ -8,7 +8,7 @@ div()
       v-btn(router,fab,absolute,top,right,dark,class="green", :to="{name: 'create', params: {resource}}", v-if="options.create")
         v-icon add
     v-data-table(:headers='columns', :items='items',:total-items="pagination.totalItems",hide-actions, :pagination.sync="pagination", :loading="loading")
-      template(slot='items', scope='props')
+      template(slot='items', slot-scope='props')
         tr
           td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
           td(v-if='actions', width='auto')
@@ -38,7 +38,6 @@ div()
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
   //- TODO move delete dialog here @sofyanhadia
-
   v-dialog(v-model="isShowEdit", width="70%")
     v-card
       v-card-title {{$t('Edit')}} \#{{currentItem.id}}
@@ -185,6 +184,7 @@ export default {
           for (let k in data.columns) {
             data.columns[k].text = this.$t(data.columns[k].text)
           }
+
           this.columns = data.columns || {}
           this.actions = data.actions || {}
 

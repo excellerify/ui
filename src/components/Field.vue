@@ -40,11 +40,8 @@ v-flex(xs12)
   div(:class="inputGroupClass",v-else-if="['file', 'pdf', 'image', 'video'].includes(field.type)")
     label {{$t(field.label)}}
     div.pt-2
-      dropzone(:acceptedFileTypes="field.acceptedFileTypes",
-        :withCredentials="true",
-        :id="'dropzone_' + name",
-        :url="$store.state.config.ajaxUploadUrl + '/' + resource + '/upload'",
-        :createThumbnailFromUrl="model"
+      dropzone(
+        :options="getDropzoneOptions(field, model)"
         @vdropzone-sending="onUploading"
         @vdropzone-success="onUploadSuccess")
         input(type='hidden', v-model='model')
@@ -63,7 +60,7 @@ v-flex(xs12)
           v-icon add
       label {{field.label}}
       v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
-        template(slot="items", scope="props")
+        template(slot="items", slot-scope="props")
           tr
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
 
@@ -72,6 +69,7 @@ v-flex(xs12)
 </template>
 
 <script>
+import 'vue2-dropzone/dist/vue2Dropzone.css'
 import randomstring from 'randomstring'
 import config from '../config'
 
@@ -142,6 +140,17 @@ export default {
         return row[l1] ? row[l1][l2] : null
       } else {
         return row[l1]
+      }
+    },
+    getDropzoneOptions(field, model) {
+      return {
+        url: this.$store.state.config.ajaxUploadUrl + '/' + this.resource + '/upload',
+        thumbnailWidth: 150,
+        maxFilesize: 1024,
+        withCredentials: true,
+        acceptedFileTypes: field.acceptedFileTypes,
+        id: 'dropzone_' + this.name,
+        createThumbnailFromUrl: model
       }
     }
   }
