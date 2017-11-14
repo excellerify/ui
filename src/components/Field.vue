@@ -149,7 +149,6 @@ export default {
         maxFilesize: 1024,
         withCredentials: true,
         acceptedFileTypes: field.acceptedFileTypes,
-        id: 'dropzone_' + this.name,
         createThumbnailFromUrl: model
       }
     }

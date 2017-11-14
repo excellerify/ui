@@ -11,7 +11,7 @@ div()
       template(slot='items', slot-scope='props')
         tr
           td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
-          td(v-if='actions', width='auto')
+          td(:width='Object.keys(options).length * 48', align="center")
             template(v-for="(value, action) in actions")
               v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router,primary,fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                 v-icon {{action.icon ? action.icon : action}}
@@ -34,7 +34,13 @@ div()
                     v-spacer
                     v-btn(small,@click.native="deleteModal = []") No
                     v-btn(small,@click.native="remove(props.item.id)") Yes
-    .jc
+
+            v-btn(v-if="typeof options.lock === 'object'",fab,small,@click="lock(props.item)")
+              v-icon lock
+
+            v-btn(v-if="typeof options.custom === 'object'",fab,small,@click="customAction(props.item)")
+              v-icon {{options.custom.icon}}
+
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
   //- TODO move delete dialog here @sofyanhadia
