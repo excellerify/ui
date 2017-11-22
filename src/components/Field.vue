@@ -8,8 +8,13 @@ v-flex(xs12)
     div.input-group
       label {{$t(field.label)}}
       v-flex(xs12)
-        v-radio-group(v-model="model", column, wrap)
-          v-radio(v-for='option in field.choices', :key="option.value", :label="option.text" :value="option.value")
+        v-radio-group(v-model="model", column, wrap, :readonly="readonly")
+          v-radio(
+            v-for='option in field.choices',
+            :key="option.value",
+            :label="option.text",
+            :value="option.value",
+            :disabled="readonly")
 
   //- if checkboxes
   template(v-else-if="['checkboxes'].indexOf(field.type) > -1")
@@ -24,17 +29,20 @@ v-flex(xs12)
             :key='option.value',
             :value='option.value',
             :label='option.text',
-          )
+            :disabled="readonly")
+
   //- if input type is date or time
   template(v-else-if="['date', 'datetime', 'time'].indexOf(field.type) > -1")
     v-menu
       v-text-field(slot='activator', v-model='model', :label="$t(field.label)")
       v-date-picker(v-model='model', no-title, scrollable, actions)
+
   //- if input type is html
   div(:class="inputGroupClass",v-else-if="field.type == 'html'")
     label {{$t(field.label)}}
     div.pt-2
       quill-editor(v-model='model', :options="editorOption")
+
   //- if input type is file
   //- TODO dropzone
   div(:class="inputGroupClass",v-else-if="['file', 'pdf', 'image', 'video'].includes(field.type)")
@@ -50,12 +58,12 @@ v-flex(xs12)
   input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model')
 
   //- if email
-  v-text-field(v-else-if="field.type == 'email'", v-model='model', v-bind='field', field="$t(field.label)", :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", v-validate="{'required': field.required, 'email': true}")
+  v-text-field(v-else-if="field.type == 'email'", v-model='model', v-bind='field', :readonly="readonly", field="$t(field.label)", :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", v-validate="{'required': field.required, 'email': true}")
 
   //- if table
   template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
    v-layout(row, wrap, class="input-group")
-      div(v-if="readonly===false")
+      div(v-if="!readonly")
         v-btn(primary,fab,small,dark,absolute,right,class="green")
           v-icon add
       label {{field.label}}
@@ -65,7 +73,16 @@ v-flex(xs12)
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
 
   //- default input
-  v-text-field(v-else, v-model='model', v-bind='field', :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", :multiLine="field.type == 'textarea'", :v-validate="{required: field.required}")
+  v-text-field(
+    v-else,
+    v-model='model',
+    v-bind='field',
+    :readonly="readonly",
+    :label="$t(field.label)",
+    :placeholder="$t(field.placeholder)",
+    :type="field.type",
+    :multiLine="field.type == 'textarea'",
+    :v-validate="{required: field.required}")
 </template>
 
 <script>
@@ -99,14 +116,15 @@ export default {
       inputGroupClass: 'input-group input-group--dirty input-group--text-field',
       editorOption: {
         modules: {
-          toolbar:
-          [['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-          ['blockquote', 'code-block'],
-          [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-          [{'list': 'ordered'}, { 'list': 'bullet' }],
-          [{'indent': '-1'}, { 'indent': '+1' }],
-          [{ 'align': [] }]]
+          toolbar: [
+            ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            ['blockquote', 'code-block'],
+            [{ header: 1 }, { header: 2 }], // custom button values
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }],
+            [{ align: [] }]
+          ]
         }
       }
     }
@@ -131,7 +149,10 @@ export default {
     },
     onUploadSuccess(file, response) {
       const filename = response.result.files.file[0].name
-      this.$emit('input', `${config.api}Files/${this.resource}/download/${filename}`)
+      this.$emit(
+        'input',
+        `${config.api}Files/${this.resource}/download/${filename}`
+      )
     },
     getColumnData(row, field) {
       // process fields like `type.name`
@@ -144,11 +165,16 @@ export default {
     },
     getDropzoneOptions(field, model) {
       return {
-        url: this.$store.state.config.ajaxUploadUrl + '/' + this.resource + '/upload',
+        url:
+          this.$store.state.config.ajaxUploadUrl +
+          '/' +
+          this.resource +
+          '/upload',
         thumbnailWidth: 150,
         maxFilesize: 1024,
         withCredentials: true,
         acceptedFileTypes: field.acceptedFileTypes,
+        id: 'dropzone_' + this.name,
         createThumbnailFromUrl: model
       }
     }

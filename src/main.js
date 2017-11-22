@@ -60,11 +60,13 @@ import validator from 'Validator'
 global.validator = validator
 
 import VForm from './components/Form.vue'
+import VView from './components/View.vue'
+
 import VField from './components/Field.vue'
 
 // import Modal from './components/Modal' Vue.use(Modal)
-
 Vue.component('v-form', VForm)
+Vue.component('v-view', VView)
 Vue.component('v-field', VField)
 
 /* eslint-disable no-new */

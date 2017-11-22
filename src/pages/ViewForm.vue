@@ -1,7 +1,7 @@
 <template lang="pug">
 v-layout
   v-flex(xs12)
-    v-form(v-model="model", v-bind="$data")
+    v-view(v-model="model", v-bind="$data")
       div(slot="buttons",class="my-4")
         v-btn(dark, class="grey",@click.native="$root.back()")
           v-icon(dark, left) chevron_left
