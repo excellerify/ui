@@ -1,19 +1,19 @@
-import Vue from 'vue'
-import config from '@/config'
-import VueI18n from 'vue-i18n'
-import helper from '../helper'
-const locales = ['en-US']
+import Vue from 'vue';
+import config from '@/config';
+import VueI18n from 'vue-i18n';
+import helper from '../helper';
+const locales = ['en-US'];
 
-Vue.use(VueI18n)
+Vue.use(VueI18n);
 
-let messages = {}
+let messages = {};
 locales.forEach(v => {
-  messages[v] = require(`./${v}/index`).default
-})
+  messages[v] = require(`./${v}/index`).default;
+});
 const i18n = new VueI18n({
   locale: helper.ls.get('locale', config.locale),
   silentTranslationWarn: true,
   messages
-})
+});
 
-export default i18n
+export default i18n;

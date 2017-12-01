@@ -1,6 +1,6 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-Vue.use(Router)
+import Vue from 'vue';
+import Router from 'vue-router';
+Vue.use(Router);
 
 function route(path, file, name, children, requiresAuth) {
   return {
@@ -12,7 +12,7 @@ function route(path, file, name, children, requiresAuth) {
     meta: {
       requiresAuth: requiresAuth || false
     }
-  }
+  };
 }
 
 const router = new Router({
@@ -39,7 +39,7 @@ const router = new Router({
     // Global redirect for 404
     { path: '*', redirect: '/error', query: {code: 404, message: 'Page Not Found.'} }
   ]
-})
+});
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth) && !global.helper.ls.get('token')) {
@@ -48,18 +48,18 @@ router.beforeEach((to, from, next) => {
       query: {
         redirect: to.fullPath
       }
-    })
+    });
   } else {
     global
       .store
-      .dispatch('checkPageTitle', to.path)
+      .dispatch('checkPageTitle', to.path);
     /* eslint-disable no-undef */
     if (typeof ga !== 'undefined') {
-      ga('set', 'page', to.path)
-      ga('send', 'pageview')
+      ga('set', 'page', to.path);
+      ga('send', 'pageview');
     }
-    next()
+    next();
   }
-})
+});
 
-export default router
+export default router;

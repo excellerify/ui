@@ -61,10 +61,10 @@
         return {
           modal: false,
           modal2: false
-        }
+        };
       },
 
       mounted () {
       }
-    }
+    };
 </script>

@@ -18,9 +18,9 @@ v-container
       v-text-field(v-model='message', label='Type your message and press Enter to send...', @keyup.enter.native='send')
 </template>
 <script>
-import ws from 'adonis-websocket-client'
-const io = ws(global.config.url, {})
-const client = io.channel('chat')
+import ws from 'adonis-websocket-client';
+const io = ws(global.config.url, {});
+const client = io.channel('chat');
 
 export default {
   data () {
@@ -29,37 +29,37 @@ export default {
       message: '',
       showWarning: false,
       maxLength: 6
-    }
+    };
   },
   methods: {
     send () {
       if (this.message.length < 1) {
-        return false
+        return false;
       }
-      client.emit('message', this.message)
-      this.message = ''
+      client.emit('message', this.message);
+      this.message = '';
     }
   },
   mounted () {
     client.connect((error, connected) => {
       if (error) {
-        this.showWarning = true
-        return false
+        this.showWarning = true;
+        return false;
         // do something
       }
-      console.log('connected: ', connected)
-      client.emit('message', 'hello')
+      console.log('connected: ', connected);
+      client.emit('message', 'hello');
       // all good
-    })
+    });
     client.on('error', (message) => {
-      console.log(message)
-    })
+      console.log(message);
+    });
     client.on('message', (message) => {
-      this.list.push(message)
+      this.list.push(message);
       if (this.list.length > this.maxLength) {
-        this.list.shift()
+        this.list.shift();
       }
-    })
+    });
   }
-}
+};
 </script>

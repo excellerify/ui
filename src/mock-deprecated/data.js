@@ -1,11 +1,11 @@
-import Mock from 'mockjs'
+import Mock from 'mockjs';
 
 let data = {
   users: [],
   types: [],
   posts: [],
   comments: []
-}
+};
 for (let i = 1; i <= 30; i++) {
   data.users.push(Mock.mock({
     id: i,
@@ -17,10 +17,10 @@ for (let i = 1; i <= 30; i++) {
     created_at: '@datetime',
     updated_at: '@datetime',
     deleted_at: null
-  }))
+  }));
 }
 
-data.users[0].username = 'admin' // default user
+data.users[0].username = 'admin'; // default user
 
 for (let i = 1; i <= 6; i++) {
   data.types.push(Mock.mock({
@@ -29,7 +29,7 @@ for (let i = 1; i <= 6; i++) {
     created_at: '@datetime',
     updated_at: '@datetime',
     deleted_at: null
-  }))
+  }));
 }
 
 for (let i = 1; i <= 33; i++) {
@@ -43,7 +43,7 @@ for (let i = 1; i <= 33; i++) {
     created_at: '@datetime',
     updated_at: '@datetime',
     deleted_at: null
-  }))
+  }));
 }
 
 for (let i = 1; i <= 20; i++) {
@@ -57,16 +57,16 @@ for (let i = 1; i <= 20; i++) {
     created_at: '@datetime',
     updated_at: '@datetime',
     deleted_at: null
-  }))
+  }));
 }
 
 data.choices = resource => {
-  let ret = []
-  let models = data[resource]
+  let ret = [];
+  let models = data[resource];
   for (let k in models) {
-    ret.push({ text: models[k].name, value: models[k].id })
+    ret.push({ text: models[k].name, value: models[k].id });
   }
-  return ret
-}
+  return ret;
+};
 
-export default data
+export default data;
