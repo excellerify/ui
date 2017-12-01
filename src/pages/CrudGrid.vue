@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  v-alert(outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
+  v-alert(v-if="error" outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
   v-layout
     v-flex(xs12)
       v-form.row.jr(:inline='true', v-model='filters.model', v-if="filters.fields", :fields='filters.fields', @submit='doSearch', submitButtonText='Search', submitButtonIcon='search')
