@@ -12,15 +12,15 @@ export default {
   data() {
     return {
       background: ''
-    }
+    };
   },
   methods: {
     changeBackground(val) {
-      document.body.style.background = val
+      document.body.style.background = val;
     }
   },
   mounted() {
-    this.changeBackground('darkgreen')
+    this.changeBackground('darkgreen');
   }
-}
+};
 </script>

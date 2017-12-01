@@ -1,6 +1,6 @@
-import Vue from 'vue'
-import axios from 'axios'
-import config from './config'
+import Vue from 'vue';
+import axios from 'axios';
+import config from './config';
 
 // enable mock
 // import mock from './mock'
@@ -12,41 +12,41 @@ var http = axios.create({
   baseURL: config.api,
   timeout: 1000
   // headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-})
+});
 
 http.interceptors.request.use(function (request) {
-  return request
+  return request;
 }, function (error) {
   // Do something with request error
-  return Promise.reject(error)
-})
+  return Promise.reject(error);
+});
 
 http.interceptors.response.use(function (response) {
-  const request = response.config
+  const request = response.config;
   if (config.debug.http) {
     console.log(
       '>>>', request.method.toUpperCase(), request.url, request.params,
       '\n   ', response.status, response.data
-    )
+    );
   }
-  return response
+  return response;
 }, function (error) {
   if (config.debug.http) {
-    let { response, config: request } = error
+    let { response, config: request } = error;
     if (request) {
       console.log(
         '>>>', request.method.toUpperCase(), request.url, request.params,
         '\n   ', response.status, response.data
-      )
+      );
     }
   }
 
   if (error.response.status === 401 || error.response.status === 403) {
-    global.store.dispatch('clearAuth')
+    global.store.dispatch('clearAuth');
   }
 
   // Do something with response error
-  return Promise.reject(error)
-})
+  return Promise.reject(error);
+});
 
-Vue.prototype.$http = http
+Vue.prototype.$http = http;

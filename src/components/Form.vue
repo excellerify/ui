@@ -83,39 +83,39 @@ export default {
       hasError: false,
       errors: [],
       message: ''
-    }
+    };
   },
 
   computed: {
     group() {
       if (!this.groupBy) {
-        return null
+        return null;
       }
-      let parents = {}
-      let children = {}
+      let parents = {};
+      let children = {};
       for (let k in this.fields) {
-        let field = this.fields[k]
-        let ref = field[this.groupBy]
-        let parentKey = field.id
+        let field = this.fields[k];
+        let ref = field[this.groupBy];
+        let parentKey = field.id;
         if (ref === null) { // is parent
-          parents[parentKey] = field
+          parents[parentKey] = field;
         } else { // is child
           if (!children[ref]) {
-            children[ref] = {}
+            children[ref] = {};
           }
-          children[ref][k] = field
+          children[ref][k] = field;
         }
       }
-      return { parents, children }
+      return { parents, children };
     },
 
     autoSubmit() {
-      return !!this.action
+      return !!this.action;
     }
   },
   watch: {
     'value'(val) {
-      this.model = val
+      this.model = val;
     },
     'model': 'updateFields'
   },
@@ -124,9 +124,9 @@ export default {
     getGroupedFields() { },
     getFieldError(fieldName) {
       for (let k in this.errors) {
-        let error = this.errors[k]
+        let error = this.errors[k];
         if (error.field === fieldName) {
-          return error.message
+          return error.message;
         }
       }
     },
@@ -135,32 +135,32 @@ export default {
     },
 
     onSubmit() {
-      const valid = global.validator.make(this.model, this.rules, this.messages)
+      const valid = global.validator.make(this.model, this.rules, this.messages);
       if (valid.passes()) {
-        this.$emit('input', this.model)
+        this.$emit('input', this.model);
         if (!this.autoSubmit) {
-          this.$emit('submit')
-          return false
+          this.$emit('submit');
+          return false;
         }
 
         this.$http[this.method](this.action, this.model).then(({ data }) => {
-          this.$emit('success', data)
-          this.hasError = false
+          this.$emit('success', data);
+          this.hasError = false;
         }).catch(({ response }) => {
-          const status = response.status
+          const status = response.status;
 
-          this.hasError = true
+          this.hasError = true;
           if (response.data.error.message) {
-            this.errors = [response.data.error]
+            this.errors = [response.data.error];
           }
 
-          this.$emit('error', status, response.data.error)
-        })
+          this.$emit('error', status, response.data.error);
+        });
       } else {
-        const errors = valid.getErrors()
-        this.hasError = true
-        this.errors = errors
-        this.$emit('error', errors)
+        const errors = valid.getErrors();
+        this.hasError = true;
+        this.errors = errors;
+        this.$emit('error', errors);
         // this.$bus.showMessage('error', 'error')
       }
     }
@@ -177,5 +177,5 @@ export default {
     //   })
     // }, this.$t('Field should be unique.'))
   }
-}
+};
 </script>

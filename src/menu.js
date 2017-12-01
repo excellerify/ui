@@ -4,4 +4,4 @@ export default [
   { divider: true },
   { 'header': 'System' },
   { 'href': '/logout', 'icon': 'lock', 'title': 'Logout' }
-]
+];

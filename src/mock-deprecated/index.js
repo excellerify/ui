@@ -1,32 +1,32 @@
-import axios from 'axios'
-import MockAdapter from 'axios-mock-adapter'
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 
-import data from './data'
+import data from './data';
 
-let mock = new MockAdapter(axios, { delayResponse: 80 })
+let mock = new MockAdapter(axios, { delayResponse: 80 });
 
 mock.onGet('/users').reply(200, {
   data: data.users.slice(0, 10)
-})
+});
 
 mock.onPost('/login').reply(200, {
   user: data.users[0],
   token: 'DFJ091283U09AODFUP018923U4J123J'
-})
+});
 
 // for `index` action of resources
 mock.onGet(/\/(posts|users|types|comments)$/).reply(({ params = { page: 1, perPage: 10 }, url }) => {
-  let resource = url.split('/')[1]
-  let offset = (params.page - 1) * params.perPage
-  let models = data[resource]
+  let resource = url.split('/')[1];
+  let offset = (params.page - 1) * params.perPage;
+  let models = data[resource];
   return [200, {
     currentPage: params.page,
     lastPage: Math.ceil(models.length / params.perPage),
     perPage: params.perPage,
     total: data[resource].length,
     data: models.slice(offset, offset + params.perPage)
-  }]
-})
+  }];
+});
 
 mock.onGet('/types/grid').reply(200, {
   'options': {
@@ -62,7 +62,7 @@ mock.onGet('/types/grid').reply(200, {
       'value': 'name'
     }
   ]
-})
+});
 
 mock.onGet('/settings/form').reply(({ params }) => {
   return [200, {
@@ -107,8 +107,8 @@ mock.onGet('/settings/form').reply(({ params }) => {
       'description': {label: 'Description(Textarea)', type: 'textarea'},
       'intro': {label: 'Intro', type: 'html'}
     }
-  }]
-})
+  }];
+});
 
 mock.onGet('/types/form').reply(({ params }) => {
   return [200, {
@@ -119,8 +119,8 @@ mock.onGet('/types/form').reply(({ params }) => {
         'required': true
       }
     }
-  }]
-})
+  }];
+});
 
 mock.onGet('/posts/form').reply(({ params }) => {
   return [200, {
@@ -146,18 +146,18 @@ mock.onGet('/posts/form').reply(({ params }) => {
       }
 
     }
-  }]
-})
+  }];
+});
 
 // for `update` action of resources
 mock.onPatch(/\/\w+\/\d+$/).reply(({ params, data: body, url }) => {
   // const id = url.split('/')[2]
-  return [200, body]
-})
+  return [200, body];
+});
 mock.onPost(/\/\w+$/).reply(({ params, data: body, url }) => {
   // const id = url.split('/')[1]
-  return [200, body]
-})
+  return [200, body];
+});
 mock.onGet('/posts/grid').reply(200, {
   'options': {
     'sort': '-id',
@@ -207,8 +207,8 @@ mock.onGet('/posts/grid').reply(200, {
       'value': 'created_at'
     }
   ]
-})
-mock.onGet('/users').reply(200, data.users[0])
+});
+mock.onGet('/users').reply(200, data.users[0]);
 
 mock.onGet('/users/grid').reply(200, {
   'options': {
@@ -255,7 +255,7 @@ mock.onGet('/users/grid').reply(200, {
     }
 
   ]
-})
+});
 
 mock.onGet('/users/form').reply(({ params }) => {
   return [200, {
@@ -275,8 +275,8 @@ mock.onGet('/users/form').reply(({ params }) => {
       }
 
     }
-  }]
-})
+  }];
+});
 
 mock.onGet(/\/\w+\/grid$/i).reply(({ params, url }) => {
   return [200, {
@@ -310,8 +310,8 @@ mock.onGet(/\/\w+\/grid$/i).reply(({ params, url }) => {
         'value': 'created_at'
       }
     ]
-  }]
-})
+  }];
+});
 
-export default mock
+export default mock;
 

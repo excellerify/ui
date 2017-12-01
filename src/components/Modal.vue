@@ -48,22 +48,22 @@ export default {
   data () {
     return {
       show: this.value
-    }
+    };
   },
   watch: {
     value (val) {
-      this.show = val
+      this.show = val;
     }
   },
   methods: {
     onOk () {
-      this.$emit('ok')
+      this.$emit('ok');
     },
     onCancel () {
-      this.$emit('cancel')
-      this.show = false
+      this.$emit('cancel');
+      this.show = false;
     }
   }
-}
+};
 
 </script>

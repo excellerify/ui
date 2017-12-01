@@ -12,7 +12,7 @@ export default {
   data () {
     return {
 
-    }
+    };
   },
   methods: {
 
@@ -20,6 +20,6 @@ export default {
   created () {
     // this.$http.get('/users').then(({data}) => console.log(data))
   }
-}
+};
 </script>
 

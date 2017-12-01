@@ -86,9 +86,9 @@ v-flex(xs12)
 </template>
 
 <script>
-import 'vue2-dropzone/dist/vue2Dropzone.css'
-import randomstring from 'randomstring'
-import config from '../config'
+import 'vue2-dropzone/dist/vue2Dropzone.css';
+import randomstring from 'randomstring';
+import config from '../config';
 
 export default {
   props: {
@@ -127,40 +127,40 @@ export default {
           ]
         }
       }
-    }
+    };
   },
   computed: {
     resource() {
-      return this.$route.params.resource
+      return this.$route.params.resource;
     },
     model: {
       get() {
-        return this.value
+        return this.value;
       },
       set(val) {
-        this.$emit('input', val)
+        this.$emit('input', val);
       }
     }
   },
   methods: {
     onUploading(file, xhr, formData) {
-      const extension = file.name.split('.')
-      file.upload.filename = `${randomstring.generate()}.${extension[extension.length - 1]}`
+      const extension = file.name.split('.');
+      file.upload.filename = `${randomstring.generate()}.${extension[extension.length - 1]}`;
     },
     onUploadSuccess(file, response) {
-      const filename = response.result.files.file[0].name
+      const filename = response.result.files.file[0].name;
       this.$emit(
         'input',
         `${config.api}Files/${this.resource}/download/${filename}`
-      )
+      );
     },
     getColumnData(row, field) {
       // process fields like `type.name`
-      let [l1, l2] = field.split('.')
+      let [l1, l2] = field.split('.');
       if (l2) {
-        return row[l1] ? row[l1][l2] : null
+        return row[l1] ? row[l1][l2] : null;
       } else {
-        return row[l1]
+        return row[l1];
       }
     },
     getDropzoneOptions(field, model) {
@@ -176,8 +176,8 @@ export default {
         acceptedFileTypes: field.acceptedFileTypes,
         id: 'dropzone_' + this.name,
         createThumbnailFromUrl: model
-      }
+      };
     }
   }
-}
+};
 </script>
