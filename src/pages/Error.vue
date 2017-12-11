@@ -20,10 +20,10 @@ export default {
     return {
       code: this.$route.query.code || 404,
       message: this.$route.query.message || 'Page Not Found.'
-    }
+    };
   },
 
   mounted () {
   }
-}
+};
 </script>

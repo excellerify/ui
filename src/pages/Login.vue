@@ -13,10 +13,6 @@ div
       v-card-row
         v-alert.py-2(error, v-model='hasError')
           div {{error.message}}
-      //- v-card-row
-      //-   v-card-text.pt-2
-      //-     google-signin
-
 </template>
 
 <style>
@@ -42,11 +38,11 @@ export default {
       error: {
         message: ''
       }
-    }
+    };
   },
   computed: {
     token() {
-      return global.helper.ls.get('token')
+      return global.helper.ls.get('token');
     }
   },
   methods: {
@@ -56,35 +52,35 @@ export default {
           username: this.model.username,
           password: this.model.password
         }).then(response => {
-          global.store.dispatch('doLogin', { user: response.data.userId, token: response.data.id, expireTime: response.data.ttl })
+          global.store.dispatch('doLogin', { user: response.data.userId, token: response.data.id, expireTime: response.data.ttl });
         }, ({ response }) => {
-          this.hasError = true
+          this.hasError = true;
 
           if (response.status === 401 || response.status === 403) {
-            this.error.message = 'invalid username or password'
-            this.$emit('error', response.status, [{ message: 'invalid username or password' }])
+            this.error.message = 'invalid username or password';
+            this.$emit('error', response.status, [{ message: 'invalid username or password' }]);
           } else {
-            this.error = response.data.error
-            this.$emit('error', response.status, response.data.error)
+            this.error = response.data.error;
+            this.$emit('error', response.status, response.data.error);
           }
-        })
+        });
     },
     doLogout() {
       this.$http
         .post('admins/logout').then(response => {
           global
             .store
-            .dispatch('clearAuth')
-        }, err => console.log(err))
+            .dispatch('clearAuth');
+        }, err => console.log(err));
     },
     authenticate(provider) {
       this.$auth.authenticate(provider).then(function(data) {
         // Execute application logic after successful social authentication
-      })
+      });
     }
   },
   beforeMount() {
-    this.getUnits()
+    this.getUnits();
   }
-}
+};
 </script>

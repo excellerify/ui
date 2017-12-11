@@ -60,7 +60,7 @@ v-app(:dark="dark",standalone)
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapState } from 'vuex';
 
 export default {
   data () {
@@ -71,15 +71,15 @@ export default {
       drawer: true,
       locales: ['en-US'],
       colors: ['blue', 'green', 'purple', 'red']
-    }
+    };
   },
   computed: {
     ...mapState(['message', 'menu', 'pageTitle'])
   },
   methods: {
     changeLocale (to) {
-      global.helper.ls.set('locale', to)
-      this.$i18n.locale = to
+      global.helper.ls.set('locale', to);
+      this.$i18n.locale = to;
     },
     fetchMenu () {
       // fetch menu from server
@@ -88,8 +88,8 @@ export default {
   },
 
   created () {
-    this.fetchMenu()
+    this.fetchMenu();
   }
-}
+};
 </script>
 

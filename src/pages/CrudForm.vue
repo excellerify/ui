@@ -1,93 +1,97 @@
 <template lang="pug">
-v-layout
-  v-flex(xs12)
-    v-form(v-model="model", v-bind="$data", :method="method", :action="action", @success="onSuccess")
-      div(slot="buttons",class="my-4")
-        v-btn(dark, class="grey",@click.native="$root.back()")
-          v-icon(dark, left) chevron_left
-          span {{$t('Back')}}
-        v-btn(primary, dark, type='submit') {{$t('Submit')}}
-          v-icon(right, dark) send
+div
+  v-alert(v-if="error" outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
+  v-layout
+    v-flex(xs12)
+      v-form(v-model="model", v-bind="$data", :method="method", :action="action", @success="onSuccess")
+        div(slot="buttons",class="my-4")
+          v-btn(dark, class="grey",@click.native="$root.back()")
+            v-icon(dark, left) chevron_left
+            span {{$t('Back')}}
+          v-btn(primary, dark, type='submit') {{$t('Submit')}}
+            v-icon(right, dark) send
 </template>
 
 <script>
-
 export default {
-
-  data () {
+  data() {
     return {
       model: {},
       fields: {},
       rules: {},
-      messages: {}
-    }
+      messages: {},
+      error: null
+    };
   },
   computed: {
-    method () {
-      return this.isEdit ? 'patch' : 'post'
+    method() {
+      return this.isEdit ? 'patch' : 'post';
     },
-    action () {
+    action() {
       if (this.isEdit) {
-        return `${this.resource}/${this.id}`
+        return `${this.resource}/${this.id}`;
       } else {
-        return `${this.resource}`
+        return `${this.resource}`;
       }
     },
-    isEdit () {
-      return !!this.id
+    isEdit() {
+      return !!this.id;
     },
-    resource () {
-      return this.$route.params.resource
+    resource() {
+      return this.$route.params.resource;
     },
-    id () {
-      return this.$route.params.id
+    id() {
+      return this.$route.params.id;
     }
-
   },
   watch: {
-    '$route': 'fetch',
-    'model': 'updateFields'
+    $route: 'fetch',
+    model: 'updateFields'
   },
   methods: {
-    getFieldError (fieldName) {
+    getFieldError(fieldName) {
       for (let k in this.errors) {
-        let error = this.errors[k]
+        let error = this.errors[k];
         if (error.field === fieldName) {
-          return error.message
+          return error.message;
         }
       }
     },
-    updateFields () {
-
+    updateFields() {},
+    fetch() {
+      this.$http
+        .get(`${this.resource}/form`, {
+          params: { id: this.id }
+        })
+        .then(({ data }) => {
+          data = data.schema;
+          this.model = data.model;
+          this.fields = data.fields;
+          this.rules = data.rules;
+          this.messages = data.messages;
+        })
+        .catch(({ response }) => {
+          this.error = response.data.error;
+        });
     },
-    fetch () {
-      this.$http.get(`${this.resource}/form`, {
-        params: {id: this.id}
-      }).then(({data}) => {
-        data = data.schema
-        this.model = data.model
-        this.fields = data.fields
-        this.rules = data.rules
-        this.messages = data.messages
-      })
-    },
-    onSubmit () {
-
-    },
-    onSuccess (data) {
-      this.$router.push({name: 'grid', params: {resource: this.resource}})
+    onSubmit() {},
+    onSuccess(data) {
+      this.$router.push({ name: 'grid', params: { resource: this.resource } });
       if (data.id) {
         // this.$router.go(-1)
       }
     }
   },
-  created () {
-    let pageTitle = (this.isEdit ? 'Update' : 'Create') + ' ' + global.helper.i.titleize(global.helper.i.singularize(this.resource))
-    this.$store.commit('setPageTitle', pageTitle)
+  created() {
+    let pageTitle =
+      (this.isEdit ? 'Update' : 'Create') +
+      ' ' +
+      global.helper.i.titleize(global.helper.i.singularize(this.resource));
+    this.$store.commit('setPageTitle', pageTitle);
   },
-  mounted () {
+  mounted() {
     // this.$bus.showMessage('success', 'success')
-    this.fetch()
+    this.fetch();
   }
-}
+};
 </script>

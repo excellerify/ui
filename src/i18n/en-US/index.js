@@ -5,4 +5,4 @@ export default {
   'Edit': 'Edit',
   'Close': 'Close',
   'Field should be unique.': 'Field should be unique.'
-}
+};

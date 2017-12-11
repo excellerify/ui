@@ -23,12 +23,12 @@ export default {
       fields: {},
       rules: {},
       messages: {}
-    }
+    };
   },
   computed: {
 
     isEdit () {
-      return !!this.id
+      return !!this.id;
     }
 
   },
@@ -39,9 +39,9 @@ export default {
   methods: {
     getFieldError (fieldName) {
       for (let k in this.errors) {
-        let error = this.errors[k]
+        let error = this.errors[k];
         if (error.field === fieldName) {
-          return error.message
+          return error.message;
         }
       }
     },
@@ -52,11 +52,11 @@ export default {
       this.$http.get(`settings/form`, {
         params: {id: this.id}
       }).then(({data}) => {
-        this.model = data.model
-        this.fields = data.fields
-        this.rules = data.rules
-        this.messages = data.messages
-      })
+        this.model = data.model;
+        this.fields = data.fields;
+        this.rules = data.rules;
+        this.messages = data.messages;
+      });
     },
     onSubmit () {
 
@@ -69,7 +69,7 @@ export default {
 
   },
   mounted () {
-    this.fetch()
+    this.fetch();
   }
-}
+};
 </script>

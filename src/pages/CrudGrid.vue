@@ -1,5 +1,6 @@
 <template lang="pug">
-div()
+div
+  v-alert(v-if="error" outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
   v-layout
     v-flex(xs12)
       v-form.row.jr(:inline='true', v-model='filters.model', v-if="filters.fields", :fields='filters.fields', @submit='doSearch', submitButtonText='Search', submitButtonIcon='search')
@@ -11,7 +12,7 @@ div()
       template(slot='items', slot-scope='props')
         tr
           td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
-          td(v-if='actions', width='auto')
+          td(:width='Object.keys(options).length * 48', align="center")
             template(v-for="(value, action) in actions")
               v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router,primary,fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                 v-icon {{action.icon ? action.icon : action}}
@@ -34,7 +35,13 @@ div()
                     v-spacer
                     v-btn(small,@click.native="deleteModal = []") No
                     v-btn(small,@click.native="remove(props.item.id)") Yes
-    .jc
+
+            v-btn(v-if="typeof options.lock === 'object'",fab,small,@click="lock(props.item)")
+              v-icon lock
+
+            v-btn(v-if="typeof options.custom === 'object'",fab,small,@click="customAction(props.item)")
+              v-icon {{options.custom.icon}}
+
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
   //- TODO move delete dialog here @sofyanhadia
@@ -48,7 +55,7 @@ div()
 </template>
 
 <script>
-import config from '../config'
+import config from '../config';
 
 const getDefaultData = () => {
   return {
@@ -79,26 +86,26 @@ const getDefaultData = () => {
     },
     isShowEdit: false,
     currentItem: false,
-    items: []
-  }
-}
+    items: [],
+    error: null
+  };
+};
 
 export default {
-
   data: getDefaultData,
 
   watch: {
     '$i18n.locale'(val) {
-      this.fetchGrid()
+      this.fetchGrid();
     },
     'pagination.page'(val) {
-      this.fetchData()
+      this.fetchData();
     },
     'pagination.sortBy'(val) {
-      this.fetchData()
+      this.fetchData();
     },
     'pagination.descending'(val) {
-      this.fetchData()
+      this.fetchData();
     },
     '$route.params': 'refresh'
     // '$route.query': 'updateRoute'
@@ -106,149 +113,171 @@ export default {
 
   methods: {
     fetchForm(item) {
-      this.$http.get(`${this.resource}/form`, {
-        params: { id: item.id }
-      }).then(({ data }) => {
-        this.form = data
-      })
+      this.$http
+        .get(`${this.resource}/form`, {
+          params: { id: item.id }
+        })
+        .then(({ data }) => {
+          this.form = data;
+        });
     },
     onSaveEdit(data) {
       if (data.id) {
-        this.isShowEdit = false
-        this.fetchData()
+        this.isShowEdit = false;
+        this.fetchData();
       }
     },
     showEdit(item) {
-      this.currentItem = item
-      this.fetchForm(item)
-      this.isShowEdit = true
+      this.currentItem = item;
+      this.fetchForm(item);
+      this.isShowEdit = true;
     },
     preFetch() {
-      const filters = {}
+      const filters = {};
 
       if (this.filters.model) {
         this._.forEach(this.filters.model, function(val, key) {
           filters[key] = {
             like: `%${val}%`
-          }
-        })
+          };
+        });
       }
 
-      const offset = (this.pagination.page - 1) * (this.filters.limit)
-      this.$route.query.filter = { where: filters, limit: this.filters.limit, offset }
+      const offset = (this.pagination.page - 1) * this.filters.limit;
+      this.$route.query.filter = {
+        where: filters,
+        limit: this.filters.limit,
+        offset
+      };
     },
     updateRoute() {
-      this.$route.query.keepLayout = true
-      console.log('update route')
+      this.$route.query.keepLayout = true;
+      console.log('update route');
       this.$router.go({
         path: this.$route.path,
         params: this.$route.params,
         query: this.$route.query
-      })
+      });
     },
     doSearch() {
-      this.pagination.page = 1
-      this.fetchData()
+      this.pagination.page = 1;
+      this.fetchData();
     },
     refresh() {
-      Object.assign(this.$data, getDefaultData())
-      this.fetchGrid().then(() => { })
-      this.fetchData()
+      Object.assign(this.$data, getDefaultData());
+      this.fetchGrid().then(() => {
+        this.fetchData();
+      });
     },
     fetch() {
       if (this.columns.length <= 0) {
         // fetch grid params from server: e.g. /crud/users/grid
-        this.fetchGrid()
+        this.fetchGrid();
       } else {
         // or define grid params manually
-        this.fetchData()
+        this.fetchData();
       }
     },
     getColumnData(row, field) {
       // process fields like `type.name`
-      let [l1, l2] = field.value.split('.')
-      let value = row[l1]
+      let [l1, l2] = field.value.split('.');
+      let value = row[l1];
       if (l2) {
-        value = row[l1] ? row[l1][l2] : null
+        value = row[l1] ? row[l1][l2] : null;
       }
       if (field.type === 'image') {
-        value = `<v-avatar size="36px"><img src="${value}" class="crud-grid-thumb" controls /></v-avatar>`
+        value = `<v-avatar size="36px"><img src="${value}" class="crud-grid-thumb" controls /></v-avatar>`;
       }
-      return value
+      return value;
     },
     fetchGrid() {
       return new Promise((resolve, reject) => {
-        this.$http.get(`${this.resource}/grid`).then(({ data }) => {
-          data = data.schema
+        this.$http
+          .get(`${this.resource}/grid`)
+          .then(({ data }) => {
+            data = data.schema;
 
-          for (let k in data.columns) {
-            data.columns[k].text = this.$t(data.columns[k].text)
-          }
+            for (let k in data.columns) {
+              data.columns[k].text = this.$t(data.columns[k].text);
+            }
 
-          this.columns = data.columns || {}
-          this.actions = data.actions || {}
+            this.columns = data.columns || {};
+            this.actions = data.actions || {};
 
-          // keep limit
-          const limit = data.filters.limit || this.filters.limit
-          this.filters = data.filters || {}
-          this.filters.limit = limit
+            // keep limit
+            const limit = data.filters.limit || this.filters.limit;
+            this.filters = data.filters || {};
+            this.filters.limit = limit;
 
-          this.options = data.options || {}
+            this.options = data.options || {};
 
-          if (this.options && this.options.sort) {
-            let sortData = this.options.sort.split('-')
-            let desc = sortData.length > 1
-            let sortField = sortData.pop()
+            if (this.options && this.options.sort) {
+              let sortData = this.options.sort.split('-');
+              let desc = sortData.length > 1;
+              let sortField = sortData.pop();
 
-            // if (sortField.indexOf('.') < 0) {
-            //   sortField = sortField
-            // }
-            this.pagination.sort = sortField
-            this.pagination.descending = desc
-          }
-          resolve()
-        })
-      })
+              // if (sortField.indexOf('.') < 0) {
+              //   sortField = sortField
+              // }
+              this.pagination.sort = sortField;
+              this.pagination.descending = desc;
+            }
+            resolve();
+          })
+          .catch(({ response }) => {
+            this.error = response.data.error;
+            reject();
+          });
+      });
     },
     fetchData() {
-      this.preFetch()
+      this.preFetch();
 
-      this.$http.get(`${this.resource}`, { params: this.$route.query }).then(({ data }) => {
-        this.items = data
+      this.$http
+        .get(`${this.resource}`, { params: this.$route.query })
+        .then(({ data }) => {
+          this.items = data;
 
-        this.$http.get(`${this.resource}/count`, { params: this.$route.query.filter }).then(({ data }) => {
-          this.pagination.totalItems = data.count
+          this.$http
+            .get(`${this.resource}/count`, { params: this.$route.query.filter })
+            .then(({ data }) => {
+              this.pagination.totalItems = data.count;
+            });
         })
-      })
+        .catch(({ response }) => {
+          this.error = response.data.error;
+        });
     },
     remove(itemId) {
       this.$http.delete(`${this.resource}/${itemId}`).then(({ data }) => {
-        this.refresh()
-      })
+        this.refresh();
+      });
     },
     next() {
-      this.pagination.page++
+      this.pagination.page++;
     }
   },
 
   computed: {
     resource() {
-      return this.$route.params.resource
+      return this.$route.params.resource;
     },
     totalPages() {
-      return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
+      return Math.ceil(
+        this.pagination.totalItems / this.pagination.rowsPerPage
+      );
     }
   },
 
-  mounted() {
-
-  },
+  mounted() {},
   created() {
-    this.$store.commit('setPageTitle', global.helper.i.titleize(global.helper.i.pluralize(this.resource)))
-    this.fetchGrid().then(() => { })
-    this.fetchData()
-    // this.fetch()
+    this.$store.commit(
+      'setPageTitle',
+      global.helper.i.titleize(global.helper.i.pluralize(this.resource))
+    );
+    this.fetchGrid().then(() => {
+      this.fetchData();
+    });
   }
-
-}
+};
 </script>

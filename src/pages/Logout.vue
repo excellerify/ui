@@ -14,8 +14,8 @@ export default {
       .post('admins/logout').then(response => {
         global
           .store
-          .dispatch('clearAuth')
-      }, err => console.log(err))
+          .dispatch('clearAuth');
+      }, err => console.log(err));
   }
-}
+};
 </script>
