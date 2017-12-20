@@ -18,10 +18,22 @@ Excellerify UI - Dashboard interface for Excellerify a model based framework. An
 * And more of your requests.
 
 ## Getting start
-
-* git clone https://github.com/excellerify/ui.git
+### Run Backend
+* git clone https://github.com/excellerify/backend.git excellerify-backend
+* cd excellerify-backend
+* npm install
+* npm run
+### Run Frontend
+* git clone https://github.com/excellerify/ui.git excellerify-ui
+* cd excellerify-ui
 * npm install
 * npm run dev
+
+## Screen Shoot
+* Login Page
+
+![Login Page](./img/login-page.png?raw=true "Login Page")
+
 
 ## Architecture
 TODO

@@ -4,7 +4,7 @@ div
     v-card(hover='', style='background:white;')
       v-card-row.deep-purple.darken-1
         v-card-title.text-center
-         h5 {{$t("Login to Admin Dashboard")}}
+         h5(style='text-align: center;') {{$t("Login to Admin Dashboard")}}
       v-card-row
         v-card-text
           v-form(v-model='model', @submit='doLogin', :fields='fields', submitButtonText="Login")
