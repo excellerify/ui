@@ -1,6 +1,6 @@
 import VModal from './Modal.vue';
 
-const install = (Vue, Options) => {
+const modal = (Vue, Options) => {
   Vue.component('v-modal', VModal);
   const ModalComponent = Vue.extend(VModal);
   let component = new ModalComponent().$mount();
@@ -23,5 +23,5 @@ const install = (Vue, Options) => {
 };
 
 export default {
-  install
+  modal
 };
