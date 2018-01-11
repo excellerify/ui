@@ -64,19 +64,42 @@ v-flex(xs12)
   input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model')
 
   //- if email
-  v-text-field(v-else-if="field.type == 'email'", v-model='model', v-bind='field', :readonly="readonly", field="$t(field.label)", :label="$t(field.label)", :placeholder="$t(field.placeholder)", :type="field.type", v-validate="{'required': field.required, 'email': true}")
+  v-text-field(
+    v-else-if="field.type == 'email'", 
+    v-model='model', v-bind='field', 
+    :readonly="readonly", 
+    field="$t(field.label)", 
+    :label="$t(field.label)", 
+    :placeholder="$t(field.placeholder)", 
+    :type="field.type", 
+    v-validate="{'required': field.required, 'email': true}")
 
   //- if table
   template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
-   v-layout(row, wrap, class="input-group")
+    v-layout(row, wrap, class="input-group")
       div(v-if="!readonly")
-        v-btn(primary,fab,small,dark,absolute,right,class="green")
+        v-btn(@click.native="getSubTableForm()",primary,fab,small,dark,absolute,right,class="green")
           v-icon add
+
       label {{field.label}}
       v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
         template(slot="items", slot-scope="props")
           tr
-            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", v-for='column in field.headers', v-html="getColumnData(props.item, column.field)")
+            td(
+              :class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", 
+              v-for='column in field.headers',
+              v-html="getColumnData(props.item, column.field)")
+    
+    v-dialog(v-model="addSubdata", width="50%")
+      v-card
+        v-card-text
+          v-form(v-model="tableForm.model", v-bind="tableForm", method="POST", :action="action")
+          div(slot="buttons",class="my-4")
+            v-btn(dark, class="grey", @click.native="addSubdata=false")
+              v-icon(dark, left) chevron_left
+              span {{$t('Cancel')}}
+            v-btn(primary, dark, type='submit') {{$t('Save')}}
+              v-icon(right, dark) save
 
   //- default input
   v-text-field(
@@ -132,7 +155,9 @@ export default {
             [{ align: [] }]
           ]
         }
-      }
+      },
+      addSubdata: false,
+      tableForm: {}
     };
   },
   computed: {
@@ -171,11 +196,7 @@ export default {
     },
     getDropzoneOptions(field, model) {
       return {
-        url:
-          this.$store.state.config.ajaxUploadUrl +
-          '/' +
-          this.resource +
-          '/upload',
+        url: `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`,
         thumbnailWidth: 150,
         maxFilesize: 1024,
         withCredentials: true,
@@ -183,6 +204,23 @@ export default {
         id: 'dropzone_' + this.name,
         createThumbnailFromUrl: model
       };
+    },
+    getSubTableForm: async function(id) {
+      try {
+        if (['table', 'array'].indexOf(this.field.type) > -1) {
+          const tableForm = await this.$http.get(`${this.field.model}/form`, {
+            params: { id: this.id }
+          });
+
+          this.tableForm = tableForm.data.schema;
+          this.addSubdata = true;
+          return Promise.resolve(this.tableForm);
+        }
+
+        Promise.resolve();
+      } catch (e) {
+        Promise.reject(e);
+      }
     }
   }
 };

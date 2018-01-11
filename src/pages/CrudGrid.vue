@@ -114,14 +114,18 @@ export default {
   },
 
   methods: {
-    fetchForm(item) {
-      this.$http
-        .get(`${this.resource}/form`, {
+    fetchForm: async function(item) {
+      try {
+        const result = await this.$http.get(`${this.resource}/form`, {
           params: { id: item.id }
-        })
-        .then(({ data }) => {
-          this.form = data;
         });
+
+        this.form = result.data;
+        Promise.resolve(result.data);
+      } catch (e) {
+        this.error = e;
+        Promise.reject(e);
+      }
     },
     onSaveEdit(data) {
       if (data.id) {
@@ -222,8 +226,10 @@ export default {
           this.pagination.sort = sortField;
           this.pagination.descending = desc;
         }
+
+        Promise.resolve();
       } catch (err) {
-        this.erro = err.error;
+        this.error = err;
         Promise.reject(err);
       }
     },
@@ -235,6 +241,7 @@ export default {
         this.pagination.totalItems = result.headers['x-total-count'];
         Promise.resolve({items: result.data, count: this.pagination.totalItems});
       } catch (err) {
+        this.error = err;
         Promise.reject(err);
       }
     },
@@ -259,14 +266,13 @@ export default {
   },
 
   mounted() {},
-  created() {
+  created: async function() {
     this.$store.commit(
       'setPageTitle',
       global.helper.i.titleize(global.helper.i.pluralize(this.resource))
     );
-    this.fetchGrid().then(() => {
-      this.fetchData();
-    });
+    await this.fetchGrid();
+    await this.fetchData();
   }
 };
 </script>
