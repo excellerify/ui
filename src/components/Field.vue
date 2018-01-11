@@ -1,7 +1,13 @@
 <template lang="pug">
 v-flex(xs12)
   //- if select2
-  v-select(v-if="['select', 'select2'].includes(field.type)", :items='field.choices', v-model='model', v-bind='field')
+  v-select(
+    v-if="['select', 'select2'].includes(field.type)", 
+    :items='field.choices', 
+    v-model='model', 
+    v-bind='field',
+    :readonly="readonly"
+  )
 
   //- if radio
   v-layout(v-else-if="['radios', 'radio'].indexOf(field.type) > -1", row)
