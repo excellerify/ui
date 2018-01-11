@@ -4,7 +4,7 @@ div
   v-layout
     v-flex(xs12)
       v-form(v-model="model", v-bind="$data", :method="method", :action="action", @success="onSuccess")
-        div(slot="buttons",class="my-4")
+        div(slot="buttons", class="my-4")
           v-btn(dark, class="grey",@click.native="$root.back()")
             v-icon(dark, left) chevron_left
             span {{$t('Back')}}
@@ -58,21 +58,23 @@ export default {
       }
     },
     updateFields() {},
-    fetch() {
-      this.$http
-        .get(`${this.resource}/form`, {
+    fetch: async function () {
+      try {
+        let data = await this.$http.get(`${this.resource}/form`, {
           params: { id: this.id }
-        })
-        .then(({ data }) => {
-          data = data.schema;
-          this.model = data.model;
-          this.fields = data.fields;
-          this.rules = data.rules;
-          this.messages = data.messages;
-        })
-        .catch(({ response }) => {
-          this.error = response.data.error;
         });
+
+        data = data.data.schema;
+        this.model = data.model;
+        this.fields = data.fields;
+        this.rules = data.rules;
+        this.messages = data.messages;
+
+        Promise.resolve(data);
+      } catch (e) {
+        this.error = e;
+        Promise.reject(e);
+      }
     },
     onSubmit() {},
     onSuccess(data) {
