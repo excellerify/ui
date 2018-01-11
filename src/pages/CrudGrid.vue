@@ -12,7 +12,7 @@ div
       template(slot='items', slot-scope='props')
         tr
           td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
-          td(:width='Object.keys(options).length * 48', align="center")
+          td(:width='Object.keys(options).length * 55', align="center")
             template(v-for="(value, action) in actions")
               v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router,primary,fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                 v-icon {{action.icon ? action.icon : action}}
@@ -29,12 +29,12 @@ div
               v-btn(slot="activator", dark, error, fab, small)
                 v-icon delete
               v-card
-                  v-card-text
-                      p(class="text-xs-center") Are you sure?
-                  v-card-actions
-                    v-spacer
-                    v-btn(small,@click.native="deleteModal = []") No
-                    v-btn(small,@click.native="remove(props.item.id)") Yes
+                v-card-text
+                  p(class="text-xs-center") Are you sure?
+                v-card-actions
+                  v-spacer
+                  v-btn(small,@click.native="deleteModal = []") No
+                  v-btn(small,@click.native="remove(props.item.id)") Yes
 
             v-btn(v-if="typeof options.lock === 'object'",fab,small,@click="lock(props.item)")
               v-icon lock
@@ -45,6 +45,7 @@ div
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
   //- TODO move delete dialog here @sofyanhadia
+  
   v-dialog(v-model="isShowEdit", width="70%")
     v-card
       v-card-title {{$t('Edit')}} \#{{currentItem.id}}
@@ -66,6 +67,7 @@ const getDefaultData = () => {
       messages: {}
     },
     filters: {
+      model: {},
       limit: config.grid.limit
     },
     loading: false,

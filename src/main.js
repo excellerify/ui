@@ -1,24 +1,12 @@
 import Vue from 'vue';
 
-import VueAuthenticate from 'vue-authenticate';
 import VeeValidate from 'vee-validate';
 import lodash from 'lodash';
 import VueLodash from 'vue-lodash';
 
 Vue.use(Vuetify);
-Vue.use(VueAuthenticate);
 Vue.use(VeeValidate);
 Vue.use(VueLodash, lodash);
-
-Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:3000', // Your API domain
-  providers: {
-    google: {
-      client_id: '688861182330-6kf005u20kai8mrdmmk3fbv9t9sj67d4.apps.googleusercontent.com',
-      redirect_uri: 'http://localhost:7001/auth/google/callback' // Your client app URL
-    }
-  }
-});
 
 import helper from './helper';
 global.helper = helper;
