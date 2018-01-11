@@ -36,13 +36,13 @@ div
                   v-btn(small,@click.native="deleteModal = []") No
                   v-btn(small,@click.native="remove(props.item.id)") Yes
 
-            v-btn(v-if="typeof options.lock === 'object'",fab,small,@click="lock(props.item)")
+            v-btn(v-if="typeof options.lock === 'object'", fab, small,@click="lock(props.item)")
               v-icon lock
 
             v-btn(v-if="typeof options.custom === 'object'",fab,small,@click="customAction(props.item)")
               v-icon {{options.custom.icon}}
 
-      v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
+    v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
   //- TODO move delete dialog here @sofyanhadia
   
@@ -165,11 +165,10 @@ export default {
       this.pagination.page = 1;
       this.fetchData();
     },
-    refresh() {
+    refresh: async function() {
       Object.assign(this.$data, getDefaultData());
-      this.fetchGrid().then(() => {
-        this.fetchData();
-      });
+      await this.fetchGrid();
+      this.fetchData();
     },
     fetch() {
       if (this.columns.length <= 0) {
@@ -192,68 +191,56 @@ export default {
       }
       return value;
     },
-    fetchGrid() {
-      return new Promise((resolve, reject) => {
-        this.$http
-          .get(`${this.resource}/grid`)
-          .then(({ data }) => {
-            data = data.schema;
+    fetchGrid: async function() {
+      try {
+        const result = await this.$http.get(`${this.resource}/grid`);
 
-            for (let k in data.columns) {
-              data.columns[k].text = this.$t(data.columns[k].text);
-            }
+        const data = result.data.schema;
 
-            this.columns = data.columns || {};
-            this.actions = data.actions || {};
+        for (let k in data.columns) {
+          data.columns[k].text = this.$t(data.columns[k].text);
+        }
 
-            // keep limit
-            const limit = data.filters.limit || this.filters.limit;
-            this.filters = data.filters || {};
-            this.filters.limit = limit;
+        this.columns = data.columns || {};
+        this.actions = data.actions || {};
 
-            this.options = data.options || {};
+        // keep limit
+        const limit = data.filters.limit || this.filters.limit;
+        this.filters = data.filters || {};
+        this.filters.limit = limit;
 
-            if (this.options && this.options.sort) {
-              let sortData = this.options.sort.split('-');
-              let desc = sortData.length > 1;
-              let sortField = sortData.pop();
+        this.options = data.options || {};
 
-              // if (sortField.indexOf('.') < 0) {
-              //   sortField = sortField
-              // }
-              this.pagination.sort = sortField;
-              this.pagination.descending = desc;
-            }
-            resolve();
-          })
-          .catch(({ response }) => {
-            this.error = response.data.error;
-            reject();
-          });
-      });
+        if (this.options && this.options.sort) {
+          let sortData = this.options.sort.split('-');
+          let desc = sortData.length > 1;
+          let sortField = sortData.pop();
+
+          // if (sortField.indexOf('.') < 0) {
+          //   sortField = sortField
+          // }
+          this.pagination.sort = sortField;
+          this.pagination.descending = desc;
+        }
+      } catch (err) {
+        this.erro = err.error;
+        Promise.reject(err);
+      }
     },
-    fetchData() {
-      this.preFetch();
-
-      this.$http
-        .get(`${this.resource}`, { params: this.$route.query })
-        .then(({ data }) => {
-          this.items = data;
-
-          this.$http
-            .get(`${this.resource}/count`, { params: this.$route.query.filter })
-            .then(({ data }) => {
-              this.pagination.totalItems = data.count;
-            });
-        })
-        .catch(({ response }) => {
-          this.error = response.data.error;
-        });
+    fetchData: async function() {
+      try {
+        await this.preFetch();
+        const result = await this.$http.get(`${this.resource}`, { params: this.$route.query });
+        this.items = result.data;
+        this.pagination.totalItems = result.headers['x-total-count'];
+        Promise.resolve({items: result.data, count: this.pagination.totalItems});
+      } catch (err) {
+        Promise.reject(err);
+      }
     },
-    remove(itemId) {
-      this.$http.delete(`${this.resource}/${itemId}`).then(({ data }) => {
-        this.refresh();
-      });
+    remove: async function(itemId) {
+      await this.$http.delete(`${this.resource}/${itemId}`);
+      this.refresh();
     },
     next() {
       this.pagination.page++;
