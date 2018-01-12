@@ -16,11 +16,11 @@ div
 
       v-alert.py-2(error, v-model='hasError')
         div(v-for='error in errors')  {{error.message}}
-      slot
+
       v-flex.pt-2.actions(xs12)
         slot(name='buttons')
-          //- v-btn.ma-0(primary, dark, type='submit') {{$t(submitButtonText)}}
-          //-   v-icon(right, dark) {{submitButtonIcon}}
+          v-btn.ma-0(primary, dark, type='submit') {{$t(submitButtonText)}}
+            v-icon(right, dark) {{submitButtonIcon}}
 </template>
 
 <script>
