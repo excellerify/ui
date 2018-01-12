@@ -94,12 +94,12 @@ v-flex(xs12)
       v-card
         v-card-text
           v-form(v-model="tableForm.model", v-bind="tableForm", method="POST", :action="action")
-          div(slot="buttons",class="my-4")
-            v-btn(dark, class="grey", @click.native="addSubdata=false")
-              v-icon(dark, left) chevron_left
-              span {{$t('Cancel')}}
-            v-btn(primary, dark, type='submit') {{$t('Save')}}
-              v-icon(right, dark) save
+            div(slot="buttons", class="my-4")
+              v-btn(dark, class="grey", @click.native="addSubdata=false")
+                v-icon(dark, left) chevron_left
+                span {{$t('Cancel')}}
+              v-btn(primary, dark, type='submit') {{$t('Save')}}
+                v-icon(right, dark) save
 
   //- default input
   v-text-field(
