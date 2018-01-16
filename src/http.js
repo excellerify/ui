@@ -2,12 +2,6 @@ import Vue from 'vue';
 import axios from 'axios';
 import config from './config';
 
-// enable mock
-// import mock from './mock'
-// if (!config.debug.mock) {
-//   mock.restore()
-// }
-
 var http = axios.create({
   baseURL: config.api,
   timeout: 1000
@@ -50,3 +44,4 @@ http.interceptors.response.use(function (response) {
 });
 
 Vue.prototype.$http = http;
+

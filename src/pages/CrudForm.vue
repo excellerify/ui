@@ -78,9 +78,10 @@ export default {
     },
     onSubmit() {},
     onSuccess(data) {
+      debugger;
       this.$router.push({ name: 'grid', params: { resource: this.resource } });
       if (data.id) {
-        // this.$router.go(-1)
+        // this.$router.go(-1);
       }
     }
   },

@@ -1,31 +1,26 @@
 import Vue from 'vue';
 
 import VeeValidate from 'vee-validate';
+Vue.use(VeeValidate);
+
+import Vuetify from 'vuetify';
+Vue.use(Vuetify);
+
 import lodash from 'lodash';
 import VueLodash from 'vue-lodash';
-
-Vue.use(Vuetify);
-Vue.use(VeeValidate);
 Vue.use(VueLodash, lodash);
 
 import helper from './helper';
-global.helper = helper;
 import config from './config';
-import store from './store/';
+import store from './store';
+
+global.helper = helper;
+global.config = config;
 global.store = store;
 
 import router from './router';
 import i18n from './i18n/';
-// import menu from './menu'
-import Vuetify from 'vuetify';
-Vue.use(Vuetify);
 import './http';
-
-import 'vuetify/src/stylus/main.styl';
-import 'vuetify/src/stylus/settings/_colors.styl';
-import '@/styles/main.styl';
-
-import App from './App.vue';
 
 import VueTimeago from 'vue-timeago';
 
@@ -38,21 +33,24 @@ Vue.use(VueTimeago, {
   }
 });
 
+import 'vuetify/src/stylus/main.styl';
+import 'vuetify/src/stylus/settings/_colors.styl';
+import '@/styles/main.styl';
+
+import App from './App.vue';
+
 import Dropzone from 'vue2-dropzone';
 import VueQuillEditor from 'vue-quill-editor';
 Vue.use(VueQuillEditor);
 Vue.component('dropzone', Dropzone);
 
-// import validator from 'indicative'
-import validator from 'Validator';
-global.validator = validator;
-
+import VGrid from './components/Grid.vue';
 import VForm from './components/Form.vue';
 import VView from './components/View.vue';
-
 import VField from './components/Field.vue';
 
 // import Modal from './components/Modal' Vue.use(Modal)
+Vue.component('v-grid', VGrid);
 Vue.component('v-form', VForm);
 Vue.component('v-view', VView);
 Vue.component('v-field', VField);
@@ -72,6 +70,7 @@ new Vue({
   },
   created() {
     // this.$http.get('/users/1').then(({data}) => console.log(data))
+    global.$http = this.$http;
     global.$t = this.$t;
     // fetch menu from server
     this
@@ -82,9 +81,11 @@ new Vue({
           .$store
           .commit('setMenu', data);
       });
+
     this
       .$store
       .dispatch('checkPageTitle', this.$route.path);
+
     this
       .$store
       .dispatch('checkAuth');

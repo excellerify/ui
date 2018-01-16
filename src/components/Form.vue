@@ -1,25 +1,42 @@
 <template lang="pug">
 div
-  form(:action='action', @submit.prevent='onSubmit')
+  form(:action='action', @submit.prevent='onSubmit', novalidate)
     v-tabs(grow, scroll-bars, v-model='active', dark, v-if="groupBy")
       v-tabs-bar(slot='activators')
-        v-tabs-item(v-for='(field, key) in group.parents', :key='key', :href="'tab-' + key", ripple)
+        v-tabs-item(v-for='(field, key) in group.parents',
+          :key='key',
+          :href="'tab-' + key",
+          ripple)
         v-tabs-slider
-      v-tabs-content(v-for='(fields, key) in group.children', :key='key', :id="'tab-' + key")
+
+      v-tabs-content(v-for='(fields, key) in group.children',
+        :key='key',
+        :id="'tab-' + key")
         v-card(flat)
           v-card-text
-            v-field(v-for='(field, name) in fields', :key='name', :name="name", :field="field", v-model="model[name]")
+            v-field(
+              v-for='(field, name) in fields',
+              :key='name',
+              :name="name",
+              :field="field",
+              v-model="model[name]")
 
     v-layout(v-bind="{[inline? 'row': 'column wrap']: true}", v-if="!groupBy")
+      v-field.pr-1(
+        @fieldError="updateFieldsError",
+        v-for='(field, name) in fields',
+        :key='name',
+        :name="name",
+        :field="field",
+        v-model="model[name]")
 
-      v-field.pr-1(v-for='(field, name) in fields', :key='name', :name="name", :field="field", v-model="model[name]")
-
-      v-alert.py-2(error, v-model='hasError')
-        div(v-for='error in errors')  {{error.message}}
+      v-alert.py-2(error, v-model='hasError', style="width: 100%; margin-top: 20px;")
+        ul
+          li(v-for='error in errors') {{error.message}}
 
       v-flex.pt-2.actions(xs12)
         slot(name='buttons')
-          v-btn.ma-0(primary, dark, type='submit') {{$t(submitButtonText)}}
+          v-btn.ma-0(primary, dark, type="submit") {{$t(submitButtonText)}}
             v-icon(right, dark) {{submitButtonIcon}}
 </template>
 
@@ -74,14 +91,14 @@ export default {
       type: Object,
       default: () => { }
     }
-
   },
   data() {
     return {
       model: this.value,
       hasError: false,
       errors: [],
-      message: ''
+      message: '',
+      fieldErrors: []
     };
   },
 
@@ -107,7 +124,6 @@ export default {
       }
       return { parents, children };
     },
-
     autoSubmit() {
       return !!this.action;
     }
@@ -128,44 +144,61 @@ export default {
         }
       }
     },
-    updateFields() {
+    updateFieldsError({field, isError, message}) {
+      const index = this._.findIndex(this.fieldErrors, {field});
 
+      if (isError) {
+        if (index < 0) {
+          this.fieldErrors.push({field, isError, message});
+        }
+      } else {
+        if (index > -1) {
+          this.fieldErrors.splice(index, 1);
+        }
+      }
     },
-
-    onSubmit() {
-      const valid = global.validator.make(this.model, this.rules, this.messages);
-      if (valid.passes()) {
-        this.$emit('input', this.model);
-        if (!this.autoSubmit) {
-          this.$emit('submit');
-          return false;
+    onSubmit: async function() {
+      try {
+        if (this.fieldErrors.length > 0) {
+          throw this.fieldErrors;
         }
 
-        this.$http[this.method](this.action, this.model).then(({ data }) => {
-          this.$emit('success', data);
-          this.hasError = false;
-        }).catch(({ response }) => {
-          const status = response.status;
+        global.store.commit('submitLoading');
 
-          this.hasError = true;
-          if (response.data.error.message) {
-            this.errors = [response.data.error];
-          }
+        this.$emit('input', this.model);
 
-          this.$emit('error', status, response.data.error);
-        });
-      } else {
-        const errors = valid.getErrors();
+        if (!this.autoSubmit) {
+          this.$emit('submit');
+          return Promise.resolve();
+        }
+
+        const result = await this.$http[this.method](this.action, this.model);
+
+        this.$emit('success', result.data);
+
+        global.store.commit('submitSuccess', {message: result.data});
+
+        return Promise.resolve(result.data);
+      } catch (e) {
+        // if (e.data.error.message) {
+        //   const status = e.status;
+        //   this.$emit('error', status, e.data.error);
+        //   this.errors = [e.data.error];
+        // }
+
         this.hasError = true;
-        this.errors = errors;
-        this.$emit('error', errors);
-        // this.$bus.showMessage('error', 'error')
+        this.errors = e;
+
+        this.$emit('error', e);
+
+        global.store.commit('submitError', {message: e});
+
+        Promise.reject(e);
       }
     }
   },
   mounted() {
     // this.$bus.showMessage('success', 'success')
-
   },
   created() {
     // global.validator.extend('unique', function (data, field, message, args, get) {

@@ -13,8 +13,6 @@ const config = {
   grid: {
     limit: 10
   }
-  // locale: 'en', //en
-  // api: 'http://192.168.1.108:3333/admin/api'
 };
 
 global.config = config;
