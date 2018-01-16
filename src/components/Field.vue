@@ -2,12 +2,14 @@
 v-flex(xs12)
   //- if select2
   v-select(
-    v-if="['select', 'select2'].includes(field.type)", 
-    :items='field.choices', 
-    v-model='model', 
+    v-if="['select', 'select2'].includes(field.type)",
+    :name='name',
+    :data-vv-as='field.label',
+    :items='field.choices',
+    v-model='model',
     v-bind='field',
-    :readonly="readonly"
-  )
+    :readonly="readonly",
+    v-validate="{'required': field.required}")
 
   //- if radio
   v-layout(v-else-if="['radios', 'radio'].indexOf(field.type) > -1", row)
@@ -16,11 +18,14 @@ v-flex(xs12)
       v-flex(xs12)
         v-radio-group(v-model="model", column, wrap, :readonly="readonly")
           v-radio(
+            :name='name',
+            :data-vv-as='field.label',
             v-for='option in field.choices',
             :key="option.value",
             :label="option.text",
             :value="option.value",
-            :disabled="readonly")
+            :disabled="readonly",
+            v-validate="{'required': field.required}")
 
   //- if checkboxes
   template(v-else-if="['checkboxes'].indexOf(field.type) > -1")
@@ -29,19 +34,27 @@ v-flex(xs12)
       v-flex(v-bind="{[field.width]: true}", xs12)
         span(v-for='option in field.choices', :key="field.value")
           component(
+            :name='name',
+            :data-vv-as='field.label',
             v-model='model',
             hide-details,
             :is="field.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
             :key='option.value',
             :value='option.value',
             :label='option.text',
-            :disabled="readonly")
+            :disabled="readonly",
+            v-validate="{'required': field.required}")
 
   //- if input type is date or time
   template(v-else-if="['date', 'datetime', 'time'].indexOf(field.type) > -1")
     v-menu
       v-text-field(slot='activator', v-model='model', :label="$t(field.label)")
-      v-date-picker(v-model='model', no-title, scrollable, actions)
+      v-date-picker(
+        v-model='model',
+        no-title,
+        scrollable,
+        actions,
+        v-validate="{'required': field.required}")
 
   //- if input type is html
   div(:class="inputGroupClass",v-else-if="field.type == 'html'")
@@ -51,59 +64,65 @@ v-flex(xs12)
 
   //- if input type is file
   //- TODO dropzone
-  div(:class="inputGroupClass",v-else-if="['file', 'pdf', 'image', 'video'].includes(field.type)")
+  div(:class="inputGroupClass", v-else-if="['file', 'pdf', 'image', 'video'].includes(field.type)")
     label {{$t(field.label)}}
     div.pt-2
       dropzone(
+        :id="field.name"
         :options="getDropzoneOptions(field, model)"
         @vdropzone-sending="onUploading"
         @vdropzone-success="onUploadSuccess")
-        input(type='hidden', v-model='model')
+        input(type='hidden', v-model='model',
+        v-validate="{'required': field.required}")
 
   //- if hidden
   input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model')
 
   //- if email
   v-text-field(
-    v-else-if="field.type == 'email'", 
-    v-model='model', v-bind='field', 
-    :readonly="readonly", 
-    field="$t(field.label)", 
-    :label="$t(field.label)", 
-    :placeholder="$t(field.placeholder)", 
-    :type="field.type", 
-    v-validate="{'required': field.required, 'email': true}")
+    v-else-if="field.type == 'email'",
+    :name='name'
+    :data-vv-as='field.label'
+    v-model='model',
+    v-bind='field',
+    :readonly="readonly",
+    field="$t(field.label)",
+    :label="$t(field.label)",
+    :placeholder="$t(field.placeholder)",
+    :type="field.type",
+    v-validate="{'required': field.required, 'email': true}",
+    :error="isError",
+    :error-messages="errorMessage")
 
   //- if table
   template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
     v-layout(row, wrap, class="input-group")
-      div(v-if="!readonly")
-        v-btn(@click.native="getSubTableForm()",primary,fab,small,dark,absolute,right,class="green")
-          v-icon add
-
       label {{field.label}}
-      v-data-table(v-bind:headers="field.headers", :items="model", hide-actions, class="elevation-1")
-        template(slot="items", slot-scope="props")
-          tr
-            td(
-              :class="'text-xs-' + (column.align !== undefined? column.align  : 'left')", 
-              v-for='column in field.headers',
-              v-html="getColumnData(props.item, column.field)")
-    
-    v-dialog(v-model="addSubdata", width="50%")
-      v-card
-        v-card-text
-          v-form(v-model="tableForm.model", v-bind="tableForm", method="POST", :action="action")
-            div(slot="buttons", class="my-4")
-              v-btn(dark, class="grey", @click.native="addSubdata=false")
-                v-icon(dark, left) chevron_left
-                span {{$t('Cancel')}}
-              v-btn(primary, dark, type='submit') {{$t('Save')}}
-                v-icon(right, dark) save
+      v-grid(:resource="field.model", :showSearch="false", :readonly="readonly", modalForm="true")
+
+  //- password input
+  v-text-field(
+    v-else-if="['password'].indexOf(field.type) > -1",
+    :name='name'
+    :data-vv-as='field.label'
+    v-model='model',
+    v-bind='field',
+    :readonly="readonly",
+    :label="$t(field.label)",
+    :placeholder="$t(field.placeholder)",
+    :multiLine="field.type == 'textarea'",
+    v-validate="{required: field.required}"
+    :error="isError",
+    :error-messages="errorMessage"
+    :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'"
+    :append-icon-cb="() => (passwordInvisible = !passwordInvisible)"
+    :type="passwordInvisible ? 'password' : 'text'")
 
   //- default input
   v-text-field(
     v-else,
+    :name='name'
+    :data-vv-as='field.label'
     v-model='model',
     v-bind='field',
     :readonly="readonly",
@@ -111,7 +130,10 @@ v-flex(xs12)
     :placeholder="$t(field.placeholder)",
     :type="field.type",
     :multiLine="field.type == 'textarea'",
-    :v-validate="{required: field.required}")
+    v-validate="{required: field.required}"
+    :error="isError",
+    :error-messages="errorMessage")
+
 </template>
 
 <script>
@@ -156,9 +178,24 @@ export default {
           ]
         }
       },
+      passwordInvisible: true,
       addSubdata: false,
-      tableForm: {}
+      tableForm: {},
+      isError: false,
+      errorMessage: []
     };
+  },
+  watch: {
+    'errors.items'(val) {
+      debugger;
+      this.isError = val.length > 0;
+      this.errorMessage = this.isError ? val[0].msg : [];
+      this.$emit('fieldError', {
+        field: this.name,
+        isError: this.isError,
+        message: this.isError ? val[0].msg : null
+      });
+    }
   },
   computed: {
     resource() {
@@ -171,6 +208,14 @@ export default {
       set(val) {
         this.$emit('input', val);
       }
+    },
+    validationRules: function () {
+      const rules = {
+        required: this.field.required,
+        email: this.field.type.toLowerCase() === 'email'
+      };
+
+      return rules;
     }
   },
   methods: {
@@ -221,6 +266,17 @@ export default {
       } catch (e) {
         Promise.reject(e);
       }
+    }
+  },
+  created: function () {
+    if (this.field.required &&
+      !this.value &&
+      !['file', 'pdf', 'image', 'video'].includes(this.field.type)) {
+      this.$emit('fieldError', {
+        field: this.name,
+        isError: true,
+        message: `The ${this.field.label} is required`
+      });
     }
   }
 };
