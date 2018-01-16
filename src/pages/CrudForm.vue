@@ -5,7 +5,7 @@ div
     v-flex(xs12)
       v-form(v-model="model", v-bind="$data", :method="method", :action="action", @success="onSuccess")
         div(slot="buttons", class="my-4")
-          v-btn(dark, class="grey",@click.native="$root.back()")
+          v-btn(dark, class="grey", @click.native="$root.back()")
             v-icon(dark, left) chevron_left
             span {{$t('Back')}}
           v-btn(primary, dark, type='submit') {{$t('Submit')}}
@@ -78,7 +78,6 @@ export default {
     },
     onSubmit() {},
     onSuccess(data) {
-      debugger;
       this.$router.push({ name: 'grid', params: { resource: this.resource } });
       if (data.id) {
         // this.$router.go(-1);

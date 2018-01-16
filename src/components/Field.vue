@@ -98,7 +98,12 @@ v-flex(xs12)
   template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
     v-layout(row, wrap, class="input-group")
       label {{field.label}}
-      v-grid(:resource="field.model", :showSearch="false", :readonly="readonly", modalForm="true")
+      v-grid(
+        :resource="field.model",
+        :showSearch="false",
+        :readonly="readonly",
+        type="field",
+        @onUpsert="$emit('onUpsert', {subForm: true})")
 
   //- password input
   v-text-field(
@@ -187,7 +192,6 @@ export default {
   },
   watch: {
     'errors.items'(val) {
-      debugger;
       this.isError = val.length > 0;
       this.errorMessage = this.isError ? val[0].msg : [];
       this.$emit('fieldError', {
@@ -271,7 +275,7 @@ export default {
   created: function () {
     if (this.field.required &&
       !this.value &&
-      !['file', 'pdf', 'image', 'video'].includes(this.field.type)) {
+      !['file', 'pdf', 'image', 'video', 'table', 'array'].includes(this.field.type)) {
       this.$emit('fieldError', {
         field: this.name,
         isError: true,

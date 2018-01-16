@@ -124,6 +124,9 @@ export default {
       type: Boolean,
       default: false,
       required: true
+    },
+    type: {
+      type: String
     }
   },
 
@@ -143,21 +146,18 @@ export default {
       this.fetchData();
     },
     '$route.params': 'refresh',
-    'global.store.submitSuccess'(val) {
-      console.log(val);
-      debugger;
+    '$store.state.submitSuccess'(val) {
       this.$router.push({name: 'create', params: {resource: this.resource}});
     }
     // '$route.query': 'updateRoute'
   },
 
   methods: {
-    onUpsert: async function() {
-      try {
-        await this.$emit('onUpsert');
+    onUpsert: function() {
+      if (this.type === 'field') {
+        this.$emit('onUpsert');
+      } else {
         this.$router.push({name: 'create', params: {resource: this.resource}});
-      } catch (e) {
-        Promise.reject(e);
       }
     },
     fetchForm: async function(item) {

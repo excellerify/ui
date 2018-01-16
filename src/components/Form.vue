@@ -23,6 +23,7 @@ div
 
     v-layout(v-bind="{[inline? 'row': 'column wrap']: true}", v-if="!groupBy")
       v-field.pr-1(
+        @onUpsert="onSubmit"
         @fieldError="updateFieldsError",
         v-for='(field, name) in fields',
         :key='name',
@@ -132,6 +133,10 @@ export default {
     'value'(val) {
       this.model = val;
     },
+    '$route'() {
+      this.fieldErrors = [];
+      this.hasError = false;
+    },
     'model': 'updateFields'
   },
   methods: {
@@ -157,7 +162,7 @@ export default {
         }
       }
     },
-    onSubmit: async function() {
+    onSubmit: async function({subForm}) {
       try {
         if (this.fieldErrors.length > 0) {
           throw this.fieldErrors;
@@ -174,20 +179,23 @@ export default {
 
         const result = await this.$http[this.method](this.action, this.model);
 
-        this.$emit('success', result.data);
+        if (!subForm) {
+          this.$emit('success', result.data);
+        }
+
+        this.fieldErrors = [];
 
         global.store.commit('submitSuccess', {message: result.data});
 
         return Promise.resolve(result.data);
       } catch (e) {
-        // if (e.data.error.message) {
-        //   const status = e.status;
-        //   this.$emit('error', status, e.data.error);
-        //   this.errors = [e.data.error];
-        // }
-
         this.hasError = true;
-        this.errors = e;
+
+        if (Array.isArray(e)) {
+          this.errors = e;
+        } else {
+          this.errors = [e];
+        }
 
         this.$emit('error', e);
 
@@ -198,7 +206,7 @@ export default {
     }
   },
   mounted() {
-    // this.$bus.showMessage('success', 'success')
+    this.fieldErrors = [];
   },
   created() {
     // global.validator.extend('unique', function (data, field, message, args, get) {
