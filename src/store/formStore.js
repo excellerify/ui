@@ -11,16 +11,26 @@ const store = {
   mutations: {
     submitLoading(state) {
       state.submitLoading = true;
-      state.submitSuccess = {};
-      state.submitError = {};
+      state.submitSuccess = {
+        status: false
+      };
+      state.submitError = {
+        status: false
+      };
     },
     submitSuccess(state, {message}) {
       state.submitLoading = false;
-      state.submitSuccess = {message};
+      state.submitSuccess = {
+        status: true,
+        message
+      };
     },
     submitError(state, {message}) {
       state.submitLoading = false;
-      state.submitError = {message};
+      state.submitError = {
+        status: true,
+        message
+      };
     }
   }
 };

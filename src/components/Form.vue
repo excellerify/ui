@@ -44,16 +44,17 @@ div
 <script>
 export default {
   props: {
+    resource: {
+      type: String
+    },
+    id: {
+      type: String
+    },
     inline: {
       type: Boolean,
       default: false
     },
     groupBy: {
-      required: false,
-      type: String,
-      default: null
-    },
-    action: {
       required: false,
       type: String,
       default: null
@@ -68,29 +69,16 @@ export default {
       type: String,
       default: 'send'
     },
-    method: {
-      required: false,
-      type: String,
-      default: 'post'
-    },
     value: {
       required: false,
       type: Object,
       default: () => { }
     },
-    formFields: {
-      required: true,
+    parrentFormFields: {
       type: Object
     },
-    rules: {
-      required: false,
-      type: Object,
-      default: () => { }
-    },
-    messages: {
-      required: false,
-      type: Object,
-      default: () => { }
+    autoSubmit: {
+      type: Boolean
     }
   },
   data() {
@@ -99,7 +87,10 @@ export default {
       hasError: false,
       formErrors: [],
       message: '',
-      fieldErrors: []
+      fieldErrors: [],
+      rules: null,
+      messages: null,
+      formFields: null
     };
   },
 
@@ -127,8 +118,18 @@ export default {
       }
       return { parents, children };
     },
-    autoSubmit() {
-      return !!this.action;
+    method() {
+      return this.isEdit ? 'patch' : 'post';
+    },
+    isEdit() {
+      return !!this.id;
+    },
+    action() {
+      if (this.isEdit) {
+        return `${this.resource}/${this.id}`;
+      } else {
+        return `${this.resource}`;
+      }
     }
   },
   watch: {
@@ -138,18 +139,29 @@ export default {
     '$route'() {
       this.fieldErrors = [];
       this.hasError = false;
+      this.fetch();
     }
   },
   methods: {
-    getGroupedFields() { },
-    getFieldError(fieldName) {
-      for (let k in this.formErrors) {
-        let error = this.formErrors[k];
-        if (error.field === fieldName) {
-          return error.message;
-        }
+    fetch: async function () {
+      try {
+        let data = await this.$http.get(`${this.resource}/form`, {
+          params: { id: this.id }
+        });
+
+        data = data.data.schema;
+        this.model = data.model;
+        this.formFields = data.fields;
+        this.rules = data.rules;
+        this.messages = data.messages;
+
+        Promise.resolve(data);
+      } catch (e) {
+        this.error = e;
+        Promise.reject(e);
       }
     },
+    getGroupedFields() { },
     updateFieldsError({field, isError, message}) {
       const index = this._.findIndex(this.fieldErrors, {field});
 
@@ -163,17 +175,17 @@ export default {
         }
       }
     },
-    onSubmit: async function({subForm}) {
+    onSubmit: async function({subForm, cb}) {
       try {
         if (this.fieldErrors.length > 0) {
           throw this.fieldErrors;
         }
 
-        global.store.commit('submitLoading');
+        this.$store.commit('submitLoading');
 
         this.$emit('input', this.model);
 
-        if (!this.autoSubmit) {
+        if (this.autoSubmit) {
           this.$emit('submit');
           return Promise.resolve();
         }
@@ -186,7 +198,11 @@ export default {
 
         this.fieldErrors = [];
 
-        global.store.commit('submitSuccess', {message: result.data});
+        this.$store.commit('submitSuccess', {message: result.data});
+
+        if (cb) {
+          cb(result.data);
+        }
 
         return Promise.resolve(result.data);
       } catch (e) {
@@ -200,7 +216,7 @@ export default {
 
         this.$emit('error', e);
 
-        global.store.commit('submitError', {message: e});
+        this.$store.commit('submitError', {message: e});
 
         Promise.reject(e);
       }
@@ -208,6 +224,11 @@ export default {
   },
   mounted() {
     this.fieldErrors = [];
+    if (!this.parrentFormFields) {
+      this.fetch();
+    } else {
+      this.formFields = this.parrentFormFields;
+    }
   },
   created() {
     // global.validator.extend('unique', function (data, field, message, args, get) {

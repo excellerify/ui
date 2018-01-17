@@ -87,7 +87,20 @@ v-flex(xs12)
         :showSearch="false",
         :readonly="readonly",
         type="field",
-        :onCreate="onGridCreate")
+        :onCreate="onGridCreate",
+        :onUpdate="onGridUpdate")
+
+      v-dialog(v-model="isShowDialogForm", max-width="70%")
+        v-card
+          v-card-title(v-if="currentItem")  {{$t('Edit')}} \#{{currentItem.id}}
+          v-card-title(v-else) {{$t('Add')}}
+          v-card-text
+             v-form(
+              v-bind="$data",
+              :id="currentItem? currentItem.id.id : null",
+              :resource="field.model")
+          v-card-actions(actions)
+            v-btn(flat, color="primary", @click.native="isShowDialogForm = false") {{$t('Close')}}
 
   //- password input
   v-text-field(
@@ -170,7 +183,9 @@ export default {
       addSubdata: false,
       tableForm: {},
       isError: false,
-      errorMessage: []
+      errorMessage: [],
+      isShowDialogForm: false,
+      currentItem: null
     };
   },
   watch: {
@@ -255,8 +270,15 @@ export default {
         Promise.reject(e);
       }
     },
-    onGridCreate: function (params) {
-      this.$emit('onUpsert', {subForm: true});
+    onGridCreate: function () {
+      this.$emit('onUpsert', {subForm: true, cb: this.onGridUpsertCb});
+    },
+    onGridUpdate: function ({item}) {
+      this.$emit('onUpsert', {subForm: true, cb: this.onGridUpsertCb});
+      this.currentItem = item;
+    },
+    onGridUpsertCb: function () {
+      this.isShowDialogForm = true;
     }
   },
   created: function () {
