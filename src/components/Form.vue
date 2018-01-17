@@ -77,8 +77,15 @@ export default {
     parrentFormFields: {
       type: Object
     },
+    parrentFormValue: {
+      type: Object
+    },
     autoSubmit: {
       type: Boolean
+    },
+    type: {
+      type: String,
+      default: 'form'
     }
   },
   data() {
@@ -140,6 +147,15 @@ export default {
       this.fieldErrors = [];
       this.hasError = false;
       this.fetch();
+    },
+    'parrentFormValue'(parrentFormValue) {
+      if (this.type === 'subForm' && parrentFormValue) {
+        this._.forEach(this.formFields, (val, key) => {
+          if (val.fk) {
+            this.model[key] = parrentFormValue[val.fk];
+          }
+        });
+      }
     }
   },
   methods: {
@@ -177,6 +193,8 @@ export default {
     },
     onSubmit: async function({subForm, cb}) {
       try {
+        debugger;
+
         if (this.fieldErrors.length > 0) {
           throw this.fieldErrors;
         }

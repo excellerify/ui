@@ -4,7 +4,6 @@ div
   v-layout
     v-flex(xs12)
       v-form(
-        v-bind="$data",
         :id="id",
         :resource="resource",
         @success="onSuccess")
