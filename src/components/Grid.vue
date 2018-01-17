@@ -11,7 +11,7 @@ v-flex(xs12)
       v-model='filters.model',
       v-if="filters.fields",
       :inline='true',
-      :parrentFormFields='filters.fields',
+      :parentFormFields='filters.fields',
       :autoSubmit='true'
       @submit='doSearch',
       submitButtonText='Search',
@@ -37,7 +37,7 @@ v-flex(xs12)
         template(slot='items', slot-scope='props')
           tr
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
-            td(:width='Object.keys(options).length * 55', align="center")
+            td(v-if="!readonly", :width='Object.keys(options).length * 55', align="center")
               template(v-for="(value, action) in actions")
                 v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router, color="primary",fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                   v-icon {{action.icon ? action.icon : action}}

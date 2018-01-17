@@ -100,9 +100,10 @@ v-flex(xs12)
               type="subForm",
               :parrentFormValue="gridFormValue",
               :id="currentItem? currentItem.id.id : null",
-              :resource="field.model")
+              :resource="field.model"
+              @success="modalSubFormClose")
           v-card-actions(actions)
-            v-btn(flat, color="primary", @click.native="isShowDialogForm = false") {{$t('Close')}}
+            v-btn(flat, color="primary", @click.native="modalSubFormClose") {{$t('Close')}}
 
   //- password input
   v-text-field(
@@ -218,7 +219,7 @@ export default {
     validationRules: function () {
       const rules = {
         required: !!this.field.required,
-        email: this.field.type.toLowerCase() === 'email'
+        email: this.field.type ? this.field.type.toLowerCase() === 'email' : false
       };
 
       return rules;
@@ -283,6 +284,10 @@ export default {
     onGridUpsertCb: function (parrentData) {
       this.gridFormValue = parrentData;
       this.isShowDialogForm = true;
+    },
+    modalSubFormClose() {
+      this.isShowDialogForm = false;
+      this.$emit('refresh');
     }
   },
   created: function () {
