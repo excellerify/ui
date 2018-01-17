@@ -11,7 +11,7 @@ v-flex(xs12)
       :inline='true',
       v-model='filters.model',
       v-if="filters.fields",
-      :fields='filters.fields',
+      :formFields='filters.fields',
       @submit='doSearch',
       submitButtonText='Search',
       submitButtonIcon='search')
@@ -22,7 +22,7 @@ v-flex(xs12)
         v-if="options.create && !readonly",
         router, fab, absolute, top, right, dark,
         class="green",
-        @click.native="onUpsert")
+        @click.native="onCreate")
         v-icon add
 
       v-data-table(
@@ -69,11 +69,11 @@ v-flex(xs12)
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 
       //- TODO move delete dialog here @sofyanhadia
-      v-dialog(v-model="isShowEdit", width="70%")
+      v-dialog(v-model="isShowEdit", max-width="70%")
         v-card
           v-card-title {{$t('Edit')}} \#{{currentItem.id}}
           v-card-text
-            v-form(v-model="form.model", v-bind="form", method="patch", :action="resource+'/'+currentItem.id", @success="onSaveEdit")
+            v-form(v-model="form.model", :form-fields="form.fields" v-bind="form", method="patch", :action="resource+'/'+currentItem.id", @success="onSaveEdit")
           v-card-actions(actions)
             v-btn(flat, color="primary", @click.native="isShowEdit = false") {{$t('Close')}}
 </template>
@@ -132,6 +132,10 @@ export default {
     },
     type: {
       type: String
+    },
+    onCreate: {
+      type: Function,
+      required: true
     }
   },
 
@@ -159,13 +163,6 @@ export default {
   },
 
   methods: {
-    onUpsert: function() {
-      if (this.type === 'field') {
-        this.$emit('onUpsert');
-      } else {
-        this.$router.push({name: 'create', params: {resource: this.resource}});
-      }
-    },
     fetchForm: async function(item) {
       try {
         const result = await this.$http.get(`${this.resource}/form`, {
@@ -315,12 +312,6 @@ export default {
   },
 
   created: async function() {
-    if (this.type !== 'field') {
-      this.$store.commit(
-        'setPageTitle',
-        global.helper.i.titleize(global.helper.i.pluralize(this.resource))
-      );
-    }
     await this.fetchGrid();
     await this.fetchData();
   }

@@ -68,7 +68,7 @@ v-flex(xs12)
     label {{$t(field.label)}}
     div.pt-2
       dropzone(
-        :id="field.name"
+        :id="getDropzoneOptions(field, model).id"
         :options="getDropzoneOptions(field, model)"
         @vdropzone-sending="onUploading"
         @vdropzone-success="onUploadSuccess")
@@ -87,7 +87,7 @@ v-flex(xs12)
         :showSearch="false",
         :readonly="readonly",
         type="field",
-        @onUpsert="$emit('onUpsert', {subForm: true})")
+        :onCreate="onGridCreate")
 
   //- password input
   v-text-field(
@@ -254,6 +254,9 @@ export default {
       } catch (e) {
         Promise.reject(e);
       }
+    },
+    onGridCreate: function (params) {
+      this.$emit('onUpsert', {subForm: true});
     }
   },
   created: function () {
