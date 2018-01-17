@@ -3,7 +3,11 @@ div
   v-alert(v-if="error" outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
   v-layout
     v-flex(xs12)
-      v-form(v-model="model", v-bind="$data", :method="method", :formFields="formFields", :action="action", @success="onSuccess")
+      v-form(
+        v-bind="$data",
+        :id="id",
+        :resource="resource",
+        @success="onSuccess")
         div(slot="buttons", class="my-4")
           v-btn(dark, class="grey", @click.native="$root.back()")
             v-icon(dark, left) chevron_left
@@ -16,27 +20,12 @@ div
 export default {
   data() {
     return {
-      model: {},
-      formFields: {},
       rules: {},
       messages: {},
       error: null
     };
   },
   computed: {
-    method() {
-      return this.isEdit ? 'patch' : 'post';
-    },
-    action() {
-      if (this.isEdit) {
-        return `${this.resource}/${this.id}`;
-      } else {
-        return `${this.resource}`;
-      }
-    },
-    isEdit() {
-      return !!this.id;
-    },
     resource() {
       return this.$route.params.resource;
     },
@@ -44,37 +33,7 @@ export default {
       return this.$route.params.id;
     }
   },
-  watch: {
-    $route: 'fetch'
-  },
   methods: {
-    getFieldError(fieldName) {
-      for (let k in this.errors) {
-        let error = this.errors[k];
-        if (error.field === fieldName) {
-          return error.message;
-        }
-      }
-    },
-    fetch: async function () {
-      try {
-        let data = await this.$http.get(`${this.resource}/form`, {
-          params: { id: this.id }
-        });
-
-        data = data.data.schema;
-        this.model = data.model;
-        this.formFields = data.fields;
-        this.rules = data.rules;
-        this.messages = data.messages;
-
-        Promise.resolve(data);
-      } catch (e) {
-        this.error = e;
-        Promise.reject(e);
-      }
-    },
-    onSubmit() {},
     onSuccess(data) {
       this.$router.push({ name: 'grid', params: { resource: this.resource } });
       if (data.id) {
@@ -83,15 +42,9 @@ export default {
     }
   },
   created() {
-    let pageTitle =
-      (this.isEdit ? 'Update' : 'Create') +
-      ' ' +
-      global.helper.i.titleize(global.helper.i.singularize(this.resource));
+    let pageTitle = `${(this.isEdit ? 'Update' : 'Create')}
+      ${global.helper.i.titleize(global.helper.i.singularize(this.resource))}`;
     this.$store.commit('setPageTitle', pageTitle);
-  },
-  mounted() {
-    // this.$bus.showMessage('success', 'success')
-    this.fetch();
   }
 };
 </script>

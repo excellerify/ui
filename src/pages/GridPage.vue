@@ -2,7 +2,8 @@
 div
   v-grid(
     :resource="resource",
-    :onCreate="onCreate"
+    :onCreate="onCreate",
+    :onUpdate="onUpdate"
   )
 </template>
 
@@ -15,8 +16,10 @@ export default {
   },
   methods: {
     onCreate: function () {
-      this.$router.push(
-        {name: 'create', params: {resource: this.resource}});
+      this.$router.push({name: 'create', params: {resource: this.resource}});
+    },
+    onUpdate: function ({item}) {
+      this.$router.push({name: 'edit', params: {id: item.id}});
     }
   },
   created: async function() {

@@ -8,10 +8,11 @@ v-flex(xs12)
 
   v-flex(xs12, v-if="showSearch")
     v-form.row.jr(
-      :inline='true',
       v-model='filters.model',
       v-if="filters.fields",
-      :formFields='filters.fields',
+      :inline='true',
+      :parrentFormFields='filters.fields',
+      :autoSubmit='true'
       @submit='doSearch',
       submitButtonText='Search',
       submitButtonIcon='search')
@@ -38,19 +39,19 @@ v-flex(xs12)
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
             td(:width='Object.keys(options).length * 55', align="center")
               template(v-for="(value, action) in actions")
-                v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router,primary,fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
+                v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router, color="primary",fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                   v-icon {{action.icon ? action.icon : action}}
 
-              v-btn(v-if="options.view",fab,dark,small,class="green",:to="{name: 'view', params: {id:props.item.id}}")
+              v-btn(v-if="options.view",fab,dark,small,class="green", :to="{name: 'view', params: {id:props.item.id}}")
                 v-icon visibility
 
-              v-btn(v-if="options.update",dark,primary,fab,small,:to="{name: 'edit', params: {id:props.item.id}}")
+              v-btn(v-if="options.update",dark,color="primary",fab,small, @click.native="onUpdate({item:props.item})")
                 v-icon edit
               //-- also you can try this: inline edit
               //-- v-btn(v-if="options.edit",dark,fab,success,small,@click.native.stop="showEdit(props.item)")
               //--   v-icon() edit
               v-dialog(v-if="options.delete", id="modal" v-model="deleteModal[props.item.id]")
-                v-btn(slot="activator", dark, error, fab, small)
+                v-btn(slot="activator", dark, color="error", fab, small)
                   v-icon delete
                 v-card
                   v-card-text
@@ -67,15 +68,6 @@ v-flex(xs12)
                 v-icon {{options.custom.icon}}
 
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
-
-      //- TODO move delete dialog here @sofyanhadia
-      v-dialog(v-model="isShowEdit", max-width="70%")
-        v-card
-          v-card-title {{$t('Edit')}} \#{{currentItem.id}}
-          v-card-text
-            v-form(v-model="form.model", :form-fields="form.fields" v-bind="form", method="patch", :action="resource+'/'+currentItem.id", @success="onSaveEdit")
-          v-card-actions(actions)
-            v-btn(flat, color="primary", @click.native="isShowEdit = false") {{$t('Close')}}
 </template>
 
 <script>
@@ -109,8 +101,6 @@ const getDefaultData = () => {
       descending: true,
       totalItems: 0
     },
-    isShowEdit: false,
-    currentItem: false,
     items: [],
     error: null
   };
@@ -136,6 +126,10 @@ export default {
     onCreate: {
       type: Function,
       required: true
+    },
+    onUpdate: {
+      type: Function,
+      required: true
     }
   },
 
@@ -154,12 +148,7 @@ export default {
     'pagination.descending'(val) {
       this.fetchData();
     },
-    '$route.params': 'refresh',
-    '$store.state.submitSuccess'(val) {
-      if (this.type === 'field') {
-        this.$router.push({name: 'create', params: {resource: this.resource}});
-      }
-    }
+    '$route.params': 'refresh'
   },
 
   methods: {
@@ -176,17 +165,12 @@ export default {
         Promise.reject(e);
       }
     },
-    onSaveEdit(data) {
-      if (data.id) {
-        this.isShowEdit = false;
-        this.fetchData();
-      }
-    },
-    showEdit(item) {
-      this.currentItem = item;
-      this.fetchForm(item);
-      this.isShowEdit = true;
-    },
+    // onSaveEdit(data) {
+    //   if (data.id) {
+    //     this.isShowDialogForm = false;
+    //     this.fetchData();
+    //   }
+    // },
     preFetch() {
       const filters = {};
 
