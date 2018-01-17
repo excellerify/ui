@@ -9,13 +9,13 @@ div
           ripple)
         v-tabs-slider
 
-      v-tabs-content(v-for='(fields, key) in group.children',
+      v-tabs-content(v-for='(formFields, key) in group.children',
         :key='key',
         :id="'tab-' + key")
         v-card(flat)
           v-card-text
             v-field(
-              v-for='(field, name) in fields',
+              v-for='(field, name) in formFields',
               :key='name',
               :name="name",
               :field="field",
@@ -23,8 +23,9 @@ div
 
     v-layout(v-bind="{[inline? 'row': 'column wrap']: true}", v-if="!groupBy")
       v-field.pr-1(
+        @onUpsert="onSubmit"
         @fieldError="updateFieldsError",
-        v-for='(field, name) in fields',
+        v-for='(field, name) in formFields',
         :key='name',
         :name="name",
         :field="field",
@@ -32,11 +33,11 @@ div
 
       v-alert.py-2(error, v-model='hasError', style="width: 100%; margin-top: 20px;")
         ul
-          li(v-for='error in errors') {{error.message}}
+          li(v-for='error in formErrors') {{error.message}}
 
       v-flex.pt-2.actions(xs12)
         slot(name='buttons')
-          v-btn.ma-0(primary, dark, type="submit") {{$t(submitButtonText)}}
+          v-btn.ma-0(color="primary", dark, type="submit") {{$t(submitButtonText)}}
             v-icon(right, dark) {{submitButtonIcon}}
 </template>
 
@@ -77,7 +78,7 @@ export default {
       type: Object,
       default: () => { }
     },
-    fields: {
+    formFields: {
       required: true,
       type: Object
     },
@@ -96,7 +97,7 @@ export default {
     return {
       model: this.value,
       hasError: false,
-      errors: [],
+      formErrors: [],
       message: '',
       fieldErrors: []
     };
@@ -109,10 +110,12 @@ export default {
       }
       let parents = {};
       let children = {};
-      for (let k in this.fields) {
-        let field = this.fields[k];
+
+      for (let k in this.formFields) {
+        let field = this.formFields[k];
         let ref = field[this.groupBy];
         let parentKey = field.id;
+
         if (ref === null) { // is parent
           parents[parentKey] = field;
         } else { // is child
@@ -132,13 +135,16 @@ export default {
     'value'(val) {
       this.model = val;
     },
-    'model': 'updateFields'
+    '$route'() {
+      this.fieldErrors = [];
+      this.hasError = false;
+    }
   },
   methods: {
     getGroupedFields() { },
     getFieldError(fieldName) {
-      for (let k in this.errors) {
-        let error = this.errors[k];
+      for (let k in this.formErrors) {
+        let error = this.formErrors[k];
         if (error.field === fieldName) {
           return error.message;
         }
@@ -157,7 +163,7 @@ export default {
         }
       }
     },
-    onSubmit: async function() {
+    onSubmit: async function({subForm}) {
       try {
         if (this.fieldErrors.length > 0) {
           throw this.fieldErrors;
@@ -174,20 +180,23 @@ export default {
 
         const result = await this.$http[this.method](this.action, this.model);
 
-        this.$emit('success', result.data);
+        if (!subForm) {
+          this.$emit('success', result.data);
+        }
+
+        this.fieldErrors = [];
 
         global.store.commit('submitSuccess', {message: result.data});
 
         return Promise.resolve(result.data);
       } catch (e) {
-        // if (e.data.error.message) {
-        //   const status = e.status;
-        //   this.$emit('error', status, e.data.error);
-        //   this.errors = [e.data.error];
-        // }
-
         this.hasError = true;
-        this.errors = e;
+
+        if (Array.isArray(e)) {
+          this.formErrors = e;
+        } else {
+          this.formErrors = [e];
+        }
 
         this.$emit('error', e);
 
@@ -198,7 +207,7 @@ export default {
     }
   },
   mounted() {
-    // this.$bus.showMessage('success', 'success')
+    this.fieldErrors = [];
   },
   created() {
     // global.validator.extend('unique', function (data, field, message, args, get) {

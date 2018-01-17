@@ -27,12 +27,12 @@ const router = new Router({
     // path, file(*.vue), name, children
     route('/', 'Main', null, [
       route('/', 'Home', 'home', null, true),
-      route('/crud/:resource', 'CrudGrid', 'grid', null, true),
+      route('/crud/:resource', 'GridPage', 'grid', null, true),
       route('/crud/:resource/:id/view', 'ViewForm', 'view', null, true),
-      route('/crud/:resource/:id/edit', 'CrudForm', 'edit', null, true),
-      route('/crud/:resource/create', 'CrudForm', 'create', null, true),
-      route('/crud/:resource/:id/:action', 'CrudForm', 'action', null, true),
-      route('/crud/:resource/:action', 'CrudForm', 'indexAction', null, true),
+      route('/crud/:resource/:id/edit', 'FormPage', 'edit', null, true),
+      route('/crud/:resource/create', 'FormPage', 'create', null, true),
+      route('/crud/:resource/:id/:action', 'FormPage', 'action', null, true),
+      route('/crud/:resource/:action', 'FormPage', 'indexAction', null, true),
       route('/settings', 'Settings', 'settings', null, true)
     ]),
 

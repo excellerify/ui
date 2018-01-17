@@ -9,7 +9,7 @@ v-flex(xs12)
     v-model='model',
     v-bind='field',
     :readonly="readonly",
-    v-validate="{'required': field.required}")
+    v-validate="validationRules")
 
   //- if radio
   v-layout(v-else-if="['radios', 'radio'].indexOf(field.type) > -1", row)
@@ -25,7 +25,7 @@ v-flex(xs12)
             :label="option.text",
             :value="option.value",
             :disabled="readonly",
-            v-validate="{'required': field.required}")
+            v-validate="validationRules")
 
   //- if checkboxes
   template(v-else-if="['checkboxes'].indexOf(field.type) > -1")
@@ -43,7 +43,7 @@ v-flex(xs12)
             :value='option.value',
             :label='option.text',
             :disabled="readonly",
-            v-validate="{'required': field.required}")
+            v-validate="validationRules")
 
   //- if input type is date or time
   template(v-else-if="['date', 'datetime', 'time'].indexOf(field.type) > -1")
@@ -54,7 +54,7 @@ v-flex(xs12)
         no-title,
         scrollable,
         actions,
-        v-validate="{'required': field.required}")
+        v-validate="validationRules")
 
   //- if input type is html
   div(:class="inputGroupClass",v-else-if="field.type == 'html'")
@@ -73,32 +73,21 @@ v-flex(xs12)
         @vdropzone-sending="onUploading"
         @vdropzone-success="onUploadSuccess")
         input(type='hidden', v-model='model',
-        v-validate="{'required': field.required}")
+        v-validate="validationRules")
 
   //- if hidden
   input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model')
-
-  //- if email
-  v-text-field(
-    v-else-if="field.type == 'email'",
-    :name='name'
-    :data-vv-as='field.label'
-    v-model='model',
-    v-bind='field',
-    :readonly="readonly",
-    field="$t(field.label)",
-    :label="$t(field.label)",
-    :placeholder="$t(field.placeholder)",
-    :type="field.type",
-    v-validate="{'required': field.required, 'email': true}",
-    :error="isError",
-    :error-messages="errorMessage")
 
   //- if table
   template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
     v-layout(row, wrap, class="input-group")
       label {{field.label}}
-      v-grid(:resource="field.model", :showSearch="false", :readonly="readonly", modalForm="true")
+      v-grid(
+        :resource="field.model",
+        :showSearch="false",
+        :readonly="readonly",
+        type="field",
+        @onUpsert="$emit('onUpsert', {subForm: true})")
 
   //- password input
   v-text-field(
@@ -110,8 +99,7 @@ v-flex(xs12)
     :readonly="readonly",
     :label="$t(field.label)",
     :placeholder="$t(field.placeholder)",
-    :multiLine="field.type == 'textarea'",
-    v-validate="{required: field.required}"
+    v-validate="validationRules"
     :error="isError",
     :error-messages="errorMessage"
     :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'"
@@ -130,7 +118,7 @@ v-flex(xs12)
     :placeholder="$t(field.placeholder)",
     :type="field.type",
     :multiLine="field.type == 'textarea'",
-    v-validate="{required: field.required}"
+    v-validate="validationRules"
     :error="isError",
     :error-messages="errorMessage")
 
@@ -187,13 +175,13 @@ export default {
   },
   watch: {
     'errors.items'(val) {
-      debugger;
       this.isError = val.length > 0;
       this.errorMessage = this.isError ? val[0].msg : [];
+
       this.$emit('fieldError', {
         field: this.name,
         isError: this.isError,
-        message: this.isError ? val[0].msg : null
+        message: this.isError ? val[0].msg : []
       });
     }
   },
@@ -211,7 +199,7 @@ export default {
     },
     validationRules: function () {
       const rules = {
-        required: this.field.required,
+        required: !!this.field.required,
         email: this.field.type.toLowerCase() === 'email'
       };
 
@@ -271,11 +259,11 @@ export default {
   created: function () {
     if (this.field.required &&
       !this.value &&
-      !['file', 'pdf', 'image', 'video'].includes(this.field.type)) {
+      !['file', 'pdf', 'image', 'video', 'table', 'array'].includes(this.field.type)) {
       this.$emit('fieldError', {
         field: this.name,
         isError: true,
-        message: `The ${this.field.label} is required`
+        message: `The ${this.field.label} field is required.`
       });
     }
   }
