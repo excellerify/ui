@@ -3,12 +3,12 @@ div
   v-alert(v-if="error" outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
   v-layout
     v-flex(xs12)
-      v-form(v-model="model", v-bind="$data", :method="method", :action="action", @success="onSuccess")
+      v-form(v-model="model", v-bind="$data", :method="method", :formFields="formFields", :action="action", @success="onSuccess")
         div(slot="buttons", class="my-4")
           v-btn(dark, class="grey", @click.native="$root.back()")
             v-icon(dark, left) chevron_left
             span {{$t('Back')}}
-          v-btn(primary, dark, type='submit') {{$t('Submit')}}
+          v-btn(color="primary", dark, type='submit') {{$t('Submit')}}
             v-icon(right, dark) send
 </template>
 
@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       model: {},
-      fields: {},
+      formFields: {},
       rules: {},
       messages: {},
       error: null
@@ -45,8 +45,7 @@ export default {
     }
   },
   watch: {
-    $route: 'fetch',
-    model: 'updateFields'
+    $route: 'fetch'
   },
   methods: {
     getFieldError(fieldName) {
@@ -57,7 +56,6 @@ export default {
         }
       }
     },
-    updateFields() {},
     fetch: async function () {
       try {
         let data = await this.$http.get(`${this.resource}/form`, {
@@ -66,7 +64,7 @@ export default {
 
         data = data.data.schema;
         this.model = data.model;
-        this.fields = data.fields;
+        this.formFields = data.fields;
         this.rules = data.rules;
         this.messages = data.messages;
 

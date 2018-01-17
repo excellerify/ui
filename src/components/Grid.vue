@@ -25,7 +25,14 @@ v-flex(xs12)
         @click.native="onUpsert")
         v-icon add
 
-      v-data-table(:headers='columns', :items='items',:total-items="pagination.totalItems",hide-actions, :pagination.sync="pagination", :loading="loading")
+      v-data-table(
+        :headers='columns',
+        :items='items',
+        :total-items="pagination.totalItems",
+        hide-actions,
+        :pagination.sync="pagination",
+        :loading="loading")
+
         template(slot='items', slot-scope='props')
           tr
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
@@ -68,7 +75,7 @@ v-flex(xs12)
           v-card-text
             v-form(v-model="form.model", v-bind="form", method="patch", :action="resource+'/'+currentItem.id", @success="onSaveEdit")
           v-card-actions(actions)
-            v-btn(flat, primary, @click.native="isShowEdit = false") {{$t('Close')}}
+            v-btn(flat, color="primary", @click.native="isShowEdit = false") {{$t('Close')}}
 </template>
 
 <script>
@@ -117,13 +124,11 @@ export default {
     },
     showSearch: {
       type: Boolean,
-      default: true,
-      required: true
+      default: true
     },
     readonly: {
       type: Boolean,
-      default: false,
-      required: true
+      default: false
     },
     type: {
       type: String
@@ -147,9 +152,10 @@ export default {
     },
     '$route.params': 'refresh',
     '$store.state.submitSuccess'(val) {
-      this.$router.push({name: 'create', params: {resource: this.resource}});
+      if (this.type === 'field') {
+        this.$router.push({name: 'create', params: {resource: this.resource}});
+      }
     }
-    // '$route.query': 'updateRoute'
   },
 
   methods: {
@@ -205,7 +211,6 @@ export default {
     },
     updateRoute() {
       this.$route.query.keepLayout = true;
-      console.log('update route');
       this.$router.go({
         path: this.$route.path,
         params: this.$route.params,
@@ -285,7 +290,7 @@ export default {
         await this.preFetch();
         const result = await this.$http.get(`${this.resource}`, { params: this.$route.query });
         this.items = result.data;
-        this.pagination.totalItems = result.headers['x-total-count'];
+        this.pagination.totalItems = parseInt(result.headers['x-total-count']);
         Promise.resolve({items: result.data, count: this.pagination.totalItems});
       } catch (err) {
         this.error = err;
@@ -310,10 +315,12 @@ export default {
   },
 
   created: async function() {
-    this.$store.commit(
-      'setPageTitle',
-      global.helper.i.titleize(global.helper.i.pluralize(this.resource))
-    );
+    if (this.type !== 'field') {
+      this.$store.commit(
+        'setPageTitle',
+        global.helper.i.titleize(global.helper.i.pluralize(this.resource))
+      );
+    }
     await this.fetchGrid();
     await this.fetchData();
   }
