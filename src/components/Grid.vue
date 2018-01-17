@@ -205,7 +205,7 @@ export default {
     refresh: async function() {
       Object.assign(this.$data, getDefaultData());
       await this.fetchGrid();
-      this.fetchData();
+      await this.fetchData();
     },
     fetch() {
       if (this.columns.length <= 0) {

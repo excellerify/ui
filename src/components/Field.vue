@@ -91,12 +91,14 @@ v-flex(xs12)
         :onUpdate="onGridUpdate")
 
       v-dialog(v-model="isShowDialogForm", max-width="70%")
-        v-card
+        v-card(v-if="isShowDialogForm")
           v-card-title(v-if="currentItem")  {{$t('Edit')}} \#{{currentItem.id}}
           v-card-title(v-else) {{$t('Add')}}
           v-card-text
-             v-form(
+            v-form(
               v-bind="$data",
+              type="subForm",
+              :parrentFormValue="gridFormValue",
               :id="currentItem? currentItem.id.id : null",
               :resource="field.model")
           v-card-actions(actions)
@@ -185,7 +187,8 @@ export default {
       isError: false,
       errorMessage: [],
       isShowDialogForm: false,
-      currentItem: null
+      currentItem: null,
+      gridFormValue: null
     };
   },
   watch: {
@@ -277,14 +280,15 @@ export default {
       this.$emit('onUpsert', {subForm: true, cb: this.onGridUpsertCb});
       this.currentItem = item;
     },
-    onGridUpsertCb: function () {
+    onGridUpsertCb: function (parrentData) {
+      this.gridFormValue = parrentData;
       this.isShowDialogForm = true;
     }
   },
   created: function () {
     if (this.field.required &&
       !this.value &&
-      !['file', 'pdf', 'image', 'video', 'table', 'array'].includes(this.field.type)) {
+      !['file', 'pdf', 'image', 'video', 'table', 'array', 'date', 'datetime', 'time'].includes(this.field.type)) {
       this.$emit('fieldError', {
         field: this.name,
         isError: true,
