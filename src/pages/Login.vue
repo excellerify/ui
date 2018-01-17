@@ -7,7 +7,7 @@ div
          h5(style='text-align: center;') {{$t("Login to Admin Dashboard")}}
       v-card-row
         v-card-text
-          v-form(v-model='model', @submit='doLogin', :fields='fields', submitButtonText="Login")
+          v-form(v-model='model', @submit='doLogin', :parentFormFields='fields', submitButtonText="Login" :autoSubmit="true")
             .flex.pb-2
               small {{$t("* Indicates required field")}}
       v-card-row

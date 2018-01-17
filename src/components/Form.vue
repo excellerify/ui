@@ -23,6 +23,7 @@ div
 
     v-layout(v-bind="{[inline? 'row': 'column wrap']: true}", v-if="!groupBy")
       v-field.pr-1(
+        @refresh="refresh"
         @onUpsert="onSubmit"
         @fieldError="updateFieldsError",
         v-for='(field, name) in formFields',
@@ -74,7 +75,7 @@ export default {
       type: Object,
       default: () => { }
     },
-    parrentFormFields: {
+    parentFormFields: {
       type: Object
     },
     parrentFormValue: {
@@ -146,7 +147,7 @@ export default {
     '$route'() {
       this.fieldErrors = [];
       this.hasError = false;
-      this.fetch();
+      this.refresh();
     },
     'parrentFormValue'(parrentFormValue) {
       if (this.type === 'subForm' && parrentFormValue) {
@@ -159,6 +160,14 @@ export default {
     }
   },
   methods: {
+    refresh() {
+      this.fieldErrors = [];
+      if (!this.parentFormFields) {
+        this.fetch();
+      } else {
+        this.formFields = this.parentFormFields;
+      }
+    },
     fetch: async function () {
       try {
         let data = await this.$http.get(`${this.resource}/form`, {
@@ -193,8 +202,6 @@ export default {
     },
     onSubmit: async function({subForm, cb}) {
       try {
-        debugger;
-
         if (this.fieldErrors.length > 0) {
           throw this.fieldErrors;
         }
@@ -210,17 +217,13 @@ export default {
 
         const result = await this.$http[this.method](this.action, this.model);
 
-        if (!subForm) {
-          this.$emit('success', result.data);
-        }
-
         this.fieldErrors = [];
 
         this.$store.commit('submitSuccess', {message: result.data});
 
-        if (cb) {
-          cb(result.data);
-        }
+        if (!subForm) this.$emit('success', result.data);
+
+        if (cb) cb(result.data);
 
         return Promise.resolve(result.data);
       } catch (e) {
@@ -241,12 +244,7 @@ export default {
     }
   },
   mounted() {
-    this.fieldErrors = [];
-    if (!this.parrentFormFields) {
-      this.fetch();
-    } else {
-      this.formFields = this.parrentFormFields;
-    }
+    this.refresh();
   },
   created() {
     // global.validator.extend('unique', function (data, field, message, args, get) {
