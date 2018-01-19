@@ -6,7 +6,7 @@ v-flex(xs12)
     icon="warning",
     :value="true") {{error.statusCode}} - {{error.message}}
 
-  v-flex(xs12, v-if="showSearch")
+  v-flex(v-if="showSearch", xs12)
     v-form.row.jr(
       v-model='filters.model',
       v-if="filters.fields",
@@ -42,7 +42,7 @@ v-flex(xs12)
                 v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router, color="primary",fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                   v-icon {{action.icon ? action.icon : action}}
 
-              v-btn(v-if="options.view",fab,dark,small,class="green", :to="{name: 'view', params: {id:props.item.id}}")
+              v-btn(v-if="options.view",fab,dark,small,class="green", @click.native="onView({item:props.item})")
                 v-icon visibility
 
               v-btn(v-if="options.update",dark,color="primary",fab,small, @click.native="onUpdate({item:props.item})")
@@ -101,6 +101,7 @@ const getDefaultData = () => {
       descending: true,
       totalItems: 0
     },
+    foreignKey: {},
     items: [],
     error: null
   };
@@ -111,6 +112,9 @@ export default {
     resource: {
       type: String,
       required: true
+    },
+    filterByFk: {
+      type: Object
     },
     showSearch: {
       type: Boolean,
@@ -128,6 +132,10 @@ export default {
       required: true
     },
     onUpdate: {
+      type: Function,
+      required: true
+    },
+    onView: {
       type: Function,
       required: true
     }
@@ -152,10 +160,10 @@ export default {
   },
 
   methods: {
-    fetchForm: async function(item) {
+    fetchForm: async function({id}) {
       try {
         const result = await this.$http.get(`${this.resource}/form`, {
-          params: { id: item.id }
+          params: { id }
         });
 
         this.form = result.data;
@@ -167,6 +175,16 @@ export default {
     },
     preFetch() {
       const filters = {};
+
+      if (this.filterByFk && this.filterByFk.value) {
+        if (!this.filters.model) {
+          this.filters.model = {};
+        }
+
+        const fkKey = this.foreignKey[this.filterByFk.model];
+
+        this.filters.model[fkKey] = this.filterByFk.value;
+      }
 
       if (this.filters.model) {
         this._.forEach(this.filters.model, function(val, key) {
@@ -248,6 +266,7 @@ export default {
 
         this.columns = data.columns || {};
         this.actions = data.actions || {};
+        this.foreignKey = data.foreignKey || {};
 
         // keep limit
         const limit = data.filters.limit || this.filters.limit;
@@ -276,10 +295,16 @@ export default {
     },
     fetchData: async function() {
       try {
-        await this.preFetch();
-        const result = await this.$http.get(`${this.resource}`, { params: this.$route.query });
+        this.preFetch();
+
+        const result = await this.$http.get(`${this.resource}`, {
+          params: this.$route.query
+        });
+
         this.items = result.data;
+
         this.pagination.totalItems = parseInt(result.headers['x-total-count']);
+
         Promise.resolve({items: result.data, count: this.pagination.totalItems});
       } catch (err) {
         this.error = err;

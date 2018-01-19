@@ -26,6 +26,7 @@ div
         @refresh="refresh"
         @onUpsert="onSubmit"
         @fieldError="updateFieldsError",
+        :resourceId="id",
         v-for='(field, name) in formFields',
         :key='name',
         :name="name",
@@ -45,10 +46,10 @@ div
 <script>
 export default {
   props: {
-    resource: {
+    id: {
       type: String
     },
-    id: {
+    resource: {
       type: String
     },
     inline: {
@@ -78,7 +79,7 @@ export default {
     parentFormFields: {
       type: Object
     },
-    parrentFormValue: {
+    parentFormValue: {
       type: Object
     },
     autoSubmit: {

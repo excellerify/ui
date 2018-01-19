@@ -84,6 +84,7 @@ v-flex(xs12)
       label {{field.label}}
       v-grid(
         :resource="field.model || name",
+        :filterByFk="{ model: resource, value : resourceId }"
         :showSearch="false",
         :readonly="readonly",
         type="field",
@@ -92,18 +93,19 @@ v-flex(xs12)
 
       v-dialog(v-model="isShowDialogForm", max-width="70%")
         v-card(v-if="isShowDialogForm")
-          v-card-title(v-if="currentItem")  {{$t('Edit')}} \#{{currentItem.id}}
-          v-card-title(v-else) {{$t('Add')}}
+          v-toolbar(style="flex: 0 0 auto;", dark, class="primary")
+            v-btn(icon, @click.native="isShowDialogForm = false", dark)
+              v-icon close
+            v-toolbar-title {{$t(currentItem? 'Edit':'Add')}}
+          v-spacer
           v-card-text
             v-form(
               v-bind="$data",
               type="subForm",
-              :parrentFormValue="gridFormValue",
-              :id="currentItem? currentItem.id.id : null",
+              :parentFormValue="gridFormValue",
+              :id="currentItem ? currentItem.id.id : null",
               :resource="field.model || name"
               @success="modalSubFormClose")
-          v-card-actions(actions)
-            v-btn(flat, color="primary", @click.native="modalSubFormClose") {{$t('Close')}}
 
   //- password input
   v-text-field(
@@ -147,6 +149,10 @@ import config from '../config';
 
 export default {
   props: {
+    resourceId: {
+      type: String,
+      default: 'new'
+    },
     field: {
       type: Object,
       required: true
@@ -216,7 +222,7 @@ export default {
         this.$emit('input', val);
       }
     },
-    validationRules: function () {
+    validationRules () {
       const rules = {
         required: !!this.field.required,
         email: this.field.type ? this.field.type.toLowerCase() === 'email' : false
