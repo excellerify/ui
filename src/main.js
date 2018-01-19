@@ -46,13 +46,11 @@ Vue.component('dropzone', Dropzone);
 
 import VGrid from './components/Grid.vue';
 import VForm from './components/Form.vue';
-import VView from './components/View.vue';
 import VField from './components/Field.vue';
 
 // import Modal from './components/Modal' Vue.use(Modal)
 Vue.component('v-grid', VGrid);
 Vue.component('v-form', VForm);
-Vue.component('v-view', VView);
 Vue.component('v-field', VField);
 
 /* eslint-disable no-new */

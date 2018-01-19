@@ -6,6 +6,7 @@ div
       v-form(
         :id="id",
         :resource="resource",
+        :readonly="true"
         @success="onSuccess")
         div(slot="buttons", class="my-4")
           v-btn(dark, class="grey", @click.native="$root.back()")

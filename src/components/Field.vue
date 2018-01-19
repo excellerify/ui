@@ -169,7 +169,8 @@ export default {
       required: false
     },
     readonly: {
-      type: Boolean
+      type: Boolean,
+      default: false
     }
   },
   data() {
