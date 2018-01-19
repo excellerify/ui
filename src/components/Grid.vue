@@ -234,6 +234,20 @@ export default {
 
         const data = result.data.schema;
 
+        if (!Array.isArray(data.columns) && typeof data.columns === 'object') {
+          const columnsArr = [];
+
+          this._.forEach(data.columns, function(value, key) {
+            if (!value.value) {
+              value.value = key;
+              columnsArr.push(value);
+            }
+          });
+
+          data.columns = columnsArr;
+        }
+
+        // convert to html safe
         for (let k in data.columns) {
           data.columns[k].text = this.$t(data.columns[k].text);
         }
