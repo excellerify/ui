@@ -165,12 +165,6 @@ export default {
         Promise.reject(e);
       }
     },
-    // onSaveEdit(data) {
-    //   if (data.id) {
-    //     this.isShowDialogForm = false;
-    //     this.fetchData();
-    //   }
-    // },
     preFetch() {
       const filters = {};
 
