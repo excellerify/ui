@@ -19,7 +19,8 @@ div
               :key='name',
               :name="name",
               :field="field",
-              v-model="model[name]")
+              v-model="model[name]",
+              :readonly="readonly")
 
     v-layout(v-bind="{[inline? 'row': 'column wrap']: true}", v-if="!groupBy")
       v-field.pr-1(
@@ -31,7 +32,8 @@ div
         :key='name',
         :name="name",
         :field="field",
-        v-model="model[name]")
+        v-model="model[name]",
+        :readonly="readonly")
 
       v-alert.py-2(error, v-model='hasError', style="width: 100%; margin-top: 20px;")
         ul
@@ -88,6 +90,10 @@ export default {
     type: {
       type: String,
       default: 'form'
+    },
+    readonly: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
