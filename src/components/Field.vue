@@ -83,7 +83,7 @@ v-flex(xs12)
     v-layout(row, wrap, class="input-group")
       label {{field.label}}
       v-grid(
-        :resource="field.model",
+        :resource="field.model || name",
         :showSearch="false",
         :readonly="readonly",
         type="field",
@@ -100,7 +100,7 @@ v-flex(xs12)
               type="subForm",
               :parrentFormValue="gridFormValue",
               :id="currentItem? currentItem.id.id : null",
-              :resource="field.model"
+              :resource="field.model || name"
               @success="modalSubFormClose")
           v-card-actions(actions)
             v-btn(flat, color="primary", @click.native="modalSubFormClose") {{$t('Close')}}
