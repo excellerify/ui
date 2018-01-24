@@ -18,7 +18,7 @@ const store = {
 
   },
   mutations: {
-    setAuth(state, {user, token, expireTime}) {
+    setAuth (state, {user, token, expireTime}) {
       state.user = user;
       state.token = token;
       state.expireTime = expireTime;
@@ -38,13 +38,13 @@ const store = {
         .ls
         .set('expireTime', expireTime);
     },
-    setMenu(state, data) {
+    setMenu (state, data) {
       state.menu = data;
     },
-    setPageTitle(state, data) {
+    setPageTitle (state, data) {
       state.pageTitle = data;
     },
-    showMessage(state, type, body) {
+    showMessage (state, type, body) {
       state.message = {
         type,
         body
@@ -52,7 +52,7 @@ const store = {
     }
   },
   actions: {
-    checkAuth({commit}) {
+    checkAuth ({commit}) {
       let data = {
         user: global
           .helper
@@ -70,11 +70,11 @@ const store = {
 
       commit('setAuth', data);
     },
-    doLogin({commit}, params) {
+    doLogin ({commit}, params) {
       commit('setAuth', params);
       router.push('/');
     },
-    clearAuth({commit}) {
+    clearAuth ({commit}) {
       commit('setAuth', {
         user: null,
         token: null,
@@ -82,7 +82,7 @@ const store = {
       });
       router.push('/login');
     },
-    checkPageTitle({commit, state}, path) {
+    checkPageTitle ({commit, state}, path) {
       for (let k in state.menu) {
         if (state.menu[k].href === path) {
           commit('setPageTitle', state.menu[k].title);

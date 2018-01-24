@@ -60,13 +60,13 @@ new Vue({
   store,
   router,
   render: h => h(App),
-  mounted() {},
+  mounted () {},
   methods: {
-    back() {
+    back () {
       this.$router.go(-1);
     }
   },
-  created() {
+  created () {
     // this.$http.get('/users/1').then(({data}) => console.log(data))
     global.$http = this.$http;
     global.$t = this.$t;
