@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true
+  },
+  "extends": ["standard", "plugin:vue/essential"],
+  "plugins": ["html"],
+  "rules": {
+    "arrow-parens": 0,
+    "generator-star-spacing": 0,
+    "space-before-function-parent": 0,
+    "semi": ["error", "always"]
+  }
+}

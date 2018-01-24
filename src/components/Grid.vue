@@ -42,7 +42,7 @@ v-flex(xs12)
                 v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router, color="primary",fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
                   v-icon {{action.icon ? action.icon : action}}
 
-              v-btn(v-if="options.view",fab,dark,small,class="green", @click.native="onView({item:props.item})")
+              v-btn(v-if="options.view && onView",fab,dark,small,class="green", @click.native="onView({item:props.item})")
                 v-icon visibility
 
               v-btn(v-if="options.update",dark,color="primary",fab,small, @click.native="onUpdate({item:props.item})")
@@ -136,8 +136,7 @@ export default {
       required: true
     },
     onView: {
-      type: Function,
-      required: true
+      type: Function
     }
   },
 

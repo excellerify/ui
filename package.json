@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
-    "lint": "eslint --ext .js,.vue src",
-    "lint:fix": "eslint --fix --ext .js,.vue src"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "adonis-websocket-client": "^1.0.2",
@@ -53,6 +53,7 @@
     "eslint-plugin-html": "^2.0.0",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^2.0.1",
+    "eslint-plugin-vue": "^4.2.0",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.16.2",
     "extract-text-webpack-plugin": "^2.0.0",

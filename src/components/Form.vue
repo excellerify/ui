@@ -1,47 +1,47 @@
-<template lang="pug">
+<template lang='pug'>
 div
   form(:action='action', @submit.prevent='onSubmit', novalidate)
-    v-tabs(grow, scroll-bars, v-model='active', dark, v-if="groupBy")
+    v-tabs(grow, scroll-bars, v-model='active', dark, v-if='groupBy')
       v-tabs-bar(slot='activators')
         v-tabs-item(v-for='(field, key) in group.parents',
           :key='key',
-          :href="'tab-' + key",
+          :href='\'tab-\' + key',
           ripple)
         v-tabs-slider
 
       v-tabs-content(v-for='(formFields, key) in group.children',
         :key='key',
-        :id="'tab-' + key")
+        :id='\'tab-\' + key')
         v-card(flat)
           v-card-text
             v-field(
               v-for='(field, name) in formFields',
               :key='name',
-              :name="name",
-              :field="field",
-              v-model="model[name]",
-              :readonly="readonly")
+              :name='name',
+              :field='field',
+              v-model='model[name]',
+              :readonly='readonly')
 
-    v-layout(v-bind="{[inline? 'row': 'column wrap']: true}", v-if="!groupBy")
+    v-layout(v-bind='{[inline? \'row\': \'column wrap\']: true}', v-if='!groupBy')
       v-field.pr-1(
-        @refresh="refresh"
-        @onUpsert="onSubmit"
-        @fieldError="updateFieldsError",
-        :resourceId="id",
+        @refresh='refresh'
+        @onUpsert='onSubmit'
+        @fieldError='updateFieldsError',
+        :resourceId='id',
         v-for='(field, name) in formFields',
         :key='name',
-        :name="name",
-        :field="field",
-        v-model="model[name]",
-        :readonly="readonly")
+        :name='name',
+        :field='field',
+        v-model='model[name]',
+        :readonly='readonly')
 
-      v-alert.py-2(error, v-model='hasError', style="width: 100%; margin-top: 20px;")
+      v-alert.py-2(error, v-model='hasError', style='width: 100%; margin-top: 20px;')
         ul
           li(v-for='error in formErrors') {{error.message}}
 
       v-flex.pt-2.actions(xs12)
         slot(name='buttons')
-          v-btn.ma-0(color="primary", dark, type="submit") {{$t(submitButtonText)}}
+          v-btn.ma-0(color='primary', dark, type='submit') {{$t(submitButtonText)}}
             v-icon(right, dark) {{submitButtonIcon}}
 </template>
 
@@ -76,7 +76,7 @@ export default {
     value: {
       required: false,
       type: Object,
-      default: () => { }
+      default: () => {}
     },
     parentFormFields: {
       type: Object
@@ -122,9 +122,11 @@ export default {
         let ref = field[this.groupBy];
         let parentKey = field.id;
 
-        if (ref === null) { // is parent
+        if (ref === null) {
+          // is parent
           parents[parentKey] = field;
-        } else { // is child
+        } else {
+          // is child
           if (!children[ref]) {
             children[ref] = {};
           }
@@ -148,15 +150,15 @@ export default {
     }
   },
   watch: {
-    'value'(val) {
+    value(val) {
       this.model = val;
     },
-    '$route'() {
+    $route() {
       this.fieldErrors = [];
       this.hasError = false;
       this.refresh();
     },
-    'parrentFormValue'(parrentFormValue) {
+    parrentFormValue(parrentFormValue) {
       if (this.type === 'subForm' && parrentFormValue) {
         this._.forEach(this.formFields, (val, key) => {
           if (val.fk) {
@@ -175,7 +177,7 @@ export default {
         this.formFields = this.parentFormFields;
       }
     },
-    fetch: async function () {
+    fetch: async function() {
       try {
         let data = await this.$http.get(`${this.resource}/form`, {
           params: { id: this.id }
@@ -193,13 +195,13 @@ export default {
         Promise.reject(e);
       }
     },
-    getGroupedFields() { },
-    updateFieldsError({field, isError, message}) {
-      const index = this._.findIndex(this.fieldErrors, {field});
+    getGroupedFields() {},
+    updateFieldsError({ field, isError, message }) {
+      const index = this._.findIndex(this.fieldErrors, { field });
 
       if (isError) {
         if (index < 0) {
-          this.fieldErrors.push({field, isError, message});
+          this.fieldErrors.push({ field, isError, message });
         }
       } else {
         if (index > -1) {
@@ -207,7 +209,7 @@ export default {
         }
       }
     },
-    onSubmit: async function({subForm, cb}) {
+    onSubmit: async function({ subForm, cb }) {
       try {
         if (this.fieldErrors.length > 0) {
           throw this.fieldErrors;
@@ -226,7 +228,7 @@ export default {
 
         this.fieldErrors = [];
 
-        this.$store.commit('submitSuccess', {message: result.data});
+        this.$store.commit('submitSuccess', { message: result.data });
 
         if (!subForm) this.$emit('success', result.data);
 
@@ -244,7 +246,7 @@ export default {
 
         this.$emit('error', e);
 
-        this.$store.commit('submitError', {message: e});
+        this.$store.commit('submitError', { message: e });
 
         Promise.reject(e);
       }

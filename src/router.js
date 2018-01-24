@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 Vue.use(Router);
 
-function route(path, file, name, children, requiresAuth) {
+function route (path, file, name, children, requiresAuth) {
   return {
     exact: true,
     path,

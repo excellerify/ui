@@ -9,7 +9,7 @@ const store = {
     }
   },
   mutations: {
-    submitLoading(state) {
+    submitLoading (state) {
       state.submitLoading = true;
       state.submitSuccess = {
         status: false
@@ -18,14 +18,14 @@ const store = {
         status: false
       };
     },
-    submitSuccess(state, {message}) {
+    submitSuccess (state, {message}) {
       state.submitLoading = false;
       state.submitSuccess = {
         status: true,
         message
       };
     },
-    submitError(state, {message}) {
+    submitError (state, {message}) {
       state.submitLoading = false;
       state.submitError = {
         status: true,
