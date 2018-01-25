@@ -6,8 +6,8 @@
   "env": {
     "browser": true
   },
-  "extends": ["standard", "plugin:vue/essential"],
-  "plugins": ["html"],
+  "extends": ["standard", "plugin:vue/recommended"],
+  "plugins": ["html", "pug"],
   "rules": {
     "generator-star-spacing": 0,
     "space-before-function-parent": 0,

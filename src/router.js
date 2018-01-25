@@ -33,6 +33,7 @@ const router = new Router({
       route('/crud/:resource/create', 'FormPage', 'create', null, true),
       route('/crud/:resource/:id/:action', 'FormPage', 'action', null, true),
       route('/crud/:resource/:action', 'FormPage', 'indexAction', null, true),
+      route('/crud/:resource/:subResource/:id/edit', 'FormPage', 'customAction', null, true),
       route('/settings', 'Settings', 'settings', null, true)
     ]),
 

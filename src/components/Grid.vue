@@ -64,14 +64,14 @@ v-flex(xs12)
               v-btn(v-if="typeof options.lock === 'object'", fab, small,@click="lock(props.item)")
                 v-icon lock
 
-              v-btn(v-if="typeof options.custom === 'object'",fab,small,@click="customAction(props.item)")
+              v-btn(v-if="typeof options.custom === 'object'",fab,small,@click="customAction(options.custom, props.item)")
                 v-icon {{options.custom.icon}}
 
       v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
 </template>
 
 <script>
-import config from '../config';
+import config from "../config";
 
 const getDefaultData = () => {
   return {
@@ -89,7 +89,7 @@ const getDefaultData = () => {
     columns: [], // fetch grid setup params from server if `columns` is empty
     actions: {},
     options: {
-      sort: 'id',
+      sort: "id",
       create: false,
       update: true,
       delete: false
@@ -97,7 +97,7 @@ const getDefaultData = () => {
     pagination: {
       page: 1,
       rowsPerPage: 10,
-      sortBy: 'id',
+      sortBy: "id",
       descending: true,
       totalItems: 0
     },
@@ -143,35 +143,22 @@ export default {
   data: getDefaultData,
 
   watch: {
-    '$i18n.locale'(val) {
+    "$i18n.locale"(val) {
       this.fetchGrid();
     },
-    'pagination.page'(val) {
+    "pagination.page"(val) {
       this.fetchData();
     },
-    'pagination.sortBy'(val) {
+    "pagination.sortBy"(val) {
       this.fetchData();
     },
-    'pagination.descending'(val) {
+    "pagination.descending"(val) {
       this.fetchData();
     },
-    '$route.params': 'refresh'
+    "$route.params": "refresh"
   },
 
   methods: {
-    fetchForm: async function({id}) {
-      try {
-        const result = await this.$http.get(`${this.resource}/form`, {
-          params: { id }
-        });
-
-        this.form = result.data;
-        Promise.resolve(result.data);
-      } catch (e) {
-        this.error = e;
-        Promise.reject(e);
-      }
-    },
     preFetch() {
       const filters = {};
 
@@ -229,12 +216,12 @@ export default {
     },
     getColumnData(row, field) {
       // process fields like `type.name`
-      let [l1, l2] = field.value.split('.');
+      let [l1, l2] = field.value.split(".");
       let value = row[l1];
       if (l2) {
         value = row[l1] ? row[l1][l2] : null;
       }
-      if (field.type === 'image') {
+      if (field.type === "image") {
         value = `<v-avatar size="36px"><img src="${value}" class="crud-grid-thumb" controls /></v-avatar>`;
       }
       return value;
@@ -245,7 +232,7 @@ export default {
 
         const data = result.data.schema;
 
-        if (!Array.isArray(data.columns) && typeof data.columns === 'object') {
+        if (!Array.isArray(data.columns) && typeof data.columns === "object") {
           const columnsArr = [];
 
           this._.forEach(data.columns, function(value, key) {
@@ -275,7 +262,7 @@ export default {
         this.options = data.options || {};
 
         if (this.options && this.options.sort) {
-          let sortData = this.options.sort.split('-');
+          let sortData = this.options.sort.split("-");
           let desc = sortData.length > 1;
           let sortField = sortData.pop();
 
@@ -302,9 +289,12 @@ export default {
 
         this.items = result.data;
 
-        this.pagination.totalItems = parseInt(result.headers['x-total-count']);
+        this.pagination.totalItems = parseInt(result.headers["x-total-count"]);
 
-        Promise.resolve({items: result.data, count: this.pagination.totalItems});
+        Promise.resolve({
+          items: result.data,
+          count: this.pagination.totalItems
+        });
       } catch (err) {
         this.error = err;
         Promise.reject(err);
@@ -316,6 +306,16 @@ export default {
     },
     next() {
       this.pagination.page++;
+    },
+    customAction: async function(option, item) {
+      this.$router.push({
+        name: "customAction",
+        params: {
+          resource: this.resource,
+          subResource: option.formUrl,
+          id: item.id
+        }
+      });
     }
   },
 

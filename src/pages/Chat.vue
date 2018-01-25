@@ -1,6 +1,6 @@
 <template lang="pug">
 v-container
-  v-alert(warning,v-model="showWarning") tips: A Socket Server is needed.
+  v-alert(warning, v-model="showWarning") tips: A Socket Server is needed.
   v-list(two-line)
     template(v-for='item in list.slice(0, 6)')
       v-subheader(v-if='item.header', v-text='item.header')
@@ -17,6 +17,7 @@ v-container
     v-flex(xs12, xl6)
       v-text-field(v-model='message', label='Type your message and press Enter to send...', @keyup.enter.native='send')
 </template>
+
 <script>
 import ws from 'adonis-websocket-client';
 const io = ws(global.config.url, {});
