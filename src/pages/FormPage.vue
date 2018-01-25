@@ -6,6 +6,7 @@ div
       v-form(
         :id="id",
         :resource="resource",
+        :subResource="subResource"
         @success="onSuccess")
         div(slot="buttons", class="my-4")
           v-btn(dark, class="grey", @click.native="$root.back()")
@@ -25,25 +26,25 @@ export default {
     };
   },
   computed: {
+    id() {
+      return this.$route.params.id;
+    },
     resource() {
       return this.$route.params.resource;
     },
-    id() {
-      return this.$route.params.id;
+    subResource() {
+      return this.$route.params.subResource;
     }
   },
   methods: {
     onSuccess(data) {
-      this.$router.push({ name: 'grid', params: { resource: this.resource } });
-      if (data.id) {
-        // this.$router.go(-1);
-      }
+      this.$router.push({ name: "grid", params: { resource: this.resource } });
     }
   },
   created() {
-    let pageTitle = `${(this.isEdit ? 'Update' : 'Create')}
+    let pageTitle = `${this.isEdit ? "Update" : "Create"}
       ${global.helper.i.titleize(global.helper.i.singularize(this.resource))}`;
-    this.$store.commit('setPageTitle', pageTitle);
+    this.$store.commit("setPageTitle", pageTitle);
   }
 };
 </script>

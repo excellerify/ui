@@ -54,6 +54,9 @@ export default {
     resource: {
       type: String
     },
+    subResource: {
+      type: String
+    },
     inline: {
       type: Boolean,
       default: false
@@ -179,7 +182,9 @@ export default {
     },
     fetch: async function() {
       try {
-        let data = await this.$http.get(`${this.resource}/form`, {
+        const getUrl = `${this.resource}/${(this.subResource || 'form')}`
+
+        let data = await this.$http.get(getUrl, {
           params: { id: this.id }
         });
 

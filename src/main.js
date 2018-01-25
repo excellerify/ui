@@ -59,13 +59,7 @@ new Vue({
   i18n,
   store,
   router,
-  render: h => h(App),
   mounted () {},
-  methods: {
-    back () {
-      this.$router.go(-1);
-    }
-  },
   created () {
     // this.$http.get('/users/1').then(({data}) => console.log(data))
     global.$http = this.$http;
@@ -87,5 +81,11 @@ new Vue({
     this
       .$store
       .dispatch('checkAuth');
-  }
+  },
+  methods: {
+    back () {
+      this.$router.go(-1);
+    }
+  },
+  render: h => h(App)
 });
