@@ -24,11 +24,11 @@ div
 
     v-layout(v-bind='{[inline? \'row\': \'column wrap\']: true}', v-if='!groupBy')
       v-field.pr-1(
-        @refresh='refresh'
-        @onUpsert='onSubmit'
+        v-for='(field, name) in formFields',
+        @refresh='refresh',
+        @onUpsert='onSubmit',
         @fieldError='updateFieldsError',
         :resourceId='id',
-        v-for='(field, name) in formFields',
         :key='name',
         :name='name',
         :field='field',
@@ -145,6 +145,9 @@ export default {
     isEdit() {
       return !!this.id;
     },
+    isCreate() {
+      return !!!this.id;
+    },
     action() {
       if (this.isEdit) {
         return `${this.resource}/${this.id}`;
@@ -174,13 +177,36 @@ export default {
           await this.fetch();
         }
 
+        // Show only available mode
+        this.formFields = this._.pickBy(this.formFields, (val, key) => {
+          if (val.mode) {
+            if (this.isEdit) {
+              return val.mode.indexOf("isEdit") > -1;
+            } else if (this.isView) {
+              return val.mode.indexOf("isView") > -1;
+            } else {
+              return val.mode.indexOf("isCreate") > -1;
+            }
+          }
+
+          return true;
+        });
+
+        console.log(this.formFields);
+
+        debugger;
+
         if (this.type === "subForm" && this.ParentData) {
-          this._.forEach(this.formFields, function(val, key) {
+          this._.forEach(
+            this.formFields,
+            function(val, key) {
               if (val.fk) {
                 this._.forEach(this.ParentData, (valData, keyData) => {
-                  const fkData = valData[val.fk[keyData]]
-                  if(!fkData){
-                    console.error(`Wrong fk, "${keyData}" should be "${val.fk}"`)
+                  const fkData = valData[val.fk[keyData]];
+                  if (!fkData) {
+                    console.error(
+                      `Wrong fk, "${keyData}" should be "${val.fk}"`
+                    );
                   }
                   this.model[key] = valData[val.fk[keyData]];
                 });
