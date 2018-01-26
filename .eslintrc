@@ -10,7 +10,7 @@
   "plugins": ["html", "pug"],
   "rules": {
     "generator-star-spacing": 0,
-    "space-before-function-parent": 0,
+    "space-before-function-paren": 0,
     "semi": ["error", "always"]
   }
 }

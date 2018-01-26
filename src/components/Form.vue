@@ -69,22 +69,23 @@ export default {
     submitButtonText: {
       required: false,
       type: String,
-      default: 'Submit'
+      default: "Submit"
     },
     submitButtonIcon: {
       required: false,
       type: String,
-      default: 'send'
+      default: "send"
     },
     value: {
       required: false,
       type: Object,
       default: () => {}
     },
-    parentFormFields: {
+    ParentData: {
+      required: false,
       type: Object
     },
-    parentFormValue: {
+    FormFields: {
       type: Object
     },
     autoSubmit: {
@@ -92,7 +93,7 @@ export default {
     },
     type: {
       type: String,
-      default: 'form'
+      default: "form"
     },
     readonly: {
       type: Boolean,
@@ -104,7 +105,7 @@ export default {
       model: this.value,
       hasError: false,
       formErrors: [],
-      message: '',
+      message: "",
       fieldErrors: [],
       rules: null,
       messages: null,
@@ -139,7 +140,7 @@ export default {
       return { parents, children };
     },
     method() {
-      return this.isEdit ? 'patch' : 'post';
+      return this.isEdit ? "patch" : "post";
     },
     isEdit() {
       return !!this.id;
@@ -160,29 +161,42 @@ export default {
       this.fieldErrors = [];
       this.hasError = false;
       this.refresh();
-    },
-    parrentFormValue(parrentFormValue) {
-      if (this.type === 'subForm' && parrentFormValue) {
-        this._.forEach(this.formFields, (val, key) => {
-          if (val.fk) {
-            this.model[key] = parrentFormValue[val.fk];
-          }
-        });
-      }
     }
   },
   methods: {
-    refresh() {
-      this.fieldErrors = [];
-      if (!this.parentFormFields) {
-        this.fetch();
-      } else {
-        this.formFields = this.parentFormFields;
+    refresh: async function() {
+      try {
+        this.fieldErrors = [];
+
+        if (this.FormFields) {
+          this.formFields = this.FormFields;
+        } else {
+          await this.fetch();
+        }
+
+        if (this.type === "subForm" && this.ParentData) {
+          this._.forEach(this.formFields, function(val, key) {
+              if (val.fk) {
+                this._.forEach(this.ParentData, (valData, keyData) => {
+                  const fkData = valData[val.fk[keyData]]
+                  if(!fkData){
+                    console.error(`Wrong fk, "${keyData}" should be "${val.fk}"`)
+                  }
+                  this.model[key] = valData[val.fk[keyData]];
+                });
+              }
+            }.bind(this)
+          );
+        }
+
+        Promise.resolve();
+      } catch (e) {
+        Promise.reject(e);
       }
     },
     fetch: async function() {
       try {
-        const getUrl = `${this.resource}/${(this.subResource || 'form')}`
+        const getUrl = `${this.resource}/${this.subResource || "form"}`;
 
         let data = await this.$http.get(getUrl, {
           params: { id: this.id }
@@ -220,12 +234,12 @@ export default {
           throw this.fieldErrors;
         }
 
-        this.$store.commit('submitLoading');
+        this.$store.commit("submitLoading");
 
-        this.$emit('input', this.model);
+        this.$emit("input", this.model);
 
         if (this.autoSubmit) {
-          this.$emit('submit');
+          this.$emit("submit");
           return Promise.resolve();
         }
 
@@ -233,9 +247,9 @@ export default {
 
         this.fieldErrors = [];
 
-        this.$store.commit('submitSuccess', { message: result.data });
+        this.$store.commit("submitSuccess", { message: result.data });
 
-        if (!subForm) this.$emit('success', result.data);
+        if (!subForm) this.$emit("success", result.data);
 
         if (cb) cb(result.data);
 
@@ -249,9 +263,9 @@ export default {
           this.formErrors = [e];
         }
 
-        this.$emit('error', e);
+        this.$emit("error", e);
 
-        this.$store.commit('submitError', { message: e });
+        this.$store.commit("submitError", { message: e });
 
         Promise.reject(e);
       }
@@ -263,7 +277,7 @@ export default {
   created() {
     // global.validator.extend('unique', function (data, field, message, args, get) {
     //   return new Promise(function (resolve, reject) {
-    //     // const fieldValue = get(data, field)
+    //     const fieldValue = get(data, field)
     //     return resolve('Unsupported in client.')
     //   })
     // }, this.$t('Field should be unique.'))

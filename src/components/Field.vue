@@ -84,14 +84,14 @@ v-flex(xs12)
       label {{field.label}}
       v-grid(
         :resource="field.model || name",
-        :filterByFk="{ model: resource, value : resourceId }"
+        :filterByFk="{ model: resource, value : resourceId }",
         :showSearch="false",
         :readonly="readonly",
         type="field",
         :onCreate="onGridCreate",
         :onUpdate="onGridUpdate")
 
-      v-dialog(v-model="isShowDialogForm", max-width="70%")
+      v-dialog(v-model="isShowDialogForm", max-width="60%")
         v-card(v-if="isShowDialogForm")
           v-toolbar(style="flex: 0 0 auto;", dark, class="primary")
             v-btn(icon, @click.native="isShowDialogForm = false", dark)
@@ -101,27 +101,27 @@ v-flex(xs12)
           v-card-text
             v-form(
               v-bind="$data",
+              :ParentData="parentData",
               type="subForm",
-              :parentFormValue="gridFormValue",
               :id="currentItem ? currentItem.id.id : null",
-              :resource="field.model || name"
+              :resource="field.model || name",
               @success="modalSubFormClose")
 
   //- password input
   v-text-field(
     v-else-if="['password'].indexOf(field.type) > -1",
-    :name='name'
-    :data-vv-as='field.label'
+    :name='name',
+    :data-vv-as='field.label',
     v-model='model',
     v-bind='field',
     :readonly="readonly",
     :label="$t(field.label)",
     :placeholder="$t(field.placeholder)",
-    v-validate="validationRules"
+    v-validate="validationRules",
     :error="isError",
-    :error-messages="errorMessage"
-    :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'"
-    :append-icon-cb="() => (passwordInvisible = !passwordInvisible)"
+    :error-messages="errorMessage",
+    :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'",
+    :append-icon-cb="() => (passwordInvisible = !passwordInvisible)",
     :type="passwordInvisible ? 'password' : 'text'")
 
   //- default input
@@ -143,15 +143,17 @@ v-flex(xs12)
 </template>
 
 <script>
-import 'vue2-dropzone/dist/vue2Dropzone.css';
-import randomstring from 'randomstring';
-import config from '../config';
+import "vue2-dropzone/dist/vue2Dropzone.css";
+import randomstring from "randomstring";
+
+import { EventBus } from '../eventBus.js';
+import config from "../config";
 
 export default {
   props: {
     resourceId: {
       type: String,
-      default: 'new'
+      default: "new"
     },
     field: {
       type: Object,
@@ -175,16 +177,16 @@ export default {
   },
   data() {
     return {
-      inputGroupClass: 'input-group input-group--dirty input-group--text-field',
+      inputGroupClass: "input-group input-group--dirty input-group--text-field",
       editorOption: {
         modules: {
           toolbar: [
-            ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+            ["bold", "italic", "underline", "strike"], // toggled buttons
             [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            ['blockquote', 'code-block'],
+            ["blockquote", "code-block"],
             [{ header: 1 }, { header: 2 }], // custom button values
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            [{ indent: '-1' }, { indent: '+1' }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            [{ indent: "-1" }, { indent: "+1" }],
             [{ align: [] }]
           ]
         }
@@ -196,15 +198,15 @@ export default {
       errorMessage: [],
       isShowDialogForm: false,
       currentItem: null,
-      gridFormValue: null
+      parentData: {}
     };
   },
   watch: {
-    'errors.items'(val) {
+    "errors.items"(val) {
       this.isError = val.length > 0;
       this.errorMessage = this.isError ? val[0].msg : [];
 
-      this.$emit('fieldError', {
+      this.$emit("fieldError", {
         field: this.name,
         isError: this.isError,
         message: this.isError ? val[0].msg : []
@@ -220,13 +222,15 @@ export default {
         return this.value;
       },
       set(val) {
-        this.$emit('input', val);
+        this.$emit("input", val);
       }
     },
-    validationRules () {
+    validationRules() {
       const rules = {
         required: !!this.field.required,
-        email: this.field.type ? this.field.type.toLowerCase() === 'email' : false
+        email: this.field.type
+          ? this.field.type.toLowerCase() === "email"
+          : false
       };
 
       return rules;
@@ -234,19 +238,21 @@ export default {
   },
   methods: {
     onUploading(file, xhr, formData) {
-      const extension = file.name.split('.');
-      file.upload.filename = `${randomstring.generate()}.${extension[extension.length - 1]}`;
+      const extension = file.name.split(".");
+      file.upload.filename = `${randomstring.generate()}.${
+        extension[extension.length - 1]
+      }`;
     },
     onUploadSuccess(file, response) {
       const filename = response.result.files.file[0].name;
       this.$emit(
-        'input',
+        "input",
         `${config.api}Files/${this.resource}/download/${filename}`
       );
     },
     getColumnData(row, field) {
       // process fields like `type.name`
-      let [l1, l2] = field.split('.');
+      let [l1, l2] = field.split(".");
       if (l2) {
         return row[l1] ? row[l1][l2] : null;
       } else {
@@ -255,53 +261,53 @@ export default {
     },
     getDropzoneOptions(field, model) {
       return {
-        url: `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`,
+        url: `${this.$store.state.config.ajaxUploadUrl}/${
+          this.resource
+        }/upload`,
         thumbnailWidth: 150,
         maxFilesize: 1024,
         withCredentials: true,
         acceptedFileTypes: field.acceptedFileTypes,
-        id: 'dropzone_' + this.name,
+        id: "dropzone_" + this.name,
         createThumbnailFromUrl: model
       };
     },
-    getSubTableForm: async function(id) {
-      try {
-        if (['table', 'array'].indexOf(this.field.type) > -1) {
-          const tableForm = await this.$http.get(`${this.field.model}/form`, {
-            params: { id: this.id }
-          });
-
-          this.tableForm = tableForm.data.schema;
-          this.addSubdata = true;
-          return Promise.resolve(this.tableForm);
-        }
-
-        Promise.resolve();
-      } catch (e) {
-        Promise.reject(e);
-      }
+    onGridCreate: function() {
+      this.$emit("onUpsert", { subForm: true, cb: this.onGridUpsertCb });
     },
-    onGridCreate: function () {
-      this.$emit('onUpsert', {subForm: true, cb: this.onGridUpsertCb});
-    },
-    onGridUpdate: function ({item}) {
-      this.$emit('onUpsert', {subForm: true, cb: this.onGridUpsertCb});
+    onGridUpdate: function({ item }) {
+      this.$emit("onUpsert", { subForm: true, cb: this.onGridUpsertCb });
       this.currentItem = item;
     },
-    onGridUpsertCb: function (parrentData) {
-      this.gridFormValue = parrentData;
+    onGridUpsertCb: function(parentData) {
+      this.parentData = {};
+      this.parentData[this.resource] = parentData;
       this.isShowDialogForm = true;
     },
     modalSubFormClose() {
       this.isShowDialogForm = false;
-      this.$emit('refresh');
+      this.$emit("refresh");
+      EventBus.$emit("gridRefresh");
     }
   },
-  created: function () {
-    if (this.field.required &&
+  created: function() {
+    if (
+      this.field.required &&
       !this.value &&
-      !['file', 'pdf', 'image', 'video', 'table', 'array', 'date', 'datetime', 'time'].includes(this.field.type)) {
-      this.$emit('fieldError', {
+      ![
+        "file",
+        "pdf",
+        "image",
+        "video",
+        "table",
+        "array",
+        "date",
+        "datetime",
+        "time",
+        "hidden"
+      ].includes(this.field.type)
+    ) {
+      this.$emit("fieldError", {
         field: this.name,
         isError: true,
         message: `The ${this.field.label} field is required.`

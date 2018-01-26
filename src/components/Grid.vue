@@ -11,7 +11,7 @@ v-flex(xs12)
       v-model='filters.model',
       v-if="filters.fields",
       :inline='true',
-      :parentFormFields='filters.fields',
+      :FormFields='filters.fields',
       :autoSubmit='true'
       @submit='doSearch',
       submitButtonText='Search',
@@ -71,6 +71,7 @@ v-flex(xs12)
 </template>
 
 <script>
+import { EventBus } from '../eventBus.js';
 import config from "../config";
 
 const getDefaultData = () => {
@@ -327,9 +328,13 @@ export default {
     }
   },
 
+  mounted() {
+  },
+
   created: async function() {
     await this.fetchGrid();
     await this.fetchData();
+    EventBus.$on("gridRefresh", this.refresh);
   }
 };
 </script>
