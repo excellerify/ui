@@ -146,7 +146,7 @@ v-flex(xs12)
 import "vue2-dropzone/dist/vue2Dropzone.css";
 import randomstring from "randomstring";
 
-import { EventBus } from '../eventBus.js';
+import { EventBus } from "../eventBus.js";
 import config from "../config";
 
 export default {
