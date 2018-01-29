@@ -9,13 +9,13 @@ div
           ripple)
         v-tabs-slider
 
-      v-tabs-content(v-for='(formFields, key) in group.children',
+      v-tabs-content(v-for='(getFields, key) in group.children',
         :key='key',
         :id='\'tab-\' + key')
         v-card(flat)
           v-card-text
             v-field(
-              v-for='(field, name) in formFields',
+              v-for='(field, name) in getFields',
               :key='name',
               :name='name',
               :field='field',
@@ -24,7 +24,7 @@ div
 
     v-layout(v-bind='{[inline? \'row\': \'column wrap\']: true}', v-if='!groupBy')
       v-field.pr-1(
-        v-for='(field, name) in formFields',
+        v-for='(field, name) in getFields',
         @refresh='refresh',
         @onUpsert='onSubmit',
         @fieldError='updateFieldsError',
@@ -154,6 +154,10 @@ export default {
       } else {
         return `${this.resource}`;
       }
+    },
+    getFields() {
+      this.filterFieldByMode();
+      return this.formFields;
     }
   },
   watch: {
@@ -163,6 +167,9 @@ export default {
     $route() {
       this.fieldErrors = [];
       this.hasError = false;
+      this.refresh();
+    },
+    FormFields() {
       this.refresh();
     }
   },
@@ -177,24 +184,7 @@ export default {
           await this.fetch();
         }
 
-        // Show only available mode
-        this.formFields = this._.pickBy(this.formFields, (val, key) => {
-          if (val.mode) {
-            if (this.isEdit) {
-              return val.mode.indexOf("isEdit") > -1;
-            } else if (this.isView) {
-              return val.mode.indexOf("isView") > -1;
-            } else {
-              return val.mode.indexOf("isCreate") > -1;
-            }
-          }
-
-          return true;
-        });
-
-        console.log(this.formFields);
-
-        debugger;
+        this.filterFieldByMode();
 
         if (this.type === "subForm" && this.ParentData) {
           this._.forEach(
@@ -219,6 +209,22 @@ export default {
       } catch (e) {
         Promise.reject(e);
       }
+    },
+    filterFieldByMode() {
+      // Show only available mode
+        this.formFields = this._.pickBy(this.formFields, (val, key) => {
+          if (val.mode) {
+            if (this.isEdit) {
+              return val.mode.indexOf("isEdit") > -1;
+            } else if (this.isView) {
+              return val.mode.indexOf("isView") > -1;
+            } else {
+              return val.mode.indexOf("isCreate") > -1;
+            }
+          }
+
+          return true;
+        });
     },
     fetch: async function() {
       try {
@@ -298,9 +304,10 @@ export default {
     }
   },
   mounted() {
-    this.refresh();
+    // this.refresh();
   },
-  created() {
+  created: async function () {
+    await this.refresh();
     // global.validator.extend('unique', function (data, field, message, args, get) {
     //   return new Promise(function (resolve, reject) {
     //     const fieldValue = get(data, field)

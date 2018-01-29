@@ -11,6 +11,7 @@
   "rules": {
     "generator-star-spacing": 0,
     "space-before-function-paren": 0,
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "no-debugger": 1
   }
 }
