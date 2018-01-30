@@ -176,7 +176,7 @@ export default {
       if (this.filters.model) {
         this._.forEach(this.filters.model, function(val, key) {
           filters[key] = {
-            like: `%${val}%`
+            regexp: `/${val}/gi`
           };
         });
       }
@@ -270,6 +270,7 @@ export default {
           // if (sortField.indexOf('.') < 0) {
           //   sortField = sortField
           // }
+
           this.pagination.sort = sortField;
           this.pagination.descending = desc;
         }
