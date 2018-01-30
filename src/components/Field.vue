@@ -4,7 +4,6 @@ v-flex(xs12)
   v-select(
     v-if="['select', 'select2'].includes(field.type)",
     :name='name',
-    :data-vv-as='field.label',
     :items='field.choices',
     v-model='model',
     v-bind='field',
@@ -19,7 +18,6 @@ v-flex(xs12)
         v-radio-group(v-model="model", column, wrap, :readonly="readonly")
           v-radio(
             :name='name',
-            :data-vv-as='field.label',
             v-for='option in field.choices',
             :key="option.value",
             :label="option.text",
@@ -35,7 +33,6 @@ v-flex(xs12)
         span(v-for='option in field.choices', :key="field.value")
           component(
             :name='name',
-            :data-vv-as='field.label',
             v-model='model',
             hide-details,
             :is="field.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
@@ -111,7 +108,6 @@ v-flex(xs12)
   v-text-field(
     v-else-if="['password'].indexOf(field.type) > -1",
     :name='name',
-    :data-vv-as='field.label',
     v-model='model',
     v-bind='field',
     :readonly="readonly",
@@ -123,6 +119,19 @@ v-flex(xs12)
     :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'",
     :append-icon-cb="() => (passwordInvisible = !passwordInvisible)",
     :type="passwordInvisible ? 'password' : 'text'")
+
+  //- //- money input
+  //- masked-input(
+  //-   v-else-if="['money'].indexOf(field.type) > -1",
+  //-   type="text",
+  //-   :name='name',
+  //-   class="form-control",
+  //-   v-model="model",
+  //-   v-bind='field',
+  //-   :readonly="readonly",
+  //-   :error-messages="errorMessage",
+  //-   :mask="['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]",
+    :guide="false")
 
   //- default input
   v-text-field(
@@ -143,8 +152,10 @@ v-flex(xs12)
 </template>
 
 <script>
-import "vue2-dropzone/dist/vue2Dropzone.css";
 import randomstring from "randomstring";
+import MaskedInput from "vue-text-mask";
+import moment from "moment";
+import "vue2-dropzone/dist/vue2Dropzone.css";
 
 import { EventBus } from "../eventBus.js";
 import config from "../config";
@@ -201,6 +212,9 @@ export default {
       parentData: {}
     };
   },
+  components: {
+    MaskedInput
+  },
   watch: {
     "errors.items"(val) {
       this.isError = val.length > 0;
@@ -219,6 +233,9 @@ export default {
     },
     model: {
       get() {
+        if (["date"].indexOf(this.field.type) > -1) {
+          return moment(String(this.value)).format('YYYY-MM-DD');
+        }
         return this.value;
       },
       set(val) {
