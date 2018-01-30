@@ -76,7 +76,7 @@ v-flex(xs12)
   input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model')
 
   //- if table
-  template(v-else-if="['table', 'array'].indexOf(field.type) > -1")
+  template(v-else-if="['table'].indexOf(field.type) > -1")
     v-layout(row, wrap, class="input-group")
       label {{field.label}}
       v-grid(
@@ -234,7 +234,7 @@ export default {
     model: {
       get() {
         if (["date"].indexOf(this.field.type) > -1) {
-          return moment(String(this.value)).format('YYYY-MM-DD');
+          return  moment(String(this.value || new Date())).format('YYYY-MM-DD');
         }
         return this.value;
       },

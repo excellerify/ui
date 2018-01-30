@@ -36,7 +36,9 @@ v-flex(xs12)
 
         template(slot='items', slot-scope='props')
           tr
-            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')", v-for='column in columns', v-html="getColumnData(props.item, column)")
+            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')",
+              v-for='column in columns',
+              v-html="getColumnData(props.item, column)")
             td(v-if="!readonly", :width='Object.keys(options).length * 55', align="center")
               template(v-for="(value, action) in actions")
                 v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router, color="primary",fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
@@ -71,6 +73,8 @@ v-flex(xs12)
 </template>
 
 <script>
+import moment from "moment";
+
 import { EventBus } from "../eventBus.js";
 import config from "../config";
 
@@ -239,6 +243,9 @@ export default {
       }
       if (field.type === "image") {
         value = `<v-avatar size="36px"><img src="${value}" class="crud-grid-thumb" controls /></v-avatar>`;
+      }
+      if (field.type === "date") {
+        value = value ? moment(String(value)).format('YYYY-MM-DD') : "" ;
       }
       return value;
     },
