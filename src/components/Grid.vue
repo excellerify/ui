@@ -71,7 +71,7 @@ v-flex(xs12)
 </template>
 
 <script>
-import { EventBus } from '../eventBus.js';
+import { EventBus } from "../eventBus.js";
 import config from "../config";
 
 const getDefaultData = () => {
@@ -174,10 +174,25 @@ export default {
       }
 
       if (this.filters.model) {
-        this._.forEach(this.filters.model, function(val, key) {
-          filters[key] = {
-            regexp: `/${val}/gi`
-          };
+        this._.forEach(this.filters.model, (val, key) => {
+          if (key.indexOf(".") > -1) {
+            let nestedFilter = {
+              regexp: `/${val}/i`
+            };
+            const splitedKey = key.split(".").reverse();
+
+            this._.map(splitedKey, (val) => {
+              const prevNestedFilter = Object.assign(nestedFilter);
+              nestedFilter = {};
+              nestedFilter[val] = prevNestedFilter;
+            });
+
+            this._.merge(filters, nestedFilter);
+          } else {
+            filters[key] = {
+              regexp: `/${val}/i`
+            };
+          }
         });
       }
 
@@ -329,8 +344,7 @@ export default {
     }
   },
 
-  mounted() {
-  },
+  mounted() {},
 
   created: async function() {
     await this.fetchGrid();
