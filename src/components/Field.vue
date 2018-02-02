@@ -50,8 +50,12 @@ v-flex(xs12)
         v-model='model',
         no-title,
         scrollable,
-        actions,
         v-validate="validationRules")
+        template(slot-scope="{ save, cancel }")
+          v-card-actions
+            v-spacer
+            v-btn(flat color="primary" @click="cancel") Cancel
+            v-btn(flat color="primary" @click="save") OK
 
   //- if input type is html
   div(:class="inputGroupClass",v-else-if="field.type == 'html'")
@@ -233,8 +237,8 @@ export default {
     },
     model: {
       get() {
-        if (["date"].indexOf(this.field.type) > -1) {
-          return  moment(String(this.value || new Date())).format('YYYY-MM-DD');
+        if (["date", "datetime"].indexOf(this.field.type) > -1) {
+          moment(String(this.value || new Date())).format('YYYY-MM-DD');
         }
         return this.value;
       },
