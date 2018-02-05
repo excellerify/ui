@@ -212,19 +212,19 @@ export default {
     },
     filterFieldByMode() {
       // Show only available mode
-        this.formFields = this._.pickBy(this.formFields, (val, key) => {
-          if (val.mode) {
-            if (this.isEdit) {
-              return val.mode.indexOf("isEdit") > -1;
-            } else if (this.isView) {
-              return val.mode.indexOf("isView") > -1;
-            } else {
-              return val.mode.indexOf("isCreate") > -1;
-            }
+      this.formFields = this._.pickBy(this.formFields, (val, key) => {
+        if (val.mode) {
+          if (this.isEdit) {
+            return val.mode.indexOf("isEdit") > -1;
+          } else if (this.isView) {
+            return val.mode.indexOf("isView") > -1;
+          } else {
+            return val.mode.indexOf("isCreate") > -1;
           }
+        }
 
-          return true;
-        });
+        return true;
+      });
     },
     fetch: async function() {
       try {
@@ -292,7 +292,14 @@ export default {
         if (Array.isArray(e)) {
           this.formErrors = e;
         } else {
-          this.formErrors = [e];
+          let err;
+
+          if (e.response && e.response.data && e.response.data.error) {
+            err = e.response.data.error;
+          } else {
+            err = e;
+          }
+          this.formErrors = [err];
         }
 
         this.$emit("error", e);
@@ -306,7 +313,7 @@ export default {
   mounted() {
     // this.refresh();
   },
-  created: async function () {
+  created: async function() {
     await this.refresh();
     // global.validator.extend('unique', function (data, field, message, args, get) {
     //   return new Promise(function (resolve, reject) {
