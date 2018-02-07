@@ -178,14 +178,14 @@ export default {
       }
 
       if (this.filters.model) {
-        this._.forEach(this.filters.model, (val, key) => {
+        this._.forEach(this.filters.model, function(val, key){
           if (key.indexOf(".") > -1) {
             let nestedFilter = {
               regexp: `/${val}/i`
             };
             const splitedKey = key.split(".").reverse();
 
-            this._.map(splitedKey, (val) => {
+            this._.map(splitedKey, val => {
               const prevNestedFilter = Object.assign(nestedFilter);
               nestedFilter = {};
               nestedFilter[val] = prevNestedFilter;
@@ -193,11 +193,19 @@ export default {
 
             this._.merge(filters, nestedFilter);
           } else {
-            filters[key] = {
-              regexp: `/${val}/i`
-            };
+            const type = this._.find(this.columns, (val)=>{debugger; val.type == 'date';});
+
+            console.log(type);
+
+            if (type === 'date') {
+              filters[key] = val;
+            } else {
+              filters[key] = {
+                regexp: `/${val}/i`
+              };
+            }
           }
-        });
+        }.bind(this));
       }
 
       const offset = (this.pagination.page - 1) * this.filters.limit;
@@ -245,7 +253,7 @@ export default {
         value = `<v-avatar size="36px"><img src="${value}" class="crud-grid-thumb" controls /></v-avatar>`;
       }
       if (field.type === "date") {
-        value = value ? moment(String(value)).format('YYYY-MM-DD') : "" ;
+        value = value ? moment(String(value)).format("YYYY-MM-DD") : "";
       }
       return value;
     },
