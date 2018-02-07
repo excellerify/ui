@@ -86,7 +86,6 @@ v-flex(xs12)
       v-grid(
         :resource="field.model || name",
         :filterByFk="{ model: resource, value : resourceId }",
-        :showSearch="false",
         :readonly="readonly",
         type="field",
         :onCreate="onGridCreate",
