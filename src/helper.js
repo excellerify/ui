@@ -14,11 +14,12 @@ helper.i = inflector();
  */
 helper.ls = {
   set(key, value) {
-    value = JSON.stringify(value);
-    storage.setItem(key, value);
+    const storedVal = JSON.stringify(value);
+    storage.setItem(key, storedVal);
+    return storedVal;
   },
   get(key, defaultValue) {
-    let value = storage.getItem(key, value);
+    let value = storage.getItem(key);
     if (value === null || value === 'undefined' || value === '') {
       value = defaultValue;
     } else {
@@ -36,8 +37,8 @@ helper.store = (key, value) => {
   }
     return helper.ls.set(key, value);
 };
-Vue.directive('back', (el, binding) => {
-  el.onclick = () => window.history.go(-1);
+Vue.directive('back', (event) => {
+  event.onclick = () => window.history.go(-1);
 });
 
 export default helper;

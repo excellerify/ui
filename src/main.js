@@ -31,8 +31,9 @@ global.helper = helper;
 global.config = config;
 global.store = store;
 
+// eslint-disable-next-line
 const en = require('vue-timeago/locales/en-US.json');
-
+// eslint-disable-next-line
 const configLocale = require(`vue-timeago/locales/${config.locale}.json`);
 
 Vue.use(VueTimeago, {
@@ -47,7 +48,6 @@ Vue.use(VueTimeago, {
 Vue.use(VueQuillEditor);
 Vue.component('dropzone', Dropzone);
 
-// import Modal from './components/Modal' Vue.use(Modal)
 Vue.component('v-grid', VGrid);
 Vue.component('v-form', VForm);
 Vue.component('v-field', VField);

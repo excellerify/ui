@@ -75,7 +75,7 @@ v-flex(xs12)
 <script>
 import moment from "moment";
 
-import { EventBus } from "../eventBus.js";
+import EventBus from "../eventBus.js";
 import config from "../config";
 
 const getDefaultData = () => {
@@ -250,7 +250,9 @@ export default {
         value = row[l1] ? row[l1][l2] : null;
       }
       if (field.type === "image") {
-        value = `<v-avatar size="36px"><img src="${value}" class="crud-grid-thumb" controls /></v-avatar>`;
+        value = `<v-avatar size="36px">
+          <img src="${value}" class="crud-grid-thumb" controls />
+          </v-avatar>`;
       }
       if (field.type === "date") {
         value = value ? moment(String(value)).format("YYYY-MM-DD") : "";

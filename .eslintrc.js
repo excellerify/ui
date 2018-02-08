@@ -28,7 +28,7 @@ module.exports = {
     "comma-dangle": ["error", "only-multiline"],
     "no-param-reassign": [
       "error",
-      { props: true, ignorePropertyModificationsFor: ["state", "Vue"] }
+      { props: true, ignorePropertyModificationsFor: ["state", "Vue", "event"] }
     ]
   }
 };

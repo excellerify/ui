@@ -83,12 +83,12 @@ const store = {
       router.push('/login');
     },
     checkPageTitle({ commit, state }, path) {
-      for (const k in state.menu) {
+      const keys = Object.keys(state.menu);
+      keys.forEach((k) => {
         if (state.menu[k].href === path) {
           commit('setPageTitle', state.menu[k].title);
-          break;
         }
-      }
+      });
     }
   }
 };

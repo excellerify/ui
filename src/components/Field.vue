@@ -160,7 +160,7 @@ import MaskedInput from "vue-text-mask";
 import moment from "moment";
 import "vue2-dropzone/dist/vue2Dropzone.css";
 
-import { EventBus } from "../eventBus.js";
+import EventBus from "../eventBus.js";
 import config from "../config";
 
 export default {

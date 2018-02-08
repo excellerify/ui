@@ -15,7 +15,7 @@ http.interceptors.request.use(request => request, error =>
 http.interceptors.response.use((response) => {
   const request = response.config;
   if (config.debug.http) {
-    console.log(
+    console.info(
       '>>>', request.method.toUpperCase(), request.url, request.params,
       '\n   ', response.status, response.data
     );
@@ -25,7 +25,7 @@ http.interceptors.response.use((response) => {
   if (config.debug.http) {
     const { response, config: request } = error;
     if (request) {
-      console.log(
+      console.info(
         '>>>', request.method.toUpperCase(), request.url, request.params,
         '\n   ', response.status, response.data
       );
