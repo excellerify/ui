@@ -7,23 +7,23 @@ import router from '../router';
 const store = {
   state: {
     pageTitle: 'Home',
-    menu: menu,
+    menu,
     user: {},
     token: null,
     message: {
       type: null,
       body: null
     },
-    config: config
+    config
 
   },
   mutations: {
-    setAuth (state, {user, token, expireTime}) {
+    setAuth(state, { user, token, expireTime }) {
       state.user = user;
       state.token = token;
       state.expireTime = expireTime;
 
-      axios.defaults.headers.common['Authorization'] = token;
+      axios.defaults.headers.common.Authorization = token;
 
       global
         .helper
@@ -38,13 +38,13 @@ const store = {
         .ls
         .set('expireTime', expireTime);
     },
-    setMenu (state, data) {
+    setMenu(state, data) {
       state.menu = data;
     },
-    setPageTitle (state, data) {
+    setPageTitle(state, data) {
       state.pageTitle = data;
     },
-    showMessage (state, type, body) {
+    showMessage(state, type, body) {
       state.message = {
         type,
         body
@@ -52,8 +52,8 @@ const store = {
     }
   },
   actions: {
-    checkAuth ({commit}) {
-      let data = {
+    checkAuth({ commit }) {
+      const data = {
         user: global
           .helper
           .ls
@@ -70,11 +70,11 @@ const store = {
 
       commit('setAuth', data);
     },
-    doLogin ({commit}, params) {
+    doLogin({ commit }, params) {
       commit('setAuth', params);
       router.push('/');
     },
-    clearAuth ({commit}) {
+    clearAuth({ commit }) {
       commit('setAuth', {
         user: null,
         token: null,
@@ -82,8 +82,8 @@ const store = {
       });
       router.push('/login');
     },
-    checkPageTitle ({commit, state}, path) {
-      for (let k in state.menu) {
+    checkPageTitle({ commit, state }, path) {
+      for (const k in state.menu) {
         if (state.menu[k].href === path) {
           commit('setPageTitle', state.menu[k].title);
           break;

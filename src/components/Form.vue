@@ -181,7 +181,7 @@ export default {
         if (this.FormFields) {
           this.formFields = this.FormFields;
         } else {
-          await this.fetch();
+          await this.fetchFormSchema();
         }
 
         this.filterFieldByMode();
@@ -226,15 +226,12 @@ export default {
         return true;
       });
     },
-    fetch: async function() {
+    fetchFormSchema: async function() {
       try {
-        const getUrl = `${this.resource}/${this.subResource || "form"}`;
-
-        let data = await this.$http.get(getUrl, {
-          params: { id: this.id }
+        const data = await this.$store.dispatch('fetchFormSchema', {
+          url: `${this.resource}/${this.subResource || "form"}`
         });
 
-        data = data.data.schema;
         this.model = data.model;
         this.formFields = data.fields;
         this.rules = data.rules;

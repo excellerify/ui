@@ -21,13 +21,13 @@ Excellerify UI - Dashboard interface for Excellerify a model based framework. An
 ### Run Backend
 * git clone https://github.com/excellerify/backend.git excellerify-backend
 * cd excellerify-backend
-* npm install
-* npm run
+* yarn install
+* yarn start
 ### Run Frontend
 * git clone https://github.com/excellerify/ui.git excellerify-ui
 * cd excellerify-ui
-* npm install
-* npm run dev
+* yarn install
+* yarn dev
 
 ## Screen Shoot
 * Login Page

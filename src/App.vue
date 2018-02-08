@@ -10,8 +10,6 @@ export default {
     return {};
   },
   methods: {},
-  created() {
-    // this.$http.get('/users').then(({data}) => console.log(data))
-  }
+  created() {}
 };
 </script>

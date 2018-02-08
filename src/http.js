@@ -2,20 +2,17 @@ import Vue from 'vue';
 import axios from 'axios';
 import config from './config';
 
-var http = axios.create({
+const http = axios.create({
   baseURL: config.api,
   timeout: 1000
   // headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
 });
 
-http.interceptors.request.use(function (request) {
-  return request;
-}, function (error) {
+http.interceptors.request.use(request => request, error =>
   // Do something with request error
-  return Promise.reject(error);
-});
+   Promise.reject(error));
 
-http.interceptors.response.use(function (response) {
+http.interceptors.response.use((response) => {
   const request = response.config;
   if (config.debug.http) {
     console.log(
@@ -24,9 +21,9 @@ http.interceptors.response.use(function (response) {
     );
   }
   return response;
-}, function (error) {
+}, (error) => {
   if (config.debug.http) {
-    let { response, config: request } = error;
+    const { response, config: request } = error;
     if (request) {
       console.log(
         '>>>', request.method.toUpperCase(), request.url, request.params,

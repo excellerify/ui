@@ -1,8 +1,8 @@
 export default {
-  'Search': 'Search',
+  Search: 'Search',
   'Create ': 'Create ',
-  'Submit': 'Submit',
-  'Edit': 'Edit',
-  'Close': 'Close',
+  Submit: 'Submit',
+  Edit: 'Edit',
+  Close: 'Close',
   'Field should be unique.': 'Field should be unique.'
 };
