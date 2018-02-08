@@ -2,9 +2,9 @@ const store = {
   state: {},
   mutations: {},
   actions: {
-    async fetchFormSchema(_, { url }) {
-      const data = await this.$http.get(url, {
-        params: { id: this.id }
+    async fetchFormSchema(_, { url, params }) {
+      const data = await global.$http.get(url, {
+        params
       });
 
       return data.data.schema;

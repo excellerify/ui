@@ -228,8 +228,9 @@ export default {
     },
     fetchFormSchema: async function() {
       try {
-        const data = await this.$store.dispatch('fetchFormSchema', {
-          url: `${this.resource}/${this.subResource || "form"}`
+        const data = await this.$store.dispatch("fetchFormSchema", {
+          url: `${this.resource}/${this.subResource || "form"}`,
+          params: { id: this.id }
         });
 
         this.model = data.model;

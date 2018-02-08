@@ -60,9 +60,9 @@ new Vue({
   router,
   mounted() {},
   created() {
-    // this.$http.get('/users/1').then(({data}) => console.log(data))
     global.$http = this.$http;
     global.$t = this.$t;
+
     // fetch menu from server
     this.$http.get('/settings/menu').then(({ data }) => {
       this.$store.commit('setMenu', data);
