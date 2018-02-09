@@ -2,13 +2,14 @@
 
 <script>
 export default {
-  mounted() {
-    this.$http
-      .post('admins/logout').then(response => {
-        global
-          .store
-          .dispatch('clearAuth');
-      }, err => console.log(err));
+  async mounted() {
+    try{
+      await this.$store.dispatch("logout");
+      await this.$store.dispatch('clearAuth');
+    } catch(e){
+      // TODO: call error
+      console.error(e);
+    }
   }
 };
 </script>

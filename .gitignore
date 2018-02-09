@@ -2,3 +2,6 @@ dist/
 .DS_Store
 node_modules/
 build/
+
+# npm lock file
+package.lock

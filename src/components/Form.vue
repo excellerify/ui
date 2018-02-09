@@ -308,17 +308,8 @@ export default {
       }
     }
   },
-  mounted() {
-    // this.refresh();
-  },
-  created: async function() {
-    await this.refresh();
-    // global.validator.extend('unique', function (data, field, message, args, get) {
-    //   return new Promise(function (resolve, reject) {
-    //     const fieldValue = get(data, field)
-    //     return resolve('Unsupported in client.')
-    //   })
-    // }, this.$t('Field should be unique.'))
+  created() {
+    this.refresh();
   }
 };
 </script>

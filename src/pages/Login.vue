@@ -84,7 +84,7 @@ export default {
         response => {
           global.store.dispatch("clearAuth");
         },
-        err => console.log(err)
+        err => console.error(err)
       );
     },
     authenticate(provider) {

@@ -41,7 +41,13 @@ v-flex(xs12)
               v-html="getColumnData(props.item, column)")
             td(v-if="!readonly", :width='Object.keys(options).length * 55', align="center")
               template(v-for="(value, action) in actions")
-                v-btn(v-if="['edit', 'delete'].indexOf(action) < 0", router, color="primary",fab,small,dark,:to="{name: action, params: {resource,id:props.item.id}}")
+                v-btn(
+                  v-if="['edit', 'delete'].indexOf(action) < 0",
+                  router, color="primary",
+                  fab,
+                  small,
+                  dark,
+                  :to="{name: action, params: {resource,id:props.item.id}}")
                   v-icon {{action.icon ? action.icon : action}}
 
               v-btn(v-if="options.view && onView",fab,dark,small,class="green", @click.native="onView({item:props.item})")
@@ -178,34 +184,37 @@ export default {
       }
 
       if (this.filters.model) {
-        this._.forEach(this.filters.model, function(val, key){
-          if (key.indexOf(".") > -1) {
-            let nestedFilter = {
-              regexp: `/${val}/i`
-            };
-            const splitedKey = key.split(".").reverse();
-
-            this._.map(splitedKey, val => {
-              const prevNestedFilter = Object.assign(nestedFilter);
-              nestedFilter = {};
-              nestedFilter[val] = prevNestedFilter;
-            });
-
-            this._.merge(filters, nestedFilter);
-          } else {
-            const type = this._.find(this.columns, (val)=>{debugger; val.type == 'date';});
-
-            console.log(type);
-
-            if (type === 'date') {
-              filters[key] = val;
-            } else {
-              filters[key] = {
+        this._.forEach(
+          this.filters.model,
+          function(val, key) {
+            if (key.indexOf(".") > -1) {
+              let nestedFilter = {
                 regexp: `/${val}/i`
               };
+              const splitedKey = key.split(".").reverse();
+
+              this._.map(splitedKey, val => {
+                const prevNestedFilter = Object.assign(nestedFilter);
+                nestedFilter = {};
+                nestedFilter[val] = prevNestedFilter;
+              });
+
+              this._.merge(filters, nestedFilter);
+            } else {
+              const type = this._.find(this.columns, val => {
+                val.type == "date";
+              });
+
+              if (type === "date") {
+                filters[key] = val;
+              } else {
+                filters[key] = {
+                  regexp: `/${val}/i`
+                };
+              }
             }
-          }
-        }.bind(this));
+          }.bind(this)
+        );
       }
 
       const offset = (this.pagination.page - 1) * this.filters.limit;

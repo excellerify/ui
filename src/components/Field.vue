@@ -237,7 +237,7 @@ export default {
     model: {
       get() {
         if (["date", "datetime"].indexOf(this.field.type) > -1) {
-          moment(String(this.value || new Date())).format('YYYY-MM-DD');
+          moment(String(this.value || new Date())).format("YYYY-MM-DD");
         }
         return this.value;
       },

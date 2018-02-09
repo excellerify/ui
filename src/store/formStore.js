@@ -3,11 +3,15 @@ const store = {
   mutations: {},
   actions: {
     async fetchFormSchema(_, { url, params }) {
-      const data = await global.$http.get(url, {
-        params
-      });
+      try {
+        const data = await global.$http.get(url, {
+          params
+        });
 
-      return data.data.schema;
+        return Promise.resolve(data.data.schema);
+      } catch (e) {
+        return Promise.resolve(e);
+      }
     }
   }
 };
