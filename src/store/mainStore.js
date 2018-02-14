@@ -1,43 +1,17 @@
-import axios from 'axios';
-
 import menu from '../menu';
 import config from '../config';
-import router from '../router';
 
 const store = {
   state: {
     pageTitle: 'Home',
     menu,
-    user: {},
-    token: null,
     message: {
       type: null,
-      body: null
+      body: null,
     },
-    config
-
+    config,
   },
   mutations: {
-    setAuth(state, { user, token, expireTime }) {
-      state.user = user;
-      state.token = token;
-      state.expireTime = expireTime;
-
-      axios.defaults.headers.common.Authorization = token;
-
-      global
-        .helper
-        .ls
-        .set('user', user);
-      global
-        .helper
-        .ls
-        .set('token', token);
-      global
-        .helper
-        .ls
-        .set('expireTime', expireTime);
-    },
     setMenu(state, data) {
       state.menu = data;
     },
@@ -47,41 +21,11 @@ const store = {
     showMessage(state, type, body) {
       state.message = {
         type,
-        body
+        body,
       };
-    }
+    },
   },
   actions: {
-    checkAuth({ commit }) {
-      const data = {
-        user: global
-          .helper
-          .ls
-          .get('user'),
-        token: global
-          .helper
-          .ls
-          .get('token'),
-        expireTime: global
-          .helper
-          .ls
-          .get('expireTime')
-      };
-
-      commit('setAuth', data);
-    },
-    doLogin({ commit }, params) {
-      commit('setAuth', params);
-      router.push('/');
-    },
-    clearAuth({ commit }) {
-      commit('setAuth', {
-        user: null,
-        token: null,
-        expireTime: null
-      });
-      router.push('/login');
-    },
     checkPageTitle({ commit, state }, path) {
       const keys = Object.keys(state.menu);
       keys.forEach((k) => {
@@ -89,8 +33,8 @@ const store = {
           commit('setPageTitle', state.menu[k].title);
         }
       });
-    }
-  }
+    },
+  },
 };
 
 export default store;

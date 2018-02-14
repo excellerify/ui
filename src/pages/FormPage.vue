@@ -1,6 +1,9 @@
 <template lang="pug">
 div
-  v-alert(v-if="error" outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
+  v-alert(v-if="error",
+    outline color="error",
+    icon="warning",
+    :value="true") {{error.statusCode}} - {{error.message}}
   v-layout
     v-flex(xs12)
       v-form(
@@ -22,7 +25,7 @@ export default {
     return {
       rules: {},
       messages: {},
-      error: null
+      error: null,
     };
   },
   computed: {
@@ -34,17 +37,17 @@ export default {
     },
     subResource() {
       return this.$route.params.subResource;
-    }
+    },
   },
   methods: {
     onSuccess(data) {
-      this.$router.push({ name: "grid", params: { resource: this.resource } });
-    }
+      this.$router.push({ name: 'grid', params: { resource: this.resource } });
+    },
   },
   created() {
-    let pageTitle = `${this.isEdit ? "Update" : "Create"}
+    let pageTitle = `${this.isEdit ? 'Update' : 'Create'}
       ${global.helper.i.titleize(global.helper.i.singularize(this.resource))}`;
-    this.$store.commit("setPageTitle", pageTitle);
-  }
+    this.$store.commit('setPageTitle', pageTitle);
+  },
 };
 </script>

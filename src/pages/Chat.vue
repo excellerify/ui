@@ -24,24 +24,24 @@ const io = ws(global.config.url, {});
 const client = io.channel('chat');
 
 export default {
-  data () {
+  data() {
     return {
       list: [],
       message: '',
       showWarning: false,
-      maxLength: 6
+      maxLength: 6,
     };
   },
   methods: {
-    send () {
+    send() {
       if (this.message.length < 1) {
         return false;
       }
       client.emit('message', this.message);
       this.message = '';
-    }
+    },
   },
-  mounted () {
+  mounted() {
     client.connect((error, connected) => {
       if (error) {
         this.showWarning = true;
@@ -52,15 +52,15 @@ export default {
       client.emit('message', 'hello');
       // all good
     });
-    client.on('error', (message) => {
+    client.on('error', message => {
       console.log(message);
     });
-    client.on('message', (message) => {
+    client.on('message', message => {
       this.list.push(message);
       if (this.list.length > this.maxLength) {
         this.list.shift();
       }
     });
-  }
+  },
 };
 </script>

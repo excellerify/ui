@@ -59,37 +59,36 @@ v-app(:dark="dark",standalone)
 </template>
 
 <script>
-
 import { mapState } from 'vuex';
 
 export default {
-  data () {
+  data() {
     return {
       dark: false,
       theme: 'primary',
       mini: false,
       drawer: true,
       locales: ['en-US'],
-      colors: ['blue', 'green', 'purple', 'red']
+      colors: ['blue', 'green', 'purple', 'red'],
     };
   },
   computed: {
-    ...mapState(['message', 'menu', 'pageTitle'])
+    ...mapState(['message', 'menu', 'pageTitle']),
   },
   methods: {
-    changeLocale (to) {
+    changeLocale(to) {
       global.helper.ls.set('locale', to);
       this.$i18n.locale = to;
     },
-    fetchMenu () {
+    fetchMenu() {
       // fetch menu from server
       // this.$http.get('menu').then(({data}) => this.$store.commit('setMenu', data))
-    }
+    },
   },
 
-  created () {
+  created() {
     this.fetchMenu();
-  }
+  },
 };
 </script>
 

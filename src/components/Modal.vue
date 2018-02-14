@@ -20,50 +20,47 @@ export default {
   props: {
     value: {
       type: Boolean,
-      default: false
+      default: false,
     },
     title: {
       type: String,
       required: false,
-      default: null
+      default: null,
     },
     body: {
       type: String,
       required: false,
-      default: null
+      default: null,
     },
-
     ok: {
       type: String,
       required: false,
-      default: 'Ok'
+      default: 'Ok',
     },
     cancel: {
       type: String,
       required: false,
-      default: 'Cancel'
-    }
-
+      default: 'Cancel',
+    },
   },
-  data () {
+  data() {
     return {
-      show: this.value
+      show: this.value,
     };
   },
   watch: {
-    value (val) {
+    value(val) {
       this.show = val;
-    }
+    },
   },
   methods: {
-    onOk () {
+    onOk() {
       this.$emit('ok');
     },
-    onCancel () {
+    onCancel() {
       this.$emit('cancel');
       this.show = false;
-    }
-  }
+    },
+  },
 };
-
 </script>

@@ -2,12 +2,10 @@ const store = {
   state: {},
   mutations: {},
   actions: {
-    async fetchFormSchema(_, { resource, subResource, id }) {
+    async fetchGridSchema(_, { resource, filters }) {
       try {
-        const url = `${resource}/${subResource || 'form'}`;
-
-        const data = await global.$http.get(url, {
-          params: { id },
+        const data = await global.$http.get(`${resource}/grid`, {
+          params: { filters },
         });
 
         return Promise.resolve(data.data.schema);

@@ -1,4 +1,5 @@
 # Excellerify UI
+
 Original project: [adminify](https://github.com/wxs77577/adminify)
 
 Excellerify UI - Dashboard interface for Excellerify a model based framework. An Admin dashboard based on Vuetify .
@@ -18,25 +19,35 @@ Excellerify UI - Dashboard interface for Excellerify a model based framework. An
 * And more of your requests.
 
 ## Getting start
+
 ### Run Backend
+
 * git clone https://github.com/excellerify/backend.git excellerify-backend
 * cd excellerify-backend
 * yarn install
 * yarn start
+
 ### Run Frontend
+
 * git clone https://github.com/excellerify/ui.git excellerify-ui
 * cd excellerify-ui
 * yarn install
 * yarn dev
 
+### Run Storybook
+
+* yarn storybook
+
 ## Screen Shoot
+
 * Login Page
 
-![Login Page](./img/login-page.png?raw=true "Login Page")
-
+![Login Page](./img/login-page.png?raw=true 'Login Page')
 
 ## Architecture
+
 TODO
 
 ## Example
+
 TODO

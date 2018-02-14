@@ -1,35 +1,36 @@
-:root{
+:root {
   --sidebar-width: 200px;
 }
-body{
-  font-family: Helvetica, Tahoma, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei" sans-serif;
+body {
+  font-family: Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB',
+    'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei' sans-serif;
 }
 
-.content{
+.content {
   background: #f9f9f9;
 }
-table.table tbody td{
+table.table tbody td {
   font-weight: normal;
 }
-.jl{
+.jl {
   justify-content: flex-start;
 }
-.jc{
+.jc {
   justify-content: center;
 }
-.jr{
+.jr {
   justify-content: flex-end;
 }
-.fixed-bottom{
+.fixed-bottom {
   position: fixed;
-  width:300px;
-  bottom:0
+  width: 300px;
+  bottom: 0;
 }
-.crud-grid-thumb{
-  margin:0.5em;
-  max-height:5em;
+.crud-grid-thumb {
+  margin: 0.5em;
+  max-height: 5em;
 }
 
-.input-group label{
+.input-group label {
   font-size: 12px;
 }
