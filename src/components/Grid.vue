@@ -27,10 +27,10 @@ v-flex(xs12)
         v-icon add
 
       v-data-table(
+        hide-actions,
         :headers='columns',
         :items='items',
         :total-items="pagination.totalItems",
-        hide-actions,
         :pagination.sync="pagination",
         :loading="loading")
 
@@ -50,14 +50,15 @@ v-flex(xs12)
                   :to="{name: action, params: {resource,id:props.item.id}}")
                   v-icon {{action.icon ? action.icon : action}}
 
-              v-btn(v-if="options.view && onView",fab,dark,small,class="green", @click.native="onView({item:props.item})")
+              v-btn(v-if="options.view && onView", fab, dark, small, class="green", @click.native="onView({item:props.item})")
                 v-icon visibility
 
-              v-btn(v-if="options.update",dark,color="primary",fab,small, @click.native="onUpdate({item:props.item})")
+              v-btn(v-if="options.update", dark, color="primary", fab, small, @click.native="onUpdate({item:props.item})")
                 v-icon edit
-              //-- also you can try this: inline edit
-              //-- v-btn(v-if="options.edit",dark,fab,success,small,@click.native.stop="showEdit(props.item)")
-              //--   v-icon() edit
+                //-- also you can try this: inline edit
+                //-- v-btn(v-if="options.edit",dark,fab,success,small,@click.native.stop="showEdit(props.item)")
+                //--   v-icon() edit
+
               v-dialog(v-if="options.delete", id="modal" v-model="deleteModal[props.item.id]")
                 v-btn(slot="activator", dark, color="error", fab, small)
                   v-icon delete
@@ -88,11 +89,6 @@ import config from '../config';
 const getDefaultData = () => {
   return {
     deleteModal: [],
-    form: {
-      fields: {},
-      rules: {},
-      messages: {},
-    },
     filters: {
       model: {},
       limit: config.grid.limit,
@@ -188,6 +184,10 @@ export default {
         this._.forEach(
           this.filters.model,
           function(val, key) {
+            if (!val) {
+              return;
+            }
+
             if (key.indexOf('.') > -1) {
               let nestedFilter = {
                 regexp: `/${val}/i`,
@@ -202,11 +202,9 @@ export default {
 
               this._.merge(filters, nestedFilter);
             } else {
-              const type = this._.find(this.columns, val => {
-                val.type == 'date';
-              });
+              const column = this._.find(this.columns, { value: key });
 
-              if (type === 'date') {
+              if (column && column.type === 'date') {
                 filters[key] = val;
               } else {
                 filters[key] = {
@@ -252,7 +250,7 @@ export default {
         this.fetchData();
       }
     },
-    getColumnData(row, field) {
+    getColumnData: (row, field) => {
       // process fields like `type.name`
       let [l1, l2] = field.value.split('.');
       let value = row[l1];
@@ -272,24 +270,29 @@ export default {
       }
       return value;
     },
-    fetchGrid: async function() {
+    convertColumnObjToArray(columns) {
+      const columnsArr = [];
+
+      this._.forEach(columns, function(value, key) {
+        if (!value.value) {
+          value.value = key;
+          columnsArr.push(value);
+        }
+      });
+
+      return columnsArr;
+    },
+    async fetchGrid() {
       try {
+        this.loading = true;
+
         const data = await this.$store.dispatch('fetchGridSchema', {
           resource: this.resource,
           filter: this.filters,
         });
 
         if (!Array.isArray(data.columns) && typeof data.columns === 'object') {
-          const columnsArr = [];
-
-          this._.forEach(data.columns, function(value, key) {
-            if (!value.value) {
-              value.value = key;
-              columnsArr.push(value);
-            }
-          });
-
-          data.columns = columnsArr;
+          data.columns = this.convertColumnObjToArray(data.columns);
         }
 
         // convert to html safe
@@ -321,6 +324,7 @@ export default {
           this.pagination.descending = desc;
         }
 
+        this.loading = false;
         Promise.resolve();
       } catch (err) {
         this.error = err;
