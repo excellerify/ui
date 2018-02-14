@@ -2,12 +2,11 @@
 v-app(:dark="dark",standalone)
   v-navigation-drawer(v-model='drawer',:mini-variant="mini", persistent,enable-resize-watcher, :dark="dark", app)
     .pa-3.text-xs-center(v-show="!mini")
-      div.display-1 Excellerify
       div(style="padding-left:5em")
         v-switch(:label="(!dark ? 'Light' : 'Dark') + ' Theme'", v-model="dark", :dark="dark", hide-details)
     .pa-3.text-xs-center(v-show="mini")
       .display-2 A
-    v-divider
+
     v-list(dense)
       template(v-for='item in menu')
         v-list-group(v-if='item.items', v-bind:group='item.group')
@@ -24,6 +23,10 @@ v-app(:dark="dark",standalone)
               v-icon.success--text {{ subItem.icon }}
             v-list-tile-content
               v-list-tile-title {{ $t(subItem.title) }}
+
+        div.text-xs-center.title(v-else-if='item.mainHeader') {{ item.mainHeader }}
+          v-divider.mt-3
+
         v-subheader(v-else-if='item.header') {{ item.header }}
         v-divider(v-else-if='item.divider')
         v-list-tile(v-else,:to='item.href', router, ripple, v-bind:disabled='item.disabled', :title="item.title")

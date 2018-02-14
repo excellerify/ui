@@ -27,8 +27,8 @@ v-flex(xs12)
         v-icon add
 
       v-data-table(
-        hide-actions,
-        :headers='columns',
+        class="elevation-1"
+        :headers="columns.concat({text: 'Action', align: 'center', sortable: false})",
         :items='items',
         :total-items="pagination.totalItems",
         :pagination.sync="pagination",
@@ -39,44 +39,41 @@ v-flex(xs12)
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')",
               v-for='column in columns',
               v-html="getColumnData(props.item, column)")
+
             td(v-if="!readonly", :width='Object.keys(options).length * 55', align="center")
               template(v-for="(value, action) in actions")
                 v-btn(
                   v-if="['edit', 'delete'].indexOf(action) < 0",
                   router, color="primary",
-                  fab,
-                  small,
+                  icon,
                   dark,
                   :to="{name: action, params: {resource,id:props.item.id}}")
                   v-icon {{action.icon ? action.icon : action}}
 
-              v-btn(v-if="options.view && onView", fab, dark, small, class="green", @click.native="onView({item:props.item})")
+              v-btn(v-if="options.view && onView", icon, dark, color="green", @click.native="onView({item:props.item})")
                 v-icon visibility
 
-              v-btn(v-if="options.update", dark, color="primary", fab, small, @click.native="onUpdate({item:props.item})")
+              v-btn(v-if="options.update", icon, dark, color="primary", @click.native="onUpdate({item:props.item})")
                 v-icon edit
-                //-- also you can try this: inline edit
-                //-- v-btn(v-if="options.edit",dark,fab,success,small,@click.native.stop="showEdit(props.item)")
-                //--   v-icon() edit
 
               v-dialog(v-if="options.delete", id="modal" v-model="deleteModal[props.item.id]")
-                v-btn(slot="activator", dark, color="error", fab, small)
+                v-btn(icon, slot="activator",  color="error")
                   v-icon delete
                 v-card
                   v-card-text
                     p(class="text-xs-center") Are you sure?
                   v-card-actions
                     v-spacer
-                    v-btn(small,@click.native="deleteModal = []") No
-                    v-btn(small,@click.native="remove(props.item.id)") Yes
+                    v-btn(@click.native="deleteModal = []") No
+                    v-btn(@click.native="remove(props.item.id)") Yes
 
-              v-btn(v-if="typeof options.lock === 'object'", fab, small,@click="lock(props.item)")
+              v-btn(v-if="typeof options.lock === 'object'", icon, @click="lock(props.item)")
                 v-icon lock
 
-              v-btn(v-if="typeof options.custom === 'object'",fab,small,@click="customAction(options.custom, props.item)")
+              v-btn(v-if="typeof options.custom === 'object'", icon, @click="customAction(options.custom, props.item)")
                 v-icon {{options.custom.icon}}
 
-      v-pagination.ma-3(v-model='pagination.page', :length='totalPages', circle)
+      //- v-pagination.text-xs-center.ma-3(v-model='pagination.page', :length='totalPages')
 </template>
 
 <script>
@@ -164,6 +161,12 @@ export default {
       this.fetchData();
     },
     '$route.params': 'refresh',
+    pagination: {
+      handler() {
+        this.fetchData();
+      },
+      deep: true,
+    },
   },
 
   methods: {
@@ -216,12 +219,13 @@ export default {
         );
       }
 
-      const offset = (this.pagination.page - 1) * this.filters.limit;
+      const { sortBy, descending, page, rowsPerPage } = this.pagination;
 
       this.$route.query.filter = {
+        order: sortBy ? [`${sortBy} ${descending ? 'DESC' : 'ASC'}`] : null,
         where: filters,
-        limit: this.filters.limit,
-        offset,
+        limit: rowsPerPage > 0 ? rowsPerPage : 0,
+        offset: (page - 1) * rowsPerPage,
       };
     },
     updateRoute() {
@@ -300,7 +304,7 @@ export default {
           data.columns[k].text = this.$t(data.columns[k].text);
         }
 
-        this.columns = data.columns || {};
+        this.columns = data.columns || [];
         this.actions = data.actions || {};
         this.foreignKey = data.foreignKey || {};
 
