@@ -26,8 +26,9 @@ helper.ls = {
       value = JSON.parse(value);
     }
     return value;
-  }
+  },
 };
+
 /**
  * a wrapper for helper.ls
  */
@@ -35,8 +36,9 @@ helper.store = (key, value) => {
   if (arguments.length < 2) {
     return helper.ls.get(key);
   }
-    return helper.ls.set(key, value);
+  return helper.ls.set(key, value);
 };
+
 Vue.directive('back', (event) => {
   event.onclick = () => window.history.go(-1);
 });

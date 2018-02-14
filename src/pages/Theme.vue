@@ -1,6 +1,5 @@
 <template>
   <div class="text-center">
-
     <div class="">
       <v-alert success :value="true">Hope you will love me!</v-alert>
     </div>
@@ -11,16 +10,16 @@
 export default {
   data() {
     return {
-      background: ''
+      background: '',
     };
   },
   methods: {
     changeBackground(val) {
       document.body.style.background = val;
-    }
+    },
   },
   mounted() {
     this.changeBackground('darkgreen');
-  }
+  },
 };
 </script>

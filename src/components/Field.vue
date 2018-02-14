@@ -3,7 +3,7 @@ v-flex(xs12)
   //- if select2
   v-select(
     v-if="['select', 'select2'].includes(field.type)",
-    :name='name',
+    :name="name",
     :items='field.choices',
     v-model='model',
     v-bind='field',
@@ -17,8 +17,8 @@ v-flex(xs12)
       v-flex(xs12)
         v-radio-group(v-model="model", column, wrap, :readonly="readonly")
           v-radio(
-            :name='name',
-            v-for='option in field.choices',
+            :name="name",
+            v-for="option in field.choices",
             :key="option.value",
             :label="option.text",
             :value="option.value",
@@ -32,7 +32,7 @@ v-flex(xs12)
       v-flex(v-bind="{[field.width]: true}", xs12)
         span(v-for='option in field.choices', :key="field.value")
           component(
-            :name='name',
+            :name="name",
             v-model='model',
             hide-details,
             :is="field.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
@@ -109,101 +109,102 @@ v-flex(xs12)
 
   //- password input
   v-text-field(
-    v-else-if="['password'].indexOf(field.type) > -1",
-    :name='name',
-    v-model='model',
-    v-bind='field',
-    :readonly="readonly",
-    :label="$t(field.label)",
-    :placeholder="$t(field.placeholder)",
-    v-validate="validationRules",
-    :error="isError",
-    :error-messages="errorMessage",
-    :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'",
-    :append-icon-cb="() => (passwordInvisible = !passwordInvisible)",
+    v-else-if="['password'].indexOf(field.type) > -1"
+    :name="name"
+    v-model='model'
+    v-bind="field"
+    :readonly="readonly"
+    :label="$t(field.label)"
+    :placeholder="$t(field.placeholder)"
+    v-validate="validationRules"
+    :error="isError"
+    :error-messages="errorMessage"
+    :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'"
+    :append-icon-cb="() => (passwordInvisible = !passwordInvisible)"
     :type="passwordInvisible ? 'password' : 'text'")
 
-  //- //- money input
-  //- masked-input(
-  //-   v-else-if="['money'].indexOf(field.type) > -1",
-  //-   type="text",
-  //-   :name='name',
-  //-   class="form-control",
-  //-   v-model="model",
-  //-   v-bind='field',
-  //-   :readonly="readonly",
-  //-   :error-messages="errorMessage",
-  //-   :mask="['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]",
-    :guide="false")
+  //- money input
+  v-text-field(
+    v-else-if="['money'].indexOf(field.type) > -1"
+    :name="name"
+    v-money="money"
+    v-model='model'
+    v-bind='field'
+    :readonly="readonly"
+    :label="$t(field.label)"
+    :placeholder="$t(field.placeholder)"
+    :type="field.type"
+    v-validate="validationRules"
+    :error="isError"
+    :error-messages="errorMessage")
 
   //- default input
   v-text-field(
     v-else,
-    :name='name'
-    :data-vv-as='field.label'
-    v-model='model',
-    v-bind='field',
-    :readonly="readonly",
-    :label="$t(field.label)",
-    :placeholder="$t(field.placeholder)",
-    :type="field.type",
-    :multiLine="field.type == 'textarea'",
+    :name="name"
+    v-model='model'
+    v-bind='field'
+    :readonly="readonly"
+    :label="$t(field.label)"
+    :placeholder="$t(field.placeholder)"
+    :type="field.type"
+    :multiLine="field.type == 'textarea'"
     v-validate="validationRules"
-    :error="isError",
+    :error="isError"
     :error-messages="errorMessage")
 
 </template>
 
 <script>
-import randomstring from "randomstring";
-import MaskedInput from "vue-text-mask";
-import moment from "moment";
-import "vue2-dropzone/dist/vue2Dropzone.css";
+import randomstring from 'randomstring';
+import moment from 'moment';
+import { VMoney } from 'v-money';
+import 'vue2-dropzone/dist/vue2Dropzone.css';
 
-import EventBus from "../eventBus.js";
-import config from "../config";
+import EventBus from '../eventBus.js';
+import config from '../config';
 
 export default {
   props: {
     resourceId: {
       type: String,
-      default: "new"
+      default: 'new',
     },
     field: {
       type: Object,
-      required: true
+      required: true,
     },
     name: {
       type: String,
-      required: false
+      required: false,
     },
     value: {
-      required: false
+      required: false,
     },
     width: {
       type: Number,
-      required: false
+      required: false,
     },
     readonly: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
-      inputGroupClass: "input-group input-group--dirty input-group--text-field",
+      inputGroupClass: 'input-group input-group--dirty input-group--text-field',
       editorOption: {
         modules: {
           toolbar: [
-            ["bold", "italic", "underline", "strike"], // toggled buttons
+            ['bold', 'italic', 'underline', 'strike'], // toggled buttons
             [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            ["blockquote", "code-block"],
+            ['blockquote', 'code-block'],
             [{ header: 1 }, { header: 2 }], // custom button values
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ indent: "-1" }, { indent: "+1" }],
-            [{ align: [] }]
-          ]
-        }
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }],
+            [{ align: [] }],
+          ],
+        },
       },
       passwordInvisible: true,
       addSubdata: false,
@@ -212,23 +213,26 @@ export default {
       errorMessage: [],
       isShowDialogForm: false,
       currentItem: null,
-      parentData: {}
+      parentData: {},
+      money: {
+        decimal: '.',
+        thousands: ',',
+        precision: 2,
+        masked: false /* doesn't work with directive */,
+      },
     };
   },
-  components: {
-    MaskedInput
-  },
   watch: {
-    "errors.items"(val) {
+    'errors.items'(val) {
       this.isError = val.length > 0;
       this.errorMessage = this.isError ? val[0].msg : [];
 
-      this.$emit("fieldError", {
+      this.$emit('fieldError', {
         field: this.name,
         isError: this.isError,
-        message: this.isError ? val[0].msg : []
+        message: this.isError ? val[0].msg : [],
       });
-    }
+    },
   },
   computed: {
     resource() {
@@ -236,29 +240,33 @@ export default {
     },
     model: {
       get() {
-        if (["date", "datetime"].indexOf(this.field.type) > -1) {
-          moment(String(this.value || new Date())).format("YYYY-MM-DD");
+        if (['date', 'datetime'].indexOf(this.field.type) > -1) {
+          return moment(String(this.value || new Date())).format('YYYY-MM-DD');
         }
         return this.value;
       },
       set(val) {
-        this.$emit("input", val);
-      }
+        if (['money'].indexOf(this.field.type) > -1) {
+          val = Number(val.replace(/[^0-9\.-]+/g, ''));
+        }
+
+        return this.$emit('input', val);
+      },
     },
     validationRules() {
       const rules = {
         required: !!this.field.required,
         email: this.field.type
-          ? this.field.type.toLowerCase() === "email"
-          : false
+          ? this.field.type.toLowerCase() === 'email'
+          : false,
       };
 
       return rules;
-    }
+    },
   },
   methods: {
     onUploading(file, xhr, formData) {
-      const extension = file.name.split(".");
+      const extension = file.name.split('.');
       file.upload.filename = `${randomstring.generate()}.${
         extension[extension.length - 1]
       }`;
@@ -266,13 +274,13 @@ export default {
     onUploadSuccess(file, response) {
       const filename = response.result.files.file[0].name;
       this.$emit(
-        "input",
-        `${config.api}Files/${this.resource}/download/${filename}`
+        'input',
+        `${config.api}Files/${this.resource}/download/${filename}`,
       );
     },
     getColumnData(row, field) {
       // process fields like `type.name`
-      let [l1, l2] = field.split(".");
+      let [l1, l2] = field.split('.');
       if (l2) {
         return row[l1] ? row[l1][l2] : null;
       } else {
@@ -288,15 +296,15 @@ export default {
         maxFilesize: 1024,
         withCredentials: true,
         acceptedFileTypes: field.acceptedFileTypes,
-        id: "dropzone_" + this.name,
-        createThumbnailFromUrl: model
+        id: 'dropzone_' + this.name,
+        createThumbnailFromUrl: model,
       };
     },
     onGridCreate: function() {
-      this.$emit("onUpsert", { subForm: true, cb: this.onGridUpsertCb });
+      this.$emit('onUpsert', { subForm: true, cb: this.onGridUpsertCb });
     },
     onGridUpdate: function({ item }) {
-      this.$emit("onUpsert", { subForm: true, cb: this.onGridUpsertCb });
+      this.$emit('onUpsert', { subForm: true, cb: this.onGridUpsertCb });
       this.currentItem = item;
     },
     onGridUpsertCb: function(parentData) {
@@ -306,33 +314,35 @@ export default {
     },
     modalSubFormClose() {
       this.isShowDialogForm = false;
-      this.$emit("refresh");
-      EventBus.$emit("gridRefresh");
-    }
+      this.$emit('refresh');
+      EventBus.$emit('gridRefresh');
+    },
   },
   created: function() {
     if (
       this.field.required &&
       !this.value &&
       ![
-        "file",
-        "pdf",
-        "image",
-        "video",
-        "table",
-        "array",
-        "date",
-        "datetime",
-        "time",
-        "hidden"
+        'file',
+        'pdf',
+        'image',
+        'video',
+        'table',
+        'array',
+        'date',
+        'datetime',
+        'time',
+        'hidden',
       ].includes(this.field.type)
     ) {
-      this.$emit("fieldError", {
+      this.$emit('fieldError', {
         field: this.name,
         isError: true,
-        message: `The ${this.field.label} field is required.`
+        message: `The ${this.field.label} field is required.`,
       });
     }
-  }
+  },
+
+  directives: { money: VMoney },
 };
 </script>

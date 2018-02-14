@@ -20,7 +20,7 @@ export default {
     return {
       rules: {},
       messages: {},
-      error: null
+      error: null,
     };
   },
   computed: {
@@ -29,7 +29,7 @@ export default {
     },
     id() {
       return this.$route.params.id;
-    }
+    },
   },
   methods: {
     onSuccess(data) {
@@ -37,12 +37,12 @@ export default {
       if (data.id) {
         // this.$router.go(-1);
       }
-    }
+    },
   },
   created() {
     let pageTitle = `View
       ${global.helper.i.titleize(global.helper.i.singularize(this.resource))}`;
     this.$store.commit('setPageTitle', pageTitle);
-  }
+  },
 };
 </script>

@@ -79,10 +79,11 @@ v-flex(xs12)
 </template>
 
 <script>
-import moment from "moment";
+import moment from 'moment';
+import numeral from 'numeral';
 
-import EventBus from "../eventBus.js";
-import config from "../config";
+import EventBus from '../eventBus.js';
+import config from '../config';
 
 const getDefaultData = () => {
   return {
@@ -90,31 +91,31 @@ const getDefaultData = () => {
     form: {
       fields: {},
       rules: {},
-      messages: {}
+      messages: {},
     },
     filters: {
       model: {},
-      limit: config.grid.limit
+      limit: config.grid.limit,
     },
     loading: false,
     columns: [], // fetch grid setup params from server if `columns` is empty
     actions: {},
     options: {
-      sort: "id",
+      sort: 'id',
       create: false,
       update: true,
-      delete: false
+      delete: false,
     },
     pagination: {
       page: 1,
       rowsPerPage: 10,
-      sortBy: "id",
+      sortBy: 'id',
       descending: true,
-      totalItems: 0
+      totalItems: 0,
     },
     foreignKey: {},
     items: [],
-    error: null
+    error: null,
   };
 };
 
@@ -122,51 +123,51 @@ export default {
   props: {
     resource: {
       type: String,
-      required: true
+      required: true,
     },
     filterByFk: {
-      type: Object
+      type: Object,
     },
     showSearch: {
       type: Boolean,
-      default: true
+      default: true,
     },
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     type: {
-      type: String
+      type: String,
     },
     onCreate: {
       type: Function,
-      required: true
+      required: true,
     },
     onUpdate: {
       type: Function,
-      required: true
+      required: true,
     },
     onView: {
-      type: Function
-    }
+      type: Function,
+    },
   },
 
   data: getDefaultData,
 
   watch: {
-    "$i18n.locale"(val) {
+    '$i18n.locale'(val) {
       this.fetchGrid();
     },
-    "pagination.page"(val) {
+    'pagination.page'(val) {
       this.fetchData();
     },
-    "pagination.sortBy"(val) {
+    'pagination.sortBy'(val) {
       this.fetchData();
     },
-    "pagination.descending"(val) {
+    'pagination.descending'(val) {
       this.fetchData();
     },
-    "$route.params": "refresh"
+    '$route.params': 'refresh',
   },
 
   methods: {
@@ -187,11 +188,11 @@ export default {
         this._.forEach(
           this.filters.model,
           function(val, key) {
-            if (key.indexOf(".") > -1) {
+            if (key.indexOf('.') > -1) {
               let nestedFilter = {
-                regexp: `/${val}/i`
+                regexp: `/${val}/i`,
               };
-              const splitedKey = key.split(".").reverse();
+              const splitedKey = key.split('.').reverse();
 
               this._.map(splitedKey, val => {
                 const prevNestedFilter = Object.assign(nestedFilter);
@@ -202,18 +203,18 @@ export default {
               this._.merge(filters, nestedFilter);
             } else {
               const type = this._.find(this.columns, val => {
-                val.type == "date";
+                val.type == 'date';
               });
 
-              if (type === "date") {
+              if (type === 'date') {
                 filters[key] = val;
               } else {
                 filters[key] = {
-                  regexp: `/${val}/i`
+                  regexp: `/${val}/i`,
                 };
               }
             }
-          }.bind(this)
+          }.bind(this),
         );
       }
 
@@ -222,7 +223,7 @@ export default {
       this.$route.query.filter = {
         where: filters,
         limit: this.filters.limit,
-        offset
+        offset,
       };
     },
     updateRoute() {
@@ -230,7 +231,7 @@ export default {
       this.$router.go({
         path: this.$route.path,
         params: this.$route.params,
-        query: this.$route.query
+        query: this.$route.query,
       });
     },
     doSearch() {
@@ -253,28 +254,32 @@ export default {
     },
     getColumnData(row, field) {
       // process fields like `type.name`
-      let [l1, l2] = field.value.split(".");
+      let [l1, l2] = field.value.split('.');
       let value = row[l1];
       if (l2) {
         value = row[l1] ? row[l1][l2] : null;
       }
-      if (field.type === "image") {
+      if (field.type === 'image') {
         value = `<v-avatar size="36px">
           <img src="${value}" class="crud-grid-thumb" controls />
           </v-avatar>`;
       }
-      if (field.type === "date") {
-        value = value ? moment(String(value)).format("YYYY-MM-DD") : "";
+      if (field.type === 'date') {
+        value = value ? moment(String(value)).format('YYYY-MM-DD') : '';
+      }
+      if (field.type === 'money') {
+        value = value ? numeral(value).format('0,0.0') : 0.0;
       }
       return value;
     },
     fetchGrid: async function() {
       try {
-        const result = await this.$http.get(`${this.resource}/grid`);
+        const data = await this.$store.dispatch('fetchGridSchema', {
+          resource: this.resource,
+          filter: this.filters,
+        });
 
-        const data = result.data.schema;
-
-        if (!Array.isArray(data.columns) && typeof data.columns === "object") {
+        if (!Array.isArray(data.columns) && typeof data.columns === 'object') {
           const columnsArr = [];
 
           this._.forEach(data.columns, function(value, key) {
@@ -304,7 +309,7 @@ export default {
         this.options = data.options || {};
 
         if (this.options && this.options.sort) {
-          let sortData = this.options.sort.split("-");
+          let sortData = this.options.sort.split('-');
           let desc = sortData.length > 1;
           let sortField = sortData.pop();
 
@@ -327,16 +332,16 @@ export default {
         this.preFetch();
 
         const result = await this.$http.get(`${this.resource}`, {
-          params: this.$route.query
+          params: this.$route.query,
         });
 
         this.items = result.data;
 
-        this.pagination.totalItems = parseInt(result.headers["x-total-count"]);
+        this.pagination.totalItems = parseInt(result.headers['x-total-count']);
 
         Promise.resolve({
           items: result.data,
-          count: this.pagination.totalItems
+          count: this.pagination.totalItems,
         });
       } catch (err) {
         this.error = err;
@@ -352,22 +357,22 @@ export default {
     },
     customAction: async function(option, item) {
       this.$router.push({
-        name: "customAction",
+        name: 'customAction',
         params: {
           resource: this.resource,
           subResource: option.formUrl,
-          id: item.id
-        }
+          id: item.id,
+        },
       });
-    }
+    },
   },
 
   computed: {
     totalPages() {
       return Math.ceil(
-        this.pagination.totalItems / this.pagination.rowsPerPage
+        this.pagination.totalItems / this.pagination.rowsPerPage,
       );
-    }
+    },
   },
 
   mounted() {},
@@ -375,7 +380,7 @@ export default {
   created: async function() {
     await this.fetchGrid();
     await this.fetchData();
-    EventBus.$on("gridRefresh", this.refresh);
-  }
+    EventBus.$on('gridRefresh', this.refresh);
+  },
 };
 </script>

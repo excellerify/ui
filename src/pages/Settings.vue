@@ -14,30 +14,26 @@ v-layout
 </template>
 
 <script>
-
 export default {
-
-  data () {
+  data() {
     return {
       model: {},
       fields: {},
       rules: {},
-      messages: {}
+      messages: {},
     };
   },
   computed: {
-
-    isEdit () {
+    isEdit() {
       return !!this.id;
-    }
-
+    },
   },
   watch: {
-    '$route': 'fetch',
-    'model': 'updateFields'
+    $route: 'fetch',
+    model: 'updateFields',
   },
   methods: {
-    getFieldError (fieldName) {
+    getFieldError(fieldName) {
       for (let k in this.errors) {
         let error = this.errors[k];
         if (error.field === fieldName) {
@@ -45,31 +41,25 @@ export default {
         }
       }
     },
-    updateFields () {
-
+    updateFields() {},
+    fetch() {
+      this.$http
+        .get(`settings/form`, {
+          params: { id: this.id },
+        })
+        .then(({ data }) => {
+          this.model = data.model;
+          this.fields = data.fields;
+          this.rules = data.rules;
+          this.messages = data.messages;
+        });
     },
-    fetch () {
-      this.$http.get(`settings/form`, {
-        params: {id: this.id}
-      }).then(({data}) => {
-        this.model = data.model;
-        this.fields = data.fields;
-        this.rules = data.rules;
-        this.messages = data.messages;
-      });
-    },
-    onSubmit () {
-
-    },
-    onSuccess (data) {
-
-    }
+    onSubmit() {},
+    onSuccess(data) {},
   },
-  created () {
-
-  },
-  mounted () {
+  created() {},
+  mounted() {
     this.fetch();
-  }
+  },
 };
 </script>

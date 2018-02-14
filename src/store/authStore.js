@@ -1,9 +1,51 @@
+import axios from 'axios';
+
+import router from '../router';
+
 const store = {
-  state: {},
-  mutations: {},
+  state: {
+    user: {},
+    token: null,
+  },
+  mutations: {
+    setAuth(state, { user, token, expireTime }) {
+      axios.defaults.headers.common.Authorization = token;
+
+      state.user = user;
+      state.token = token;
+      state.expireTime = expireTime;
+
+      global.helper.ls.set('user', user);
+      global.helper.ls.set('token', token);
+      global.helper.ls.set('expireTime', expireTime);
+    },
+  },
   actions: {
-    // async login(_, { url, params }) {},
-    async logout() {
+    checkAuth({ commit }) {
+      const data = {
+        user: global.helper.ls.get('user'),
+        token: global.helper.ls.get('token'),
+        expireTime: global.helper.ls.get('expireTime'),
+      };
+
+      commit('setAuth', data);
+    },
+    login: async ({ commit }, { username, password }) => {
+      try {
+        const response = await global.$http.post('admins/login', { username, password });
+
+        commit('setAuth', {
+          user: response.data.userId,
+          token: response.data.id,
+          expireTime: response.data.ttl,
+        });
+
+        router.push('/');
+      } catch (e) {
+        Promise.reject(e);
+      }
+    },
+    logout: async () => {
       try {
         const result = await global.$http.post('admins/logout');
 
@@ -11,8 +53,16 @@ const store = {
       } catch (e) {
         return Promise.resolve(e);
       }
-    }
-  }
+    },
+    clearAuth({ commit }) {
+      commit('setAuth', {
+        user: null,
+        token: null,
+        expireTime: null,
+      });
+      router.push('/login');
+    },
+  },
 };
 
 export default store;

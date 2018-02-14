@@ -9,7 +9,7 @@ div
         v-card-text
           v-form(v-model='model',
             @submit='doLogin',
-            :FormFields='fields',
+            :FormFields='loginFields',
             submitButtonText="Login",
             :autoSubmit="true")
             .flex.pb-2
@@ -30,71 +30,53 @@ export default {
   data() {
     return {
       model: {
-        username: "",
-        password: ""
+        username: '',
+        password: '',
       },
-      fields: {
-        username: { label: "Username", required: true },
-        password: { label: "Password", type: "password", required: true }
+      loginFields: {
+        username: { label: 'Username', required: true },
+        password: { label: 'Password', type: 'password', required: true },
       },
       show: true,
       hasError: false,
       error: {
-        message: ""
-      }
+        message: '',
+      },
     };
   },
-  computed: {
-    token() {
-      return global.helper.ls.get("token");
-    }
-  },
+  computed: {},
   methods: {
-    doLogin() {
-      this.$http
-        .post("admins/login", {
+    doLogin: async function() {
+      try {
+        debugger;
+        await this.$store.dispatch('login', {
           username: this.model.username,
-          password: this.model.password
-        })
-        .then(
-          response => {
-            global.store.dispatch("doLogin", {
-              user: response.data.userId,
-              token: response.data.id,
-              expireTime: response.data.ttl
-            });
-          },
-          ({ response }) => {
-            this.hasError = true;
+          password: this.model.password,
+        });
+      } catch (e) {
+        console.log(e);
 
-            if (response.status === 401 || response.status === 403) {
-              this.error.message = "invalid username or password";
-              this.$emit("error", response.status, [
-                { message: "invalid username or password" }
-              ]);
-            } else {
-              this.error = response.data.error;
-              this.$emit("error", response.status, response.data.error);
-            }
-          }
-        );
+        this.hasError = true;
+
+        const response = e.response;
+
+        if (response.status === 401 || response.status === 403) {
+          this.error.message = 'invalid username or password';
+          this.$emit('error', response.status, [
+            { message: 'invalid username or password' },
+          ]);
+        } else {
+          this.error = response.data.error;
+          this.$emit('error', response.status, response.data.error);
+        }
+      }
     },
-    doLogout() {
-      this.$http.post("admins/logout").then(
-        response => {
-          global.store.dispatch("clearAuth");
-        },
-        err => console.error(err)
-      );
+    authenticate: provider => {
+      this.$auth.authenticate(provider);
     },
-    authenticate(provider) {
-      this.$auth.authenticate(provider).then(function(data) {
-        // Execute application logic after successful social authentication
-      });
-    }
   },
   beforeMount() {
     this.getUnits();
-  }
+  },
 };
 </script>

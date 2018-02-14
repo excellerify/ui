@@ -4,10 +4,11 @@ import Vuetify from 'vuetify';
 import lodash from 'lodash';
 import VueLodash from 'vue-lodash';
 import VueTimeago from 'vue-timeago';
-import 'vuetify/src/stylus/main.styl';
-import 'vuetify/src/stylus/settings/_colors.styl';
 import Dropzone from 'vue2-dropzone';
 import VueQuillEditor from 'vue-quill-editor';
+
+import 'vuetify/src/stylus/main.styl';
+import 'vuetify/src/stylus/settings/_colors.styl';
 
 import helper from './helper';
 import config from './config';
@@ -41,8 +42,8 @@ Vue.use(VueTimeago, {
   locale: config.locale,
   locales: {
     en,
-    [config.locale]: configLocale
-  }
+    [config.locale]: configLocale,
+  },
 });
 
 Vue.use(VueQuillEditor);
@@ -75,7 +76,7 @@ new Vue({
   methods: {
     back() {
       this.$router.go(-1);
-    }
+    },
   },
-  render: h => h(App)
+  render: h => h(App),
 });

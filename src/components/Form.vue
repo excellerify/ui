@@ -49,67 +49,67 @@ div
 export default {
   props: {
     id: {
-      type: String
+      type: String,
     },
     resource: {
-      type: String
+      type: String,
     },
     subResource: {
-      type: String
+      type: String,
     },
     inline: {
       type: Boolean,
-      default: false
+      default: false,
     },
     groupBy: {
       required: false,
       type: String,
-      default: null
+      default: null,
     },
     submitButtonText: {
       required: false,
       type: String,
-      default: "Submit"
+      default: 'Submit',
     },
     submitButtonIcon: {
       required: false,
       type: String,
-      default: "send"
+      default: 'send',
     },
     value: {
       required: false,
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     ParentData: {
       required: false,
-      type: Object
+      type: Object,
     },
     FormFields: {
-      type: Object
+      type: Object,
     },
     autoSubmit: {
-      type: Boolean
+      type: Boolean,
     },
     type: {
       type: String,
-      default: "form"
+      default: 'form',
     },
     readonly: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
       model: this.value,
       hasError: false,
       formErrors: [],
-      message: "",
+      message: '',
       fieldErrors: [],
       rules: null,
       messages: null,
-      formFields: null
+      formFields: null,
     };
   },
 
@@ -140,7 +140,7 @@ export default {
       return { parents, children };
     },
     method() {
-      return this.isEdit ? "patch" : "post";
+      return this.isEdit ? 'patch' : 'post';
     },
     isEdit() {
       return !!this.id;
@@ -158,7 +158,7 @@ export default {
     getFields() {
       this.filterFieldByMode();
       return this.formFields;
-    }
+    },
   },
   watch: {
     value(val) {
@@ -171,7 +171,7 @@ export default {
     },
     FormFields() {
       this.refresh();
-    }
+    },
   },
   methods: {
     refresh: async function() {
@@ -186,7 +186,7 @@ export default {
 
         this.filterFieldByMode();
 
-        if (this.type === "subForm" && this.ParentData) {
+        if (this.type === 'subForm' && this.ParentData) {
           this._.forEach(
             this.formFields,
             function(val, key) {
@@ -195,13 +195,13 @@ export default {
                   const fkData = valData[val.fk[keyData]];
                   if (!fkData) {
                     console.error(
-                      `Wrong fk, "${keyData}" should be "${val.fk}"`
+                      `Wrong fk, "${keyData}" should be "${val.fk}"`,
                     );
                   }
                   this.model[key] = valData[val.fk[keyData]];
                 });
               }
-            }.bind(this)
+            }.bind(this),
           );
         }
 
@@ -215,11 +215,11 @@ export default {
       this.formFields = this._.pickBy(this.formFields, (val, key) => {
         if (val.mode) {
           if (this.isEdit) {
-            return val.mode.indexOf("isEdit") > -1;
+            return val.mode.indexOf('isEdit') > -1;
           } else if (this.isView) {
-            return val.mode.indexOf("isView") > -1;
+            return val.mode.indexOf('isView') > -1;
           } else {
-            return val.mode.indexOf("isCreate") > -1;
+            return val.mode.indexOf('isCreate') > -1;
           }
         }
 
@@ -228,9 +228,10 @@ export default {
     },
     fetchFormSchema: async function() {
       try {
-        const data = await this.$store.dispatch("fetchFormSchema", {
-          url: `${this.resource}/${this.subResource || "form"}`,
-          params: { id: this.id }
+        const data = await this.$store.dispatch('fetchFormSchema', {
+          resource: `${this.resource}`,
+          subResource: `${this.subResource || 'form'}`,
+          id: this.id,
         });
 
         this.model = data.model;
@@ -264,12 +265,10 @@ export default {
           throw this.fieldErrors;
         }
 
-        this.$store.commit("submitLoading");
-
-        this.$emit("input", this.model);
+        this.$emit('input', this.model);
 
         if (this.autoSubmit) {
-          this.$emit("submit");
+          this.$emit('submit');
           return Promise.resolve();
         }
 
@@ -277,9 +276,9 @@ export default {
 
         this.fieldErrors = [];
 
-        this.$store.commit("submitSuccess", { message: result.data });
-
-        if (!subForm) this.$emit("success", result.data);
+        if (!subForm) {
+          this.$emit('success', result.data);
+        }
 
         if (cb) cb(result.data);
 
@@ -300,16 +299,16 @@ export default {
           this.formErrors = [err];
         }
 
-        this.$emit("error", e);
+        this.$emit('error', e);
 
-        this.$store.commit("submitError", { message: e });
+        this.$store.commit('submitError', { message: e });
 
         Promise.reject(e);
       }
-    }
+    },
   },
   created() {
     this.refresh();
-  }
+  },
 };
 </script>
