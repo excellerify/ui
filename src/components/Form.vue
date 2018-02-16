@@ -35,11 +35,11 @@ div
         v-model='model[name]',
         :readonly='readonly')
 
-      v-alert.py-2(error, v-model='hasError', style='width: 100%; margin-top: 20px;')
-        ul
+      v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
+        ul.px-3
           li(v-for='error in formErrors') {{error.message}}
 
-      v-flex.pt-2.actions(xs12)
+      v-flex.mt-2.actions(xs12)
         slot(name='buttons')
           v-btn.ma-0(color='primary', dark, type='submit') {{$t(submitButtonText)}}
             v-icon(right, dark) {{submitButtonIcon}}

@@ -1,5 +1,5 @@
 <template lang="pug">
-  div
+  v-app(:dark="dark", standalone)
     transition(mode="out-in")
       router-view
 </template>

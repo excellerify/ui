@@ -1,10 +1,9 @@
 <template lang="pug">
 div
-  v-dialog(:value='true', persistent='', :width='300')
-    v-card(hover='', style='background:white;')
-      v-card-row.deep-purple.darken-1
-        v-card-title.text-center
-         h5(style='text-align: center;') {{$t("Login to Admin Dashboard")}}
+  v-flex(xs10 offset-xs1 sm6 offset-sm3 md5 offset-md4 lg4 offset-lg4 style="margin-top: 50px;")
+    v-card(style='background:white;')
+      v-card-title.text-xs-center
+        h3.title {{$t("Login to Admin Dashboard")}}
       v-card-row
         v-card-text
           v-form(v-model='model',
@@ -20,7 +19,8 @@ div
 </template>
 
 <style>
-body {
+body,
+.application--wrap {
   background: #666 !important;
 }
 </style>

@@ -19,6 +19,7 @@ http.interceptors.response.use(
   (response) => {
     const request = response.config;
     if (config.debug.http) {
+      // eslint-disable-next-line
       console.info(
         '>>>',
         request.method.toUpperCase(),
@@ -35,6 +36,7 @@ http.interceptors.response.use(
     if (config.debug.http) {
       const { response, config: request } = error;
       if (request) {
+        // eslint-disable-next-line
         console.info(
           '>>>',
           request.method.toUpperCase(),

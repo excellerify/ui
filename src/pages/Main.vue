@@ -1,5 +1,5 @@
 <template lang="pug">
-v-app(:dark="dark",standalone)
+div
   v-navigation-drawer(v-model='drawer',:mini-variant="mini", persistent,enable-resize-watcher, :dark="dark", app)
     .pa-3.text-xs-center(v-show="!mini")
       div(style="padding-left:5em")

@@ -142,7 +142,7 @@ v-flex(xs12)
   v-text-field(
     v-else,
     :name="name"
-    v-model='model'
+    v-model.lazy='model'
     v-bind='field'
     :readonly="readonly"
     :label="$t(field.label)"
@@ -223,15 +223,18 @@ export default {
     };
   },
   watch: {
-    'errors.items'(val) {
-      this.isError = val.length > 0;
-      this.errorMessage = this.isError ? val[0].msg : [];
+    'errors.items': {
+      handler(val) {
+        this.isError = val.length > 0;
+        this.errorMessage = this.isError ? val[0].msg : [];
 
-      this.$emit('fieldError', {
-        field: this.name,
-        isError: this.isError,
-        message: this.isError ? val[0].msg : [],
-      });
+        this.$emit('fieldError', {
+          field: this.name,
+          isError: this.isError,
+          message: this.isError ? val[0].msg : [],
+        });
+      },
+      deep: true,
     },
   },
   computed: {

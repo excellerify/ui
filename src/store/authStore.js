@@ -31,28 +31,20 @@ const store = {
       commit('setAuth', data);
     },
     login: async ({ commit }, { username, password }) => {
-      try {
-        const response = await global.$http.post('admins/login', { username, password });
+      const response = await global.$http.post('admins/login', { username, password });
 
-        commit('setAuth', {
-          user: response.data.userId,
-          token: response.data.id,
-          expireTime: response.data.ttl,
-        });
+      commit('setAuth', {
+        user: response.data.userId,
+        token: response.data.id,
+        expireTime: response.data.ttl,
+      });
 
-        router.push('/');
-      } catch (e) {
-        Promise.reject(e);
-      }
+      router.push('/');
     },
     logout: async () => {
-      try {
-        const result = await global.$http.post('admins/logout');
+      const result = await global.$http.post('admins/logout');
 
-        return Promise.resolve(result);
-      } catch (e) {
-        return Promise.resolve(e);
-      }
+      return result;
     },
     clearAuth({ commit }) {
       commit('setAuth', {

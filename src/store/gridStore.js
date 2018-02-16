@@ -3,15 +3,11 @@ const store = {
   mutations: {},
   actions: {
     async fetchGridSchema(_, { resource, filters }) {
-      try {
-        const data = await global.$http.get(`${resource}/grid`, {
-          params: { filters },
-        });
+      const data = await global.$http.get(`${resource}/grid`, {
+        params: { filters },
+      });
 
-        return Promise.resolve(data.data.schema);
-      } catch (e) {
-        return Promise.resolve(e);
-      }
+      return data.data.schema;
     },
   },
 };
