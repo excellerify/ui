@@ -1,11 +1,15 @@
-var apiVersion = process.env.EXCELLERIFY_API_VERSION || ""
+const { argv } = require('yargs');
+const merge = require('webpack-merge');
 
-apiVersion = apiVersion ? "/" + apiVersion + "/" : "/"
+let apiVersion = process.env.EXCELLERIFY_API_VERSION || '';
 
-var merge = require("webpack-merge")
-var prodEnv = require("./prod.env")
+apiVersion = apiVersion ? `/${apiVersion}` : '';
+
+const apiUrl = argv.apiUrl || `http://localhost:3000/api${apiVersion}`;
+
+const prodEnv = require('./prod.env');
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_URL: '"http://localhost:3000/api' + apiVersion + '"'
-})
+  API_URL: `"${apiUrl}/"`,
+});

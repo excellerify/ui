@@ -280,8 +280,9 @@ export default {
       this._.forEach(columns, function(value, key) {
         if (!value.value) {
           value.value = key;
-          columnsArr.push(value);
         }
+
+        columnsArr.push(value);
       });
 
       return columnsArr;
@@ -304,8 +305,8 @@ export default {
           data.columns[k].text = this.$t(data.columns[k].text);
         }
 
-        this.columns = data.columns || [];
-        this.actions = data.actions || {};
+        this.columns = data.columns;
+        this.actions = data.actions;
         this.foreignKey = data.foreignKey || {};
 
         // keep limit
@@ -329,10 +330,10 @@ export default {
         }
 
         this.loading = false;
-        Promise.resolve();
+        return;
       } catch (err) {
         this.error = err;
-        Promise.reject(err);
+        return err;
       }
     },
     fetchData: async function() {
@@ -347,13 +348,13 @@ export default {
 
         this.pagination.totalItems = parseInt(result.headers['x-total-count']);
 
-        Promise.resolve({
+        return {
           items: result.data,
           count: this.pagination.totalItems,
-        });
+        };
       } catch (err) {
         this.error = err;
-        Promise.reject(err);
+        return err;
       }
     },
     remove: async function(itemId) {

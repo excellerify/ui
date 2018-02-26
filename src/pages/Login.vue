@@ -48,14 +48,11 @@ export default {
   methods: {
     doLogin: async function() {
       try {
-        debugger;
         await this.$store.dispatch('login', {
           username: this.model.username,
           password: this.model.password,
         });
       } catch (e) {
-        console.log(e);
-
         this.hasError = true;
 
         const response = e.response;
