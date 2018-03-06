@@ -56,10 +56,12 @@ v-flex(xs12)
               v-btn(v-if="options.update", icon, dark, color="primary", @click.native="onUpdate({item:props.item})")
                 v-icon edit
 
-              v-dialog(v-if="options.delete", id="modal" v-model="deleteModal[props.item.id]")
+              v-dialog(v-if="options.delete", id="modal", v-model="deleteModal[props.item.id]", max-width="300px")
                 v-btn(icon, slot="activator",  color="error")
                   v-icon delete
                 v-card
+                  v-toolbar(card dark color="primary")
+                    v-toolbar-title Delete
                   v-card-text
                     p(class="text-xs-center") Are you sure?
                   v-card-actions
@@ -212,6 +214,7 @@ export default {
               } else {
                 filters[key] = {
                   regexp: `/${val}/i`,
+                  plain: val,
                 };
               }
             }

@@ -58,9 +58,9 @@ export default {
         const response = e.response;
 
         if (response.status === 401 || response.status === 403) {
-          this.error.message = 'invalid username or password';
+          this.error.message = 'Invalid Username or Password';
           this.$emit('error', response.status, [
-            { message: 'invalid username or password' },
+            { message: this.error.message },
           ]);
         } else {
           this.error = response.data.error;
@@ -71,9 +71,6 @@ export default {
     authenticate: provider => {
       this.$auth.authenticate(provider);
     },
-  },
-  beforeMount() {
-    this.getUnits();
   },
 };
 </script>
