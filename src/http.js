@@ -16,7 +16,7 @@ http.interceptors.request.use(
 );
 
 http.interceptors.response.use(
-  (response) => {
+  response => {
     const request = response.config;
     if (config.debug.http) {
       // eslint-disable-next-line
@@ -32,7 +32,7 @@ http.interceptors.response.use(
     }
     return response;
   },
-  (error) => {
+  error => {
     if (config.debug.http) {
       const { response, config: request } = error;
       if (request) {

@@ -10,6 +10,7 @@ module.exports = {
   extends: ['standard', 'airbnb-base', 'plugin:vue/recommended'],
   plugins: ['html', 'pug'],
   rules: {
+    'arrow-parens': ['error', 'as-needed'],
     'no-undefined': 'error',
     'object-curly-spacing': ['error', 'always'],
     'generator-star-spacing': 0,

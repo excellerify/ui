@@ -38,6 +38,9 @@ export default {
     subResource() {
       return this.$route.params.subResource;
     },
+    isEdit() {
+      return !!this.id;
+    },
   },
   methods: {
     onSuccess(data) {
@@ -45,9 +48,11 @@ export default {
     },
   },
   created() {
-    let pageTitle = `${this.isEdit ? 'Update' : 'Create'}
-      ${global.helper.i.titleize(global.helper.i.singularize(this.resource))}`;
-    this.$store.commit('setPageTitle', pageTitle);
+    const pageTitle = this.isEdit ? 'Update' : 'Create';
+    this.$store.dispatch('checkPageTitle', {
+      path: this.$route.path,
+      action: pageTitle,
+    });
   },
 };
 </script>

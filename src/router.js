@@ -13,8 +13,8 @@ function route(path, file, name, children, requiresAuth) {
     children,
     component,
     meta: {
-      requiresAuth: requiresAuth || false
-    }
+      requiresAuth: requiresAuth || false,
+    },
   };
 }
 
@@ -41,18 +41,18 @@ const router = new Router({
         'FormPage',
         'customAction',
         null,
-        true
+        true,
       ),
-      route('/settings', 'Settings', 'settings', null, true)
+      route('/settings', 'Settings', 'settings', null, true),
     ]),
 
     // Global redirect for 404
     {
       path: '*',
       redirect: '/error',
-      query: { code: 404, message: 'Page Not Found.' }
-    }
-  ]
+      query: { code: 404, message: 'Page Not Found.' },
+    },
+  ],
 });
 
 router.beforeEach((to, from, next) => {
@@ -63,11 +63,11 @@ router.beforeEach((to, from, next) => {
     next({
       path: '/login',
       query: {
-        redirect: to.fullPath
-      }
+        redirect: to.fullPath,
+      },
     });
   } else {
-    global.store.dispatch('checkPageTitle', to.path);
+    global.store.dispatch('checkPageTitle', { path: to.path });
     /* eslint-disable no-undef */
     if (typeof ga !== 'undefined') {
       ga('set', 'page', to.path);

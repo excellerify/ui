@@ -9,14 +9,14 @@ const locales = ['en-US'];
 Vue.use(VueI18n);
 
 const messages = {};
-locales.forEach((v) => {
+locales.forEach(v => {
   // eslint-disable-next-line
   messages[v] = require(`./${v}/index`).default;
 });
 const i18n = new VueI18n({
   locale: helper.ls.get('locale', config.locale),
   silentTranslationWarn: true,
-  messages
+  messages,
 });
 
 export default i18n;

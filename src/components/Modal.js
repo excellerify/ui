@@ -1,6 +1,6 @@
 import VModal from './Modal.vue';
 
-const modal = (Vue) => {
+const modal = Vue => {
   Vue.component('v-modal', VModal);
   const ModalComponent = Vue.extend(VModal);
   const component = new ModalComponent().$mount();

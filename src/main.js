@@ -69,7 +69,7 @@ new Vue({
       this.$store.commit('setMenu', data);
     });
 
-    this.$store.dispatch('checkPageTitle', this.$route.path);
+    this.$store.dispatch('checkPageTitle', { path: this.$route.path });
 
     this.$store.dispatch('checkAuth');
   },

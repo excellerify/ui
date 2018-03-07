@@ -39,7 +39,7 @@ helper.store = (key, value) => {
   return helper.ls.set(key, value);
 };
 
-Vue.directive('back', (event) => {
+Vue.directive('back', event => {
   event.onclick = () => window.history.go(-1);
 });
 

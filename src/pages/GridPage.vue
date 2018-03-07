@@ -23,17 +23,17 @@ export default {
       });
     },
     onUpdate: function({ item }) {
-      this.$router.push({ name: 'edit', params: { id: item.id } });
+      this.$router.push({
+        name: 'edit',
+        params: { resource: this.resource, id: item.id },
+      });
     },
     onView: function({ item }) {
       this.$router.push({ name: 'view', params: { id: item.id } });
     },
   },
-  created: async function() {
-    this.$store.commit(
-      'setPageTitle',
-      global.helper.i.titleize(global.helper.i.pluralize(this.resource)),
-    );
+  created() {
+    this.$store.dispatch('checkPageTitle', { path: this.$route.path });
   },
 };
 </script>

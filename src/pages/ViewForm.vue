@@ -40,9 +40,10 @@ export default {
     },
   },
   created() {
-    let pageTitle = `View
-      ${global.helper.i.titleize(global.helper.i.singularize(this.resource))}`;
-    this.$store.commit('setPageTitle', pageTitle);
+    this.$store.dispatch('checkPageTitle', {
+      path: this.$route.path,
+      action: 'View',
+    });
   },
 };
 </script>
