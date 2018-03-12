@@ -35,7 +35,7 @@ const router = new Router({
       [
         route('/', 'Home', 'home'),
         route('/crud/:resource', 'GridPage', 'grid'),
-        route('/crud/:resource/:id/view', 'ViewForm', 'view'),
+        route('/crud/:resource/:id/view', 'ViewPage', 'view'),
         route('/crud/:resource/:id/edit', 'FormPage', 'edit'),
         route('/crud/:resource/create', 'FormPage', 'create'),
         route('/crud/:resource/:id/:action', 'FormPage', 'action'),

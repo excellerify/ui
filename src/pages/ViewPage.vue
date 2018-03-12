@@ -1,16 +1,17 @@
 <template lang="pug">
 div.card
-  v-layout
-    v-flex(xs12)
-      v-form(
-        :id="id",
-        :resource="resource",
-        :readonly="true"
-        @success="onSuccess")
-        div(slot="buttons", class="my-4")
-          v-btn(dark, class="grey", @click.native="$root.back()")
-            v-icon(dark, left) chevron_left
-            span {{$t('Back')}}
+  v-card-text
+    v-layout
+      v-flex(xs12)
+        v-form(
+          :id="id",
+          :resource="resource",
+          :readonly="true"
+          @success="onSuccess")
+          div(slot="buttons", class="my-4")
+            v-btn(dark, class="grey", @click.native="$root.back()")
+              v-icon(dark, left) chevron_left
+              span {{$t('Back')}}
 </template>
 
 <script>
