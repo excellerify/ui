@@ -82,14 +82,6 @@ export default {
       global.helper.ls.set('locale', to);
       this.$i18n.locale = to;
     },
-    fetchMenu() {
-      // fetch menu from server
-      // this.$http.get('menu').then(({data}) => this.$store.commit('setMenu', data))
-    },
-  },
-
-  created() {
-    this.fetchMenu();
   },
 };
 </script>

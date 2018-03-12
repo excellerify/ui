@@ -3,7 +3,7 @@ import Router from 'vue-router';
 
 Vue.use(Router);
 
-function route(path, file, name, children, requiresAuth) {
+function route(path, file, name, children = null, requiresAuth = true) {
   // eslint-disable-next-line
   const component = require(`./pages/${file}.vue`);
   return {
@@ -23,28 +23,37 @@ const router = new Router({
   mode: 'hash',
   scrollBehavior: () => ({ y: 0 }),
   routes: [
-    route('/login', 'Login', 'login'),
-    route('/logout', 'Logout', 'logout'),
-    route('/error', 'Error', 'error'),
+    route('/login', 'Login', 'login', null, false),
+    route('/logout', 'Logout', 'logout', null, false),
+    route('/error', 'Error', 'error', null, false),
 
     // path, file(*.vue), name, children
-    route('/', 'Main', null, [
-      route('/', 'Home', 'home', null, true),
-      route('/crud/:resource', 'GridPage', 'grid', null, true),
-      route('/crud/:resource/:id/view', 'ViewForm', 'view', null, true),
-      route('/crud/:resource/:id/edit', 'FormPage', 'edit', null, true),
-      route('/crud/:resource/create', 'FormPage', 'create', null, true),
-      route('/crud/:resource/:id/:action', 'FormPage', 'action', null, true),
-      route('/crud/:resource/:action', 'FormPage', 'indexAction', null, true),
-      route(
-        '/crud/:resource/:subResource/:id/edit',
-        'FormPage',
-        'customAction',
-        null,
-        true,
-      ),
-      route('/settings', 'Settings', 'settings', null, true),
-    ]),
+    route(
+      '/',
+      'Main',
+      null,
+      [
+        route('/', 'Home', 'home'),
+        route('/crud/:resource', 'GridPage', 'grid'),
+        route('/crud/:resource/:id/view', 'ViewForm', 'view'),
+        route('/crud/:resource/:id/edit', 'FormPage', 'edit'),
+        route('/crud/:resource/create', 'FormPage', 'create'),
+        route('/crud/:resource/:id/:action', 'FormPage', 'action'),
+        route('/crud/:resource/:action', 'FormPage', 'indexAction'),
+        route(
+          '/crud/:resource/:subResource/:id/edit',
+          'FormPage',
+          'customActionForm',
+        ),
+        route(
+          '/crud/:resource/:subResource/:id',
+          'GridPage',
+          'customActionGrid',
+        ),
+        route('/settings', 'Settings', 'settings'),
+      ],
+      true,
+    ),
 
     // Global redirect for 404
     {

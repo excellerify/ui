@@ -18,12 +18,6 @@ div
           div {{error.message}}
 </template>
 
-<style>
-body,
-.application--wrap {
-  background: #666 !important;
-}
-</style>
 
 <script>
 export default {

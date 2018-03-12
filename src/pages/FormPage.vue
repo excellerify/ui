@@ -1,10 +1,6 @@
 <template lang="pug">
 div.card
   v-card-text
-    v-alert(v-if="error",
-      outline color="error",
-      icon="warning",
-      :value="true") {{error.statusCode}} - {{error.message}}
     v-layout
       v-flex(xs12)
         v-form(
@@ -23,11 +19,7 @@ div.card
 <script>
 export default {
   data() {
-    return {
-      rules: {},
-      messages: {},
-      error: null,
-    };
+    return {};
   },
   computed: {
     id() {

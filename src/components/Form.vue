@@ -108,7 +108,6 @@ export default {
       message: '',
       fieldErrors: [],
       rules: null,
-      messages: null,
       formFields: null,
     };
   },
@@ -140,7 +139,9 @@ export default {
       return { parents, children };
     },
     method() {
-      return this.isEdit ? 'patch' : 'post';
+      return (
+        this.$route.query.method || (this.isEdit ? 'patch' : 'post')
+      ).toLowerCase();
     },
     isEdit() {
       return !!this.id;
@@ -149,7 +150,9 @@ export default {
       return !!!this.id;
     },
     action() {
-      if (this.isEdit) {
+      if (this.$route.query.action) {
+        return `${this.resource}/${this.$route.query.action}`;
+      } else if (this.isEdit) {
         return `${this.resource}/${this.id}`;
       } else {
         return `${this.resource}`;
@@ -234,10 +237,9 @@ export default {
           id: this.id,
         });
 
-        this.model = data.model;
         this.formFields = data.fields;
-        this.rules = data.rules;
-        this.messages = data.messages;
+        this.model = data.model || {};
+        this.rules = data.rules || {};
 
         Promise.resolve(data);
       } catch (e) {
@@ -291,8 +293,8 @@ export default {
         } else {
           let err;
 
-          if (e.response && e.response.data && e.response.data.error) {
-            err = e.response.data.error;
+          if (e.response && e.response.data) {
+            err = e.response.data.error || e.response.data;
           } else {
             err = e;
           }

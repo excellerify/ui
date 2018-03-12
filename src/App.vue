@@ -12,6 +12,13 @@
       router-view
 </template>
 
+<style>
+body,
+.application--wrap {
+  background: #ddd !important;
+}
+</style>
+
 <script>
 import { mapGetters } from 'vuex';
 

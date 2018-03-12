@@ -74,8 +74,6 @@ v-flex(xs12)
 
               v-btn(v-if="typeof options.custom === 'object'", icon, @click="customAction(options.custom, props.item)")
                 v-icon {{options.custom.icon}}
-
-      //- v-pagination.text-xs-center.ma-3(v-model='pagination.page', :length='totalPages')
 </template>
 
 <script>
@@ -324,10 +322,6 @@ export default {
           let desc = sortData.length > 1;
           let sortField = sortData.pop();
 
-          // if (sortField.indexOf('.') < 0) {
-          //   sortField = sortField
-          // }
-
           this.pagination.sort = sortField;
           this.pagination.descending = desc;
         }
@@ -368,12 +362,32 @@ export default {
       this.pagination.page++;
     },
     customAction: async function(option, item) {
+      const { resource } = this;
+
+      let subResource,
+        name = 'customAction';
+
+      if (option.type === 'form') {
+        subResource = option.formUrl;
+        name = `${name}Form`;
+      } else if (option.type === 'grid') {
+        subResource = option.gridUrl;
+        name = `${name}Grid`;
+      } else {
+        throw new Error('Invalid action type');
+      }
+
       this.$router.push({
-        name: 'customAction',
+        name,
         params: {
-          resource: this.resource,
-          subResource: option.formUrl,
+          resource,
+          subResource,
+          type: option.type,
           id: item.id,
+        },
+        query: {
+          action: option.action || subResource,
+          method: option.method || 'POST',
         },
       });
     },

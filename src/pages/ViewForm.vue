@@ -1,6 +1,5 @@
 <template lang="pug">
-div
-  v-alert(v-if="error" outline color="error" icon="warning" :value="true") {{error.statusCode}} - {{error.message}}
+div.card
   v-layout
     v-flex(xs12)
       v-form(
@@ -17,11 +16,7 @@ div
 <script>
 export default {
   data() {
-    return {
-      rules: {},
-      messages: {},
-      error: null,
-    };
+    return {};
   },
   computed: {
     resource() {
@@ -34,9 +29,6 @@ export default {
   methods: {
     onSuccess(data) {
       this.$router.push({ name: 'grid', params: { resource: this.resource } });
-      if (data.id) {
-        // this.$router.go(-1);
-      }
     },
   },
   created() {
