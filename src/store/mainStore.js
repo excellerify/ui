@@ -5,10 +5,6 @@ const store = {
   state: {
     pageTitle: 'Home',
     menu,
-    message: {
-      type: null,
-      body: null,
-    },
     config,
   },
   mutations: {
@@ -17,12 +13,6 @@ const store = {
     },
     setPageTitle(state, data) {
       state.pageTitle = data;
-    },
-    showMessage(state, type, body) {
-      state.message = {
-        type,
-        body,
-      };
     },
   },
   actions: {

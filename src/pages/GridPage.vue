@@ -1,11 +1,12 @@
 <template lang="pug">
-div
-  v-grid(
-    :resource="resource",
-    :onCreate="onCreate",
-    :onUpdate="onUpdate",
-    :onView="onView"
-  )
+div.card
+  v-card-text
+    v-grid(
+      :resource="resource",
+      :onCreate="onCreate",
+      :onUpdate="onUpdate",
+      :onView="onView"
+    )
 </template>
 
 <script>

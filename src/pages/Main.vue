@@ -37,7 +37,7 @@ div
           v-list-tile-action(v-if='item.subAction')
             v-icon.success--text {{ item.subAction }}
 
-  v-toolbar.darken-1(fixed,dark,:class="theme", app)
+  v-toolbar.darken-1(fixed, dark, :class="theme", app)
     v-toolbar-side-icon(dark, @click.stop='drawer = !drawer')
     v-toolbar-title {{$t(pageTitle)}}
     v-spacer
@@ -55,10 +55,9 @@ div
   main
     v-content
       v-container(fluid)
-          v-alert(v-bind='message', v-model='message.body', dismissible) {{message.body}}
-          .py-2
-            v-slide-y-transition(mode='out-in')
-              router-view
+        .py-2
+          v-slide-y-transition(mode='out-in')
+            router-view
 </template>
 
 <script>
@@ -76,7 +75,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['message', 'menu', 'pageTitle']),
+    ...mapState(['menu', 'pageTitle']),
   },
   methods: {
     changeLocale(to) {

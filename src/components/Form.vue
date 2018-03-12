@@ -17,7 +17,7 @@ div
             v-field(
               v-for='(field, name) in getFields',
               :key='name',
-              :name='name',
+              :name='field.label',
               :field='field',
               v-model='model[name]',
               :readonly='readonly')
@@ -30,7 +30,7 @@ div
         @fieldError='updateFieldsError',
         :resourceId='id',
         :key='name',
-        :name='name',
+        :name='field.label',
         :field='field',
         v-model='model[name]',
         :readonly='readonly')

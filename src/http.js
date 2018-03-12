@@ -50,21 +50,18 @@ http.interceptors.response.use(
     }
 
     if (!error.response) {
-      const networkError = {
-        response: {
-          status: 503,
-          data: {
-            error: error.message,
-          },
+      // eslint-disable-next-line
+      error.response = {
+        status: 503,
+        data: {
+          error: error.message,
         },
       };
-
-      global.store.commit('setGlobalError', error.message);
-
-      return Promise.reject(networkError);
     } else if (error.response.status === 401 || error.response.status === 403) {
       global.store.dispatch('clearAuth');
     }
+
+    global.store.commit('setGlobalError', error.message);
 
     return Promise.reject(error);
   },

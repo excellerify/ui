@@ -9,6 +9,7 @@ const locales = ['en-US'];
 Vue.use(VueI18n);
 
 const messages = {};
+
 locales.forEach(v => {
   // eslint-disable-next-line
   messages[v] = require(`./${v}/index`).default;
