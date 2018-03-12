@@ -59,12 +59,8 @@ export default {
 
         if (response.status === 401 || response.status === 403) {
           this.error.message = 'Invalid Username or Password';
-          this.$emit('error', response.status, [
-            { message: this.error.message },
-          ]);
         } else {
-          this.error = response.data.error;
-          this.$emit('error', response.status, response.data.error);
+          this.error.message = response.data.error;
         }
       }
     },
