@@ -2,14 +2,13 @@
 v-flex(xs12)
   v-alert(
     v-if="error",
-    outline color="error",
     icon="warning",
-    :value="true") {{error.statusCode}} - {{error.message}}
+    :value="true") {{error.message}}
 
-  v-flex(v-if="showSearch", xs12)
+  v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs12)
     v-form.row.jr(
-      v-model='filters.model',
       v-if="filters.fields",
+      v-model='filters.model',
       :inline='true',
       :FormFields='filters.fields',
       :autoSubmit='true'
