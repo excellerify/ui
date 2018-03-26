@@ -5,16 +5,23 @@ v-flex(xs12)
     icon="warning",
     :value="true") {{error.message}}
 
-  v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs12)
-    v-form.row.jr(
-      v-if="filters.fields",
-      v-model='filters.model',
-      :inline='true',
-      :FormFields='filters.fields',
-      :autoSubmit='true'
-      @submit='doSearch',
-      submitButtonText='Search',
-      submitButtonIcon='search')
+  v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs12, style="margin-bottom: 15px")
+    v-expansion-panel
+      v-expansion-panel-content
+        div(slot="header") 
+          v-icon search
+          span SEARCH
+        v-card(style="padding: 0 25px")
+          v-carrd-text
+            v-form.row.jr(
+              v-if="filters.fields",
+              v-model='filters.model',
+              :inline='true',
+              :FormFields='filters.fields',
+              :autoSubmit='true'
+              @submit='doSearch',
+              submitButtonText='Search',
+              submitButtonIcon='search')
 
   v-card
     div

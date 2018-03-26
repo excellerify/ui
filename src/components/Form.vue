@@ -39,10 +39,11 @@ div
         ul.px-3
           li(v-for='error in formErrors') {{error.message}}
 
-      v-flex.mt-2.actions(xs12)
-        slot(name='buttons')
-          v-btn.ma-0(color='primary', dark, type='submit') {{$t(submitButtonText)}}
-            v-icon(right, dark) {{submitButtonIcon}}
+      v-layout
+        v-flex.mt-2.actions(xs12)
+          slot(name='buttons')
+            v-btn.ma-0(color='primary', dark, type='submit') {{$t(submitButtonText)}}
+              v-icon(right, dark) {{submitButtonIcon}}
 </template>
 
 <script>
