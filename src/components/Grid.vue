@@ -316,7 +316,6 @@ export default {
 
         this.columns = data.columns;
         this.actions = data.actions;
-        debugger;
         this.foreignKey = data.foreignKey || {};
 
         // keep limit
