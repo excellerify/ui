@@ -83,38 +83,38 @@ v-flex(xs12)
 </template>
 
 <script>
-import moment from 'moment';
-import numeral from 'numeral';
+import moment from "moment";
+import numeral from "numeral";
 
-import EventBus from '../eventBus.js';
-import config from '../config';
+import EventBus from "../eventBus.js";
+import config from "../config";
 
 const getDefaultData = () => {
   return {
     deleteModal: [],
     filters: {
       model: {},
-      limit: config.grid.limit,
+      limit: config.grid.limit
     },
     loading: false,
     columns: [], // fetch grid setup params from server if `columns` is empty
     actions: {},
     options: {
-      sort: 'id',
+      sort: "id",
       create: false,
       update: true,
-      delete: false,
+      delete: false
     },
     pagination: {
       page: 1,
       rowsPerPage: 10,
-      sortBy: 'id',
+      sortBy: "id",
       descending: true,
-      totalItems: 0,
+      totalItems: 0
     },
     foreignKey: {},
     items: [],
-    error: null,
+    error: null
   };
 };
 
@@ -122,57 +122,57 @@ export default {
   props: {
     resource: {
       type: String,
-      required: true,
+      required: true
     },
     filterByFk: {
-      type: Object,
+      type: Object
     },
     showSearch: {
       type: Boolean,
-      default: true,
+      default: true
     },
     readonly: {
       type: Boolean,
-      default: false,
+      default: false
     },
     type: {
-      type: String,
+      type: String
     },
     onCreate: {
       type: Function,
-      required: true,
+      required: true
     },
     onUpdate: {
       type: Function,
-      required: true,
+      required: true
     },
     onView: {
-      type: Function,
-    },
+      type: Function
+    }
   },
 
   data: getDefaultData,
 
   watch: {
-    '$i18n.locale'(val) {
+    "$i18n.locale"(val) {
       this.fetchGrid();
     },
-    'pagination.page'(val) {
+    "pagination.page"(val) {
       this.fetchData();
     },
-    'pagination.sortBy'(val) {
+    "pagination.sortBy"(val) {
       this.fetchData();
     },
-    'pagination.descending'(val) {
+    "pagination.descending"(val) {
       this.fetchData();
     },
-    '$route.params': 'refresh',
+    "$route.params": "refresh",
     pagination: {
       handler() {
         this.fetchData();
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
 
   methods: {
@@ -180,13 +180,15 @@ export default {
       const filters = {};
 
       if (this.filterByFk && this.filterByFk.value) {
-        if (!this.filters.model) {
-          this.filters.model = {};
-        }
-
         const fkKey = this.foreignKey[this.filterByFk.model];
 
-        this.filters.model[fkKey] = this.filterByFk.value;
+        if (fkKey) {
+          if (!this.filters.model) {
+            this.filters.model = {};
+          }
+
+          this.filters.model[fkKey] = this.filterByFk.value;
+        }
       }
 
       if (this.filters.model) {
@@ -197,11 +199,11 @@ export default {
               return;
             }
 
-            if (key.indexOf('.') > -1) {
+            if (key.indexOf(".") > -1) {
               let nestedFilter = {
-                regexp: `/${val}/i`,
+                regexp: `/${val}/i`
               };
-              const splitedKey = key.split('.').reverse();
+              const splitedKey = key.split(".").reverse();
 
               this._.map(splitedKey, val => {
                 const prevNestedFilter = Object.assign(nestedFilter);
@@ -213,26 +215,26 @@ export default {
             } else {
               const column = this._.find(this.columns, { value: key });
 
-              if (column && column.type === 'date') {
+              if (column && column.type === "date") {
                 filters[key] = val;
               } else {
                 filters[key] = {
                   regexp: `/${val}/i`,
-                  plain: val,
+                  plain: val
                 };
               }
             }
-          }.bind(this),
+          }.bind(this)
         );
       }
 
       const { sortBy, descending, page, rowsPerPage } = this.pagination;
 
       this.$route.query.filter = {
-        order: sortBy ? [`${sortBy} ${descending ? 'DESC' : 'ASC'}`] : null,
+        order: sortBy ? [`${sortBy} ${descending ? "DESC" : "ASC"}`] : null,
         where: filters,
         limit: rowsPerPage > 0 ? rowsPerPage : 0,
-        offset: (page - 1) * rowsPerPage,
+        offset: (page - 1) * rowsPerPage
       };
     },
     updateRoute() {
@@ -240,7 +242,7 @@ export default {
       this.$router.go({
         path: this.$route.path,
         params: this.$route.params,
-        query: this.$route.query,
+        query: this.$route.query
       });
     },
     doSearch() {
@@ -263,21 +265,21 @@ export default {
     },
     getColumnData: (row, field) => {
       // process fields like `type.name`
-      let [l1, l2] = field.value.split('.');
+      let [l1, l2] = field.value.split(".");
       let value = row[l1];
       if (l2) {
         value = row[l1] ? row[l1][l2] : null;
       }
-      if (field.type === 'image') {
+      if (field.type === "image") {
         value = `<v-avatar size="36px">
           <img src="${value}" class="crud-grid-thumb" controls />
           </v-avatar>`;
       }
-      if (field.type === 'date') {
-        value = value ? moment(String(value)).format('YYYY-MM-DD') : '';
+      if (field.type === "date") {
+        value = value ? moment(String(value)).format("YYYY-MM-DD") : "";
       }
-      if (field.type === 'money') {
-        value = value ? numeral(value).format('0,0.0') : 0.0;
+      if (field.type === "money") {
+        value = value ? numeral(value).format("0,0.0") : 0.0;
       }
       return value;
     },
@@ -298,12 +300,12 @@ export default {
       try {
         this.loading = true;
 
-        const data = await this.$store.dispatch('fetchGridSchema', {
+        const data = await this.$store.dispatch("fetchGridSchema", {
           resource: this.resource,
-          filter: this.filters,
+          filter: this.filters
         });
 
-        if (!Array.isArray(data.columns) && typeof data.columns === 'object') {
+        if (!Array.isArray(data.columns) && typeof data.columns === "object") {
           data.columns = this.convertColumnObjToArray(data.columns);
         }
 
@@ -314,6 +316,7 @@ export default {
 
         this.columns = data.columns;
         this.actions = data.actions;
+        debugger;
         this.foreignKey = data.foreignKey || {};
 
         // keep limit
@@ -324,7 +327,7 @@ export default {
         this.options = data.options || {};
 
         if (this.options && this.options.sort) {
-          let sortData = this.options.sort.split('-');
+          let sortData = this.options.sort.split("-");
           let desc = sortData.length > 1;
           let sortField = sortData.pop();
 
@@ -344,16 +347,16 @@ export default {
         this.preFetch();
 
         const result = await this.$http.get(`${this.resource}`, {
-          params: this.$route.query,
+          params: this.$route.query
         });
 
         this.items = result.data;
 
-        this.pagination.totalItems = parseInt(result.headers['x-total-count']);
+        this.pagination.totalItems = parseInt(result.headers["x-total-count"]);
 
         return {
           items: result.data,
-          count: this.pagination.totalItems,
+          count: this.pagination.totalItems
         };
       } catch (err) {
         this.error = err;
@@ -371,16 +374,16 @@ export default {
       const { resource } = this;
 
       let subResource,
-        name = 'customAction';
+        name = "customAction";
 
-      if (option.type === 'form') {
+      if (option.type === "form") {
         subResource = option.formUrl;
         name = `${name}Form`;
-      } else if (option.type === 'grid') {
+      } else if (option.type === "grid") {
         subResource = option.gridUrl;
         name = `${name}Grid`;
       } else {
-        throw new Error('Invalid action type');
+        throw new Error("Invalid action type");
       }
 
       this.$router.push({
@@ -389,22 +392,22 @@ export default {
           resource,
           subResource,
           type: option.type,
-          id: item.id,
+          id: item.id
         },
         query: {
           action: option.action || subResource,
-          method: option.method || 'POST',
-        },
+          method: option.method || "POST"
+        }
       });
-    },
+    }
   },
 
   computed: {
     totalPages() {
       return Math.ceil(
-        this.pagination.totalItems / this.pagination.rowsPerPage,
+        this.pagination.totalItems / this.pagination.rowsPerPage
       );
-    },
+    }
   },
 
   mounted() {},
@@ -412,7 +415,7 @@ export default {
   created: async function() {
     await this.fetchGrid();
     await this.fetchData();
-    EventBus.$on('gridRefresh', this.refresh);
-  },
+    EventBus.$on("gridRefresh", this.refresh);
+  }
 };
 </script>

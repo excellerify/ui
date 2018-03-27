@@ -11,6 +11,24 @@ const store = {
 
       return data.data.schema;
     },
+
+    async fetchAutoComplete(_, { dataSource, searchVal }) {
+      const search = {};
+      dataSource.searchParams.map(param => {
+        search[param] = {
+          regexp: `/${searchVal}/i`,
+          plain: searchVal,
+        };
+
+        return search;
+      });
+
+      const data = await global.$http.get(dataSource.url, {
+        params: { filter: { where: search } },
+      });
+
+      return data.data;
+    }
   },
 };
 
