@@ -47,39 +47,56 @@ v-flex(xs12)
               v-html="getColumnData(props.item, column)")
 
             td(v-if="!readonly", :width='Object.keys(options).length * 55', align="center")
-              template(v-for="(value, action) in actions")
-                v-btn(
-                  v-if="['edit', 'delete'].indexOf(action) < 0",
-                  router, color="primary",
-                  icon,
-                  dark,
-                  :to="{name: action, params: {resource,id:props.item.id}}")
-                  v-icon {{action.icon ? action.icon : action}}
+              v-menu(open-on-hover offset-y )
+                v-btn(icon slot="activator")
+                  v-icon more_vert
 
-              v-btn(v-if="options.view && onView", icon, dark, color="green", @click.native="onView({item:props.item})")
-                v-icon visibility
+                v-list
+                  //- v-list-tile(v-if="['edit', 'delete'].indexOf(action) < 0")
+                  //-   v-list-tile-content
+                  //-     template(v-for="(value, action) in actions")
+                  //-       v-btn(
+                  //-         router,
+                  //-         color="primary",
+                  //-         icon,
+                  //-         dark,
+                  //-         :to="{name: action, params: {resource,id:props.item.id}}")
+                  //-         v-icon {{action.icon ? action.icon : action}}
 
-              v-btn(v-if="options.update", icon, dark, color="primary", @click.native="onUpdate({item:props.item})")
-                v-icon edit
+                  v-list-tile(v-if="options.view && onView", )
+                    v-list-tile-content
+                      v-btn(icon, dark, color="green", @click.native="onView({item:props.item})")
+                        v-icon visibility
 
-              v-dialog(v-if="options.delete", id="modal", v-model="deleteModal[props.item.id]", max-width="300px")
-                v-btn(icon, slot="activator",  color="error")
-                  v-icon delete
-                v-card
-                  v-toolbar(card dark color="primary")
-                    v-toolbar-title Delete
-                  v-card-text
-                    p(class="text-xs-center") Are you sure?
-                  v-card-actions
-                    v-spacer
-                    v-btn(@click.native="deleteModal = []") No
-                    v-btn(@click.native="remove(props.item.id)") Yes
+                  v-list-tile(v-if="options.update")
+                    v-list-tile-content
+                      v-btn(icon, dark, color="primary", @click.native="onUpdate({item:props.item})")
+                        v-icon edit
 
-              v-btn(v-if="typeof options.lock === 'object'", icon, @click="lock(props.item)")
-                v-icon lock
+                  v-list-tile(v-if="options.delete")
+                    v-list-tile-content
+                      v-dialog(id="modal", v-model="deleteModal[props.item.id]", max-width="300px")
+                        v-btn(icon, slot="activator",  color="error")
+                          v-icon delete
+                        v-card
+                          v-toolbar(card dark color="primary")
+                            v-toolbar-title Delete
+                          v-card-text
+                            p(class="text-xs-center") Are you sure?
+                          v-card-actions
+                            v-spacer
+                            v-btn(@click.native="deleteModal = []") No
+                            v-btn(@click.native="remove(props.item.id)") Yes
 
-              v-btn(v-if="typeof options.custom === 'object'", icon, @click="customAction(options.custom, props.item)")
-                v-icon {{options.custom.icon}}
+                  v-list-tile(v-if="typeof options.lock === 'object'")
+                    v-list-tile-content
+                      v-btn(icon, @click="lock(props.item)")
+                        v-icon lock
+
+                  v-list-tile(v-if="typeof options.custom === 'object'")
+                    v-list-tile-content
+                      v-btn(icon, @click="customAction(options.custom, props.item)")
+                        v-icon {{options.custom.icon}}
 </template>
 
 <script>
