@@ -46,23 +46,12 @@ v-flex(xs12)
               v-for='column in columns',
               v-html="getColumnData(props.item, column)")
 
-            td(v-if="!readonly", :width='Object.keys(options).length * 55', align="center")
+            td(v-if="!readonly", :width='100', align="center")
               v-menu(open-on-hover offset-y )
                 v-btn(icon slot="activator")
                   v-icon more_vert
 
                 v-list
-                  //- v-list-tile(v-if="['edit', 'delete'].indexOf(action) < 0")
-                  //-   v-list-tile-content
-                  //-     template(v-for="(value, action) in actions")
-                  //-       v-btn(
-                  //-         router,
-                  //-         color="primary",
-                  //-         icon,
-                  //-         dark,
-                  //-         :to="{name: action, params: {resource,id:props.item.id}}")
-                  //-         v-icon {{action.icon ? action.icon : action}}
-
                   v-list-tile(v-if="options.view && onView", )
                     v-list-tile-content
                       v-btn(icon, dark, color="green", @click.native="onView({item:props.item})")
