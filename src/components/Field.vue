@@ -26,16 +26,35 @@ v-flex(xs12)
 
       //- if autocomplete
       v-select(
-        v-else-if="field.dataSource",
-        v-validate="validationRules",
-        v-model="model",
-        v-bind="field",
+        v-else-if="field.dataSource"
+        v-validate="validationRules"
+        v-model="model"
+        v-bind="field"
         autocomplete
         browser-autocomplete="off"
+        item-text="text"
+        item-value="value"
+        :loading="loading"
+        :name="name"
+        :search-input.sync='autoCompleteSync'
+        :items='field.choices'
+        :readonly="readonly")
+
+    v-layout(v-else-if="['map'].indexOf(field.type) > -1")
+      //- if map
+      v-select(
+        v-validate="validationRules"
+        v-model="model"
+        v-bind="field"
+        autocomplete
+        browser-autocomplete="off"
+        item-text="text"
+        item-value="value"
         :loading="loading"
         :name="name",
-        :search-input.sync='autoCompleteSync',
-        :items='field.choices',
+        :search-input.sync='mapSync'
+        :items='field.choices'
+        :hint="`${model ? `id: ${model.id}` : ''}`"
         :readonly="readonly")
 
     //- if radio
@@ -249,7 +268,8 @@ export default {
         masked: false /* doesn't work with directive */
       },
       loading: false,
-      autoCompleteSync: null
+      autoCompleteSync: null,
+      mapSync: null
     };
   },
   watch: {
@@ -268,6 +288,9 @@ export default {
     },
     autoCompleteSync: function(val) {
       val && this.onAutoCompleteSync(val);
+    },
+    mapSync: function(val) {
+      (val || this.model) && this.onMapSync(val);
     }
   },
   computed: {
@@ -355,6 +378,36 @@ export default {
       this.$emit("refresh");
       EventBus.$emit("gridRefresh");
     },
+    onMapSync: async function(val) {
+      try {
+        if (!val) {
+          this.field.choices = this.model ? [this.model] : null;
+          return;
+        }
+
+        this.loading = true;
+
+        const data = await this.$store.dispatch("fetchMapAutocomplete", {
+          searchVal: val
+        });
+
+        if (data.length > 0) {
+          this.field.choices = [];
+
+          data.map(val => {
+            this.field.choices.push({ value: val, text: val.text });
+          });
+        } else {
+          this.field.choices = this.model ? [this.model] : null;
+        }
+
+        this.loading = false;
+      } catch (e) {
+        this.loading = false;
+
+        Promise.reject(e);
+      }
+    },
     onAutoCompleteSync: async function(val) {
       try {
         this.loading = true;
@@ -378,7 +431,7 @@ export default {
               }
             });
 
-            this.field.choices.push(choice);
+            this.field.choices.push({ value: val, text: choice });
           });
         } else {
           this.field.choices = null;

@@ -8,7 +8,7 @@ v-flex(xs12)
   v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs12, style="margin-bottom: 15px")
     v-expansion-panel
       v-expansion-panel-content
-        div(slot="header") 
+        div(slot="header")
           v-icon search
           span SEARCH
         v-card(style="padding: 0 25px")

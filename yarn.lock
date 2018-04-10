@@ -7969,6 +7969,10 @@ vue-google-auth@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/vue-google-auth/-/vue-google-auth-1.0.5.tgz#45a6ee110037e05cc31fc74c15908fac1f594983"
 
+vue-google-autocomplete@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/vue-google-autocomplete/-/vue-google-autocomplete-1.1.0.tgz#74b700da8d905e2c3dd0bc219b3d740e99277b2e"
+
 vue-google-signin-button@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/vue-google-signin-button/-/vue-google-signin-button-1.0.2.tgz#71389a1233ece20c06aace0870acf54794b3af3c"
