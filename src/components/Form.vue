@@ -15,24 +15,24 @@ div
         v-card(flat)
           v-card-text
             v-field(
-              v-for='(field, name) in getFields',
-              v-model='model[name]',
-              :key='name',
-              :name='field.label',
-              :field='field',
+              v-for='(field, name) in getFields'
+              v-model='model[name]'
+              :key='name'
+              :name='field.label'
+              :field='field'
               :readonly='readonly || field.readonly')
 
     v-layout(v-bind='{[inline? \'row\': \'column wrap\']: true}', v-if='!groupBy')
-      v-field.pr-1(
-        v-for='(field, name) in getFields',
-        @refresh='refresh',
-        @onUpsert='onSubmit',
-        @fieldError='updateFieldsError',
-        v-model='model[name]',
-        :resourceId='id',
-        :key='name',
-        :name='field.label',
-        :field='field',
+      v-field(
+        v-for='(field, name) in getFields'
+        @refresh='refresh'
+        @onUpsert='onSubmit'
+        @fieldError='updateFieldsError'
+        v-model='model[name]'
+        :resourceId='id'
+        :key='name'
+        :name='field.label'
+        :field='field'
         :readonly='readonly || field.readonly')
 
       v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
@@ -198,17 +198,24 @@ export default {
         this.formFields = this.togleFieldOptionalsOn();
 
         if (this.type === "subForm" && this.ParentData) {
+          // resolve parent FK
           this._.forEach(
             this.formFields,
             function(val, key) {
+              // if field is marked as FK, resolve FK data
               if (val.fk) {
                 this._.forEach(this.ParentData, (valData, keyData) => {
                   const fkData = valData[val.fk[keyData]];
+
+                  // if FK data not found, raise error
                   if (!fkData) {
                     console.error(
-                      `Wrong fk, "${keyData}" should be "${val.fk}"`
+                      `Field "${val.fk}" \
+                      not found in parent data or table "${keyData}"`
                     );
                   }
+
+                  // assign FK data, from parrent to form field
                   this.model[key] = valData[val.fk[keyData]];
                 });
               }
@@ -314,7 +321,9 @@ export default {
           this.$emit("success", result.data);
         }
 
-        if (cb) cb(result.data);
+        if (cb) {
+          cb(result.data);
+        }
 
         return Promise.resolve(result.data);
       } catch (e) {

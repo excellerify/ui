@@ -1,10 +1,9 @@
-import Vue from 'vue';
 import axios from 'axios';
 import config from './config';
 
 const http = axios.create({
   baseURL: config.api,
-  timeout: 1000,
+  timeout: 1000
   // headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
 });
 
@@ -12,7 +11,7 @@ http.interceptors.request.use(
   request => request,
   error =>
     // Do something with request error
-    Promise.reject(error),
+    Promise.reject(error)
 );
 
 http.interceptors.response.use(
@@ -27,7 +26,7 @@ http.interceptors.response.use(
         request.params,
         '\n   ',
         response.status,
-        response.data,
+        response.data
       );
     }
     return response;
@@ -44,7 +43,7 @@ http.interceptors.response.use(
           request.params,
           '\n   ',
           response.status,
-          response.data,
+          response.data
         );
       }
     }
@@ -54,8 +53,8 @@ http.interceptors.response.use(
       error.response = {
         status: 503,
         data: {
-          error: error.message,
-        },
+          error: error.message
+        }
       };
     } else if (error.response.status === 401 || error.response.status === 403) {
       global.store.dispatch('clearAuth');
@@ -64,7 +63,7 @@ http.interceptors.response.use(
     global.store.commit('setGlobalError', error.message);
 
     return Promise.reject(error);
-  },
+  }
 );
 
-Vue.prototype.$http = http;
+export default http;

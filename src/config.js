@@ -7,12 +7,12 @@ const config = {
   ajaxUploadUrl: `${apiBaseUrl}files`,
   debug: {
     mock: false, // enable mock
-    http: false, // http request log
+    http: false // http request log
   },
   api: apiBaseUrl,
   grid: {
-    limit: 10,
-  },
+    limit: 10
+  }
 };
 
 global.config = config;
