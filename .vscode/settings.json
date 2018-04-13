@@ -1,5 +1,8 @@
 {
 "editor.formatOnSave": true,
 "prettier.eslintIntegration": true,
-"files.autoSave": "onFocusChange"
+"files.autoSave": "onFocusChange",
+"cSpell.words": [
+    "dropzone"
+]
 }

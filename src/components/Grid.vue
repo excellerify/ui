@@ -33,15 +33,44 @@ v-flex(xs12)
         v-icon add
 
       v-data-table(
+        v-model="selected"
         class="elevation-1"
-        :headers="columns.concat({text: 'Action', align: 'center', sortable: false})",
+        :headers="columns",
         :items='items',
         :total-items="pagination.totalItems",
         :pagination.sync="pagination",
         :loading="loading")
 
-        template(slot='items', slot-scope='props')
+        template(slot="headers" slot-scope="props")
           tr
+            th
+              v-checkbox(
+                primary
+                hide-details
+                @click.native="toggleAll"
+                :input-value="props.all"
+                :indeterminate="props.indeterminate"
+              )
+            th(
+              v-for="header in columns"
+              :key="header.text"
+              :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
+              align="left"
+              @click="changeSort(header.value)"
+            )
+              b {{ header.text }}
+              v-icon(small) arrow_upward
+            th Action
+
+        template(slot="items", slot-scope="props")
+          tr(:active="props.selected" @click="props.selected=!props.selected")
+            td
+              v-checkbox(
+                primary
+                hide-details
+                :input-value="props.selected"
+              )
+
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')",
               v-for='column in columns',
               v-html="getColumnData(props.item, column)")
@@ -86,6 +115,11 @@ v-flex(xs12)
                     v-list-tile-content
                       v-btn(icon, @click="customAction(options.custom, props.item)")
                         v-icon {{options.custom.icon}}
+
+        template(slot="no-data")
+          tr
+            td(:colspan="2 + columns.length", align="center")
+              span Sorry, nothing to display here :(
 </template>
 
 <script>
@@ -120,7 +154,8 @@ const getDefaultData = () => {
     },
     foreignKey: {},
     items: [],
-    error: null
+    error: null,
+    selected: []
   };
 };
 
@@ -182,6 +217,18 @@ export default {
   },
 
   methods: {
+    toggleAll() {
+      if (this.selected.length) this.selected = [];
+      else this.selected = this.items.slice();
+    },
+    changeSort(column) {
+      if (this.pagination.sortBy === column) {
+        this.pagination.descending = !this.pagination.descending;
+      } else {
+        this.pagination.sortBy = column;
+        this.pagination.descending = false;
+      }
+    },
     preFetch() {
       const filters = {};
 
@@ -417,9 +464,9 @@ export default {
 
   mounted() {},
 
-  created: async function() {
-    await this.fetchGrid();
-    await this.fetchData();
+  created: function() {
+    this.fetchGrid();
+    this.fetchData();
     EventBus.$on("gridRefresh", this.refresh);
   }
 };

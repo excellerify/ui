@@ -1,60 +1,58 @@
 <template lang="pug">
-v-flex(xs12)
-  div(v-if="readonly")
+div
+  div(v-if="readonly && ['table', 'map', 'select'].indexOf(field.type) === -1")
     v-text-field(
       :label="field.label"
-      :value="model"
+      :value="typeof model === 'object' ? JSON.stringify(model) : model"
       readonly)
+
+  div(v-else-if="field.type === 'automatic'")
+    v-text-field(
+      :label="field.label"
+      :value="model || 'AUTO'"
+      disabled)
 
   div(v-else-if="field.disabled")
     v-text-field(
       :label="field.label"
-      :value="model || \"AUTO\""
+      :value="model"
       disabled)
 
   div(v-else)
     //- if select2
     div(v-if="['select', 'select2'].includes(field.type)")
       v-select(
-        v-if="!field.dataSource",
-        v-validate="validationRules",
-        v-model='model',
-        v-bind='field',
-        :name="name",
-        :items='field.choices',
+        v-if="!field.dataSource"
+        v-validate="validationRules"
+        v-model="model"
+        v-bind="field"
+        :name="name"
+        :items="field.choices"
         :readonly="readonly")
 
       //- if autocomplete
       v-select(
         v-else-if="field.dataSource"
+        autocomplete
         v-validate="validationRules"
         v-model="model"
         v-bind="field"
-        autocomplete
         browser-autocomplete="off"
         item-text="text"
         item-value="value"
         :loading="loading"
         :name="name"
-        :search-input.sync='autoCompleteSync'
-        :items='field.choices'
+        :search-input.sync="autoCompleteSync"
+        :items="field.choices"
         :readonly="readonly")
 
-    v-layout(v-else-if="['map'].indexOf(field.type) > -1")
-      //- if map
-      v-select(
-        v-validate="validationRules"
-        v-model="model"
+    //- if map
+    template(v-else-if="['map'].indexOf(field.type) > -1")
+      v-google-map(
         v-bind="field"
-        autocomplete
-        browser-autocomplete="off"
-        item-text="text"
-        item-value="value"
-        :loading="loading"
-        :name="name",
-        :search-input.sync='mapSync'
-        :items='field.choices'
-        :hint="`${model ? `id: ${model.id}` : ''}`"
+        @input="(val) => {model = val}"
+        :name="name"
+        :value="model"
         :readonly="readonly")
 
     //- if radio
@@ -80,7 +78,7 @@ v-flex(xs12)
           span(v-for='option in field.choices', :key="field.value")
             component(
               :name="name",
-              v-model='model',
+              v-model="model",
               hide-details,
               :is="field.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
               :key='option.value',
@@ -124,18 +122,19 @@ v-flex(xs12)
           v-validate="validationRules")
 
     //- if hidden
-    input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model')
+    input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model', :name="name")
 
     //- if table
     template(v-else-if="['table'].indexOf(field.type) > -1")
       v-layout(row, wrap, class="input-group")
         label {{field.label}}
         v-grid(
-          :resource="field.model || name",
-          :filterByFk="{ model: resource, value : resourceId }",
-          :readonly="readonly",
-          type="field",
-          :onCreate="onGridCreate",
+          type="field"
+          :name="name"
+          :resource="field.model || name"
+          :filterByFk="{ model: resource, value : resourceId }"
+          :readonly="readonly"
+          :onCreate="onGridCreate"
           :onUpdate="onGridUpdate")
 
         v-dialog(v-model="isShowDialogForm", max-width="60%")
@@ -147,11 +146,11 @@ v-flex(xs12)
             v-spacer
             v-card-text
               v-form(
-                v-bind="$data",
-                :ParentData="parentData",
-                type="subForm",
-                :id="currentItem ? currentItem.id.id : null",
-                :resource="field.model || name",
+                v-bind="$data"
+                type="subForm"
+                :ParentData="parentData"
+                :id="currentItem ? currentItem.id.id : null"
+                :resource="field.model || name"
                 @success="modalSubFormClose")
 
     //- password input
@@ -203,13 +202,13 @@ v-flex(xs12)
 </template>
 
 <script>
+import { VMoney } from "v-money";
 import randomstring from "randomstring";
 import moment from "moment";
-import { VMoney } from "v-money";
-import "vue2-dropzone/dist/vue2Dropzone.css";
-
 import EventBus from "../eventBus.js";
 import config from "../config";
+
+import "vue2-dropzone/dist/vue2Dropzone.css";
 
 export default {
   props: {
@@ -268,8 +267,7 @@ export default {
         masked: false /* doesn't work with directive */
       },
       loading: false,
-      autoCompleteSync: null,
-      mapSync: null
+      autoCompleteSync: null
     };
   },
   watch: {
@@ -288,9 +286,6 @@ export default {
     },
     autoCompleteSync: function(val) {
       val && this.onAutoCompleteSync(val);
-    },
-    mapSync: function(val) {
-      (val || this.model) && this.onMapSync(val);
     }
   },
   computed: {
@@ -349,13 +344,13 @@ export default {
       }
     },
     getDropzoneOptions(field, model) {
+      const uploadUrl =
+        `${this.$store.state.config.api}${this.field.uploadUrl}` ||
+        `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`;
       return {
-        url: `${this.$store.state.config.ajaxUploadUrl}/${
-          this.resource
-        }/upload`,
+        url: `${uploadUrl}`,
         thumbnailWidth: 150,
         maxFilesize: 1024,
-        withCredentials: true,
         acceptedFileTypes: field.acceptedFileTypes,
         id: "dropzone_" + this.name,
         createThumbnailFromUrl: model
@@ -378,38 +373,14 @@ export default {
       this.$emit("refresh");
       EventBus.$emit("gridRefresh");
     },
-    onMapSync: async function(val) {
+
+    onAutoCompleteSync: async function(val) {
       try {
         if (!val) {
           this.field.choices = this.model ? [this.model] : null;
           return;
         }
 
-        this.loading = true;
-
-        const data = await this.$store.dispatch("fetchMapAutocomplete", {
-          searchVal: val
-        });
-
-        if (data.length > 0) {
-          this.field.choices = [];
-
-          data.map(val => {
-            this.field.choices.push({ value: val, text: val.text });
-          });
-        } else {
-          this.field.choices = this.model ? [this.model] : null;
-        }
-
-        this.loading = false;
-      } catch (e) {
-        this.loading = false;
-
-        Promise.reject(e);
-      }
-    },
-    onAutoCompleteSync: async function(val) {
-      try {
         this.loading = true;
 
         const data = await this.$store.dispatch("fetchAutoComplete", {
@@ -421,20 +392,16 @@ export default {
           this.field.choices = [];
 
           data.map(val => {
-            let choice = "";
-
-            this.field.dataSource.searchParams.map((param, key) => {
-              choice += val[param];
-
-              if (key != this.field.dataSource.searchParams.length - 1) {
-                choice += " - ";
-              }
-            });
-
-            this.field.choices.push({ value: val, text: choice });
+            this.field.choices.push(this.populateAuocompleteChoices(val));
           });
         } else {
-          this.field.choices = null;
+          if (this.model) {
+            this.field.choices.push(
+              this.populateAuocompleteChoices(this.model)
+            );
+          } else {
+            this.field.choices = null;
+          }
         }
 
         this.loading = false;
@@ -443,6 +410,19 @@ export default {
 
         Promise.reject(e);
       }
+    },
+    populateAuocompleteChoices: function(val) {
+      let choice = "";
+
+      this.field.dataSource.searchParams.map((param, key) => {
+        choice += val[param];
+
+        if (key != this.field.dataSource.searchParams.length - 1) {
+          choice += " - ";
+        }
+      });
+
+      return { value: val, text: choice };
     }
   },
   created: function() {
@@ -459,7 +439,8 @@ export default {
         "date",
         "datetime",
         "time",
-        "hidden"
+        "hidden",
+        "money"
       ].includes(this.field.type)
     ) {
       this.$emit("fieldError", {
