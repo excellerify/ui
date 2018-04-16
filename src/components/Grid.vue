@@ -319,8 +319,9 @@ export default {
       let value = row[field.value];
 
       if (field.type === "image") {
+        const image = value ? global.config.api + value : "static/noimage.png";
         value = `<div class="avatar grey lighten-4" style="height: 36px; width: 36px;">
-          <img src="${global.config.api + value}" alt="avatar">
+          <img src="${image}" alt="avatar">
         </div>`;
       } else if (field.type === "date") {
         value = value ? moment(String(value)).format("YYYY-MM-DD") : "";
