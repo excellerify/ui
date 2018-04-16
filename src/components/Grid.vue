@@ -71,9 +71,9 @@ v-flex(xs12)
                 :input-value="props.selected"
               )
 
-            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')",
-              v-for='column in columns',
-              v-html="getColumnData(props.item, column)")
+            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')"
+              v-for='column in columns')
+              span(v-html="getColumnData(props.item, column)")
 
             td(v-if="!readonly", :width='100', align="center")
               v-menu(open-on-hover offset-y )
@@ -316,24 +316,26 @@ export default {
         this.fetchData();
       }
     },
-    getColumnData: (row, field) => {
-      // process fields like `type.name`
-      let [l1, l2] = field.value.split(".");
-      let value = row[l1];
-      if (l2) {
-        value = row[l1] ? row[l1][l2] : null;
-      }
+    getColumnData(row, field) {
+      let value = row[field.value];
+
       if (field.type === "image") {
-        value = `<v-avatar size="36px">
-          <img src="${value}" class="crud-grid-thumb" controls />
-          </v-avatar>`;
-      }
-      if (field.type === "date") {
+        value = `<div class="avatar grey lighten-4" style="height: 36px; width: 36px;">
+          <img src="${value}" alt="avatar">
+        </div>`;
+      } else if (field.type === "date") {
         value = value ? moment(String(value)).format("YYYY-MM-DD") : "";
-      }
-      if (field.type === "money") {
+      } else if (field.type === "money") {
         value = value ? numeral(value).format("0,0.0") : 0.0;
+      } else {
+        // process fields like `type.name`
+        const split = field.value.split(".");
+
+        if (split.length > 0) {
+          value = this._.get(row, field.value);
+        }
       }
+
       return value;
     },
     convertColumnObjToArray(columns) {

@@ -114,7 +114,7 @@ div
       label {{$t(field.label)}}
       div.pt-2
         dropzone(
-          :id="getDropzoneOptions(field, model).id"
+          :id="`dropzone_${name}`"
           :options="getDropzoneOptions(field, model)"
           @vdropzone-sending="onUploading"
           @vdropzone-success="onUploadSuccess")
@@ -323,30 +323,30 @@ export default {
   methods: {
     onUploading(file, xhr, formData) {
       const extension = file.name.split(".");
+
+      formData.append("id", this.resourceId);
+
       file.upload.filename = `${randomstring.generate()}.${
         extension[extension.length - 1]
       }`;
     },
+
     onUploadSuccess(file, response) {
-      const filename = response.result.files.file[0].name;
-      this.$emit(
-        "input",
-        `${config.api}Files/${this.resource}/download/${filename}`
-      );
-    },
-    getColumnData(row, field) {
-      // process fields like `type.name`
-      let [l1, l2] = field.split(".");
-      if (l2) {
-        return row[l1] ? row[l1][l2] : null;
-      } else {
-        return row[l1];
+      if (response.url) {
+        const filename = response.url;
+        this.model = `${config.api}${response.url}`;
+        return;
       }
+
+      const filename = response.url || response.result.files.file[0].name;
+      this.model = `${config.api}Files/${this.resource}/download/${filename}`;
     },
+
     getDropzoneOptions(field, model) {
       const uploadUrl =
         `${this.$store.state.config.api}${this.field.uploadUrl}` ||
         `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`;
+
       return {
         url: `${uploadUrl}`,
         thumbnailWidth: 150,
@@ -373,7 +373,6 @@ export default {
       this.$emit("refresh");
       EventBus.$emit("gridRefresh");
     },
-
     onAutoCompleteSync: async function(val) {
       try {
         if (!val) {

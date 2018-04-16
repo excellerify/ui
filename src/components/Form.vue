@@ -3,14 +3,16 @@ div
   form(:action='action', @submit.prevent='onSubmit', novalidate)
     v-tabs(grow, scroll-bars, v-model='active', dark, v-if='groupBy')
       v-tabs-bar(slot='activators')
-        v-tabs-item(v-for='(field, key) in group.parents',
-          :key='key',
-          :href='\'tab-\' + key',
+        v-tabs-item(
+          v-for='(field, key) in group.parents'
+          :key='key'
+          :href='\'tab-\' + key'
           ripple)
         v-tabs-slider
 
-      v-tabs-content(v-for='(getFields, key) in group.children',
-        :key='key',
+      v-tabs-content(
+        v-for='(getFields, key) in group.children'
+        :key='key'
         :id='\'tab-\' + key')
         v-card(flat)
           v-card-text
@@ -23,7 +25,7 @@ div
               :readonly='readonly || field.readonly')
 
     v-layout(v-bind='{[inline? \'row\': \'column wrap\']: true}', v-if='!groupBy')
-      v-field(
+      v-field.pr-1(
         v-for='(field, name) in getFields'
         @refresh='refresh'
         @onUpsert='onSubmit'
@@ -42,7 +44,7 @@ div
       v-layout
         v-flex.mt-2.actions(xs12)
           slot(name='buttons')
-            v-btn.ma-0(color='primary', dark, type='submit') {{$t(submitButtonText)}}
+            v-btn.mt-3(color='primary', dark, type='submit', small) {{$t(submitButtonText)}}
               v-icon(right, dark) {{submitButtonIcon}}
 </template>
 
