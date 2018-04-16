@@ -116,10 +116,10 @@ div
         dropzone(
           :id="`dropzone_${name}`"
           :options="getDropzoneOptions(field, model)"
+          ref="dropzone"
           @vdropzone-sending="onUploading"
           @vdropzone-success="onUploadSuccess")
-          input(type='hidden', v-model='model',
-          v-validate="validationRules")
+          input(type="hidden" v-model="model" v-validate="validationRules")
 
     //- if hidden
     input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model', :name="name")
@@ -334,7 +334,7 @@ export default {
     onUploadSuccess(file, response) {
       if (response.url) {
         const filename = response.url;
-        this.model = `${config.api}${response.url}`;
+        this.model = `${response.url}`;
         return;
       }
 
@@ -353,7 +353,16 @@ export default {
         maxFilesize: 1024,
         acceptedFileTypes: field.acceptedFileTypes,
         id: "dropzone_" + this.name,
-        createThumbnailFromUrl: model
+        createThumbnailFromUrl: model,
+        uploadMultiple: false,
+        maxFiles: 1,
+        init: function() {
+          this.on("addedfile", function(file) {
+            if (this.files.length > 1) {
+              this.removeFile(this.files[0]);
+            }
+          });
+        }
       };
     },
     onGridCreate: function() {
@@ -424,7 +433,7 @@ export default {
       return { value: val, text: choice };
     }
   },
-  created: function() {
+  created() {
     if (
       this.field.required &&
       !this.value &&
@@ -447,6 +456,12 @@ export default {
         isError: true,
         message: `The ${this.field.label} field is required.`
       });
+    }
+  },
+  mounted() {
+    if (["image"].includes(this.field.type) && this.value) {
+      var url = `${global.config.api + this.value}`;
+      this.$refs.dropzone.manuallyAddFile({}, url);
     }
   },
 

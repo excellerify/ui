@@ -26,10 +26,10 @@ v-flex(xs12)
   v-card
     div
       v-btn(
-        v-if="options.create && !readonly",
-        router, fab, absolute, top, right, dark,
-        class="green",
-        @click.native="onCreate")
+        v-if="options.create && !readonly"
+        class="green"
+        @click.native="onCreate"
+        router, fab, absolute, top, right, dark)
         v-icon add
 
       v-data-table(
@@ -68,8 +68,7 @@ v-flex(xs12)
               v-checkbox(
                 primary
                 hide-details
-                :input-value="props.selected"
-              )
+                :input-value="props.selected")
 
             td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')"
               v-for='column in columns')
@@ -321,7 +320,7 @@ export default {
 
       if (field.type === "image") {
         value = `<div class="avatar grey lighten-4" style="height: 36px; width: 36px;">
-          <img src="${value}" alt="avatar">
+          <img src="${global.config.api + value}" alt="avatar">
         </div>`;
       } else if (field.type === "date") {
         value = value ? moment(String(value)).format("YYYY-MM-DD") : "";

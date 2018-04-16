@@ -44,7 +44,7 @@ div
       v-layout
         v-flex.mt-2.actions(xs12)
           slot(name='buttons')
-            v-btn.mt-3(color='primary', dark, type='submit', small) {{$t(submitButtonText)}}
+            v-btn.mt-2(color='primary', dark, type='submit', small) {{$t(submitButtonText)}}
               v-icon(right, dark) {{submitButtonIcon}}
 </template>
 
