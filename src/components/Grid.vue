@@ -304,7 +304,6 @@ export default {
     refresh: async function() {
       Object.assign(this.$data, getDefaultData());
       await this.fetchGrid();
-      await this.fetchData();
     },
     fetch() {
       if (this.columns.length <= 0) {
@@ -404,12 +403,18 @@ export default {
           params: this.$route.query
         });
 
-        this.items = result.data;
-
-        this.pagination.totalItems = parseInt(result.headers["x-total-count"]);
+        if (result.data.items) {
+          this.items = result.data.items;
+          this.pagination.totalItems = parseInt(result.data.totalCount);
+        } else {
+          this.items = result.data;
+          this.pagination.totalItems = parseInt(
+            result.headers["x-total-count"]
+          );
+        }
 
         return {
-          items: result.data,
+          items: this.items,
           count: this.pagination.totalItems
         };
       } catch (err) {
@@ -464,11 +469,11 @@ export default {
     }
   },
 
-  mounted() {},
+  mounted() {
+    this.refresh();
+  },
 
-  created: function() {
-    this.fetchGrid();
-    this.fetchData();
+  created() {
     EventBus.$on("gridRefresh", this.refresh);
   }
 };
