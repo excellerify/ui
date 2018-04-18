@@ -53,6 +53,7 @@ div
         @input="(val) => {model = val}"
         :name="name"
         :value="model"
+        :required="required"
         :readonly="readonly")
 
     //- if radio
@@ -284,8 +285,12 @@ export default {
       },
       deep: true
     },
-    autoCompleteSync: function(val) {
-      val && this.onAutoCompleteSync(val);
+    autoCompleteSync(val) {
+      if (val) {
+        this.onAutoCompleteSync(val);
+      } else if (this.model) {
+        this.field.choices = [this.populateAutocompleteChoices(this.model)];
+      }
     }
   },
   computed: {
@@ -330,7 +335,6 @@ export default {
         extension[extension.length - 1]
       }`;
     },
-
     onUploadSuccess(file, response) {
       if (response.url) {
         const filename = response.url;
@@ -341,7 +345,6 @@ export default {
       const filename = response.url || response.result.files.file[0].name;
       this.model = `${config.api}Files/${this.resource}/download/${filename}`;
     },
-
     getDropzoneOptions(field, model) {
       const uploadUrl =
         `${this.$store.state.config.api}${this.field.uploadUrl}` ||
@@ -384,11 +387,6 @@ export default {
     },
     onAutoCompleteSync: async function(val) {
       try {
-        if (!val) {
-          this.field.choices = this.model ? [this.model] : null;
-          return;
-        }
-
         this.loading = true;
 
         const data = await this.$store.dispatch("fetchAutoComplete", {
@@ -397,19 +395,13 @@ export default {
         });
 
         if (data.length > 0) {
-          this.field.choices = [];
-
-          data.map(val => {
-            this.field.choices.push(this.populateAuocompleteChoices(val));
-          });
+          this.field.choices = data.map(val =>
+            this.populateAutocompleteChoices(val)
+          );
+        } else if (this.model) {
+          this.field.choices = [this.populateAutocompleteChoices(this.model)];
         } else {
-          if (this.model) {
-            this.field.choices.push(
-              this.populateAuocompleteChoices(this.model)
-            );
-          } else {
-            this.field.choices = null;
-          }
+          this.field.choices = null;
         }
 
         this.loading = false;
@@ -419,7 +411,7 @@ export default {
         Promise.reject(e);
       }
     },
-    populateAuocompleteChoices: function(val) {
+    populateAutocompleteChoices: function(val) {
       let choice = "";
 
       this.field.dataSource.searchParams.map((param, key) => {

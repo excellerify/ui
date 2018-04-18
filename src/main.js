@@ -21,7 +21,7 @@ import App from './App.vue';
 import VGrid from './components/Grid.vue';
 import VForm from './components/Form.vue';
 import VField from './components/Field.vue';
-import VGoogleMap from './components/GoogleMap.vue';
+import VGoogleMap from './components/fields/GoogleMap.vue';
 
 import './styles/main.styl';
 import http from './http';

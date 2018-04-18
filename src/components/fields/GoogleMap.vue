@@ -36,14 +36,19 @@ export default {
       required: false,
       default: {}
     },
+    name: {
+      type: String,
+      required: true
+    },
     readonly: {
       type: Boolean,
       required: false,
       default: false
     },
-    name: {
-      type: String,
-      required: true
+    required: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {
