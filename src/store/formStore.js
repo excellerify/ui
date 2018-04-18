@@ -6,7 +6,7 @@ const store = {
       const url = `${resource}/${subResource || 'form'}`;
 
       const data = await global.$http.get(url, {
-        params: { id },
+        params: { id }
       });
 
       return data.data.schema;
@@ -17,19 +17,23 @@ const store = {
       dataSource.searchParams.map(param => {
         search[param] = {
           regexp: `/${searchVal}/i`,
-          plain: searchVal,
+          plain: searchVal
         };
 
         return search;
       });
 
-      const data = await global.$http.get(dataSource.url, {
-        params: { filter: { where: search } },
+      let { data } = await global.$http.get(dataSource.url, {
+        params: { filter: { where: search } }
       });
 
-      return data.data;
+      if (data.items) {
+        data = data.items;
+      }
+
+      return data;
     }
-  },
+  }
 };
 
 export default store;
