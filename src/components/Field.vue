@@ -448,7 +448,8 @@ export default {
         "datetime",
         "time",
         "hidden",
-        "money"
+        "money",
+        "map"
       ].includes(this.field.type)
     ) {
       this.$emit("fieldError", {
