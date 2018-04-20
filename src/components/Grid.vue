@@ -319,6 +319,7 @@ export default {
 
       if (field.type === "image") {
         const image = value ? global.config.api + value : "static/noimage.png";
+
         value = `<div class="avatar grey lighten-4" style="height: 36px; width: 36px;">
           <img src="${image}" alt="avatar">
         </div>`;

@@ -9,18 +9,23 @@ div
 
     v-list(dense)
       template(v-for='item in menu')
-        v-list-group(v-if='item.items', v-bind:group='item.group')
-          v-list-tile(:to='item.href', slot='item', :title="item.title")
+        v-list-group(v-if='item.items', v-bind:group='item')
+          v-list-tile(:to='item.href', slot='activator', :title="item.title")
             v-list-tile-action
               v-icon() {{ item.icon }}
             v-list-tile-content
-              v-list-tile-title {{ $t(item.title) }}
-            v-list-tile-action
-              v-icon() keyboard_arrow_down
+              v-list-tile-title {{ item.title }}
 
-          v-list-tile(v-for='subItem in item.items', :key='subItem.href',:to='subItem.href', v-bind:router='!subItem.target', ripple, v-bind:disabled='subItem.disabled', v-bind:target='subItem.target')
+          v-list-tile(
+            ripple
+            v-for='subItem in item.items'
+            :key='subItem.href'
+            :to='subItem.href'
+            v-bind:router='!subItem.target'
+            v-bind:disabled='subItem.disabled'
+            v-bind:target='subItem.target')
             v-list-tile-action(v-if='subItem.icon')
-              v-icon.success--text {{ subItem.icon }}
+              v-icon
             v-list-tile-content
               v-list-tile-title {{ $t(subItem.title) }}
 
@@ -61,28 +66,28 @@ div
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
 
 export default {
   data() {
     return {
       dark: false,
-      theme: 'primary',
+      theme: "primary",
       mini: false,
       drawer: true,
-      locales: ['en-US'],
-      colors: ['blue', 'green', 'purple', 'red'],
+      locales: ["en-US"],
+      colors: ["blue", "green", "purple", "red"]
     };
   },
   computed: {
-    ...mapState(['menu', 'pageTitle']),
+    ...mapState(["menu", "pageTitle"])
   },
   methods: {
     changeLocale(to) {
-      global.helper.ls.set('locale', to);
+      global.helper.ls.set("locale", to);
       this.$i18n.locale = to;
-    },
-  },
+    }
+  }
 };
 </script>
 
