@@ -55,14 +55,14 @@ export default {
     return {
       geocoder: new google.maps.Geocoder(),
       center: {
-        lat: this.value.lat || -6.121435,
-        lng: this.value.lng || 106.774124
+        lat: this.value.latitude || -6.121435,
+        lng: this.value.longitude || 106.774124
       },
       markers: [
         {
           position: {
-            lat: this.value.lat || -6.121435,
-            lng: this.value.lng || 106.774124
+            lat: this.value.latitude || -6.121435,
+            lng: this.value.longitude || 106.774124
           }
         }
       ]
@@ -95,11 +95,11 @@ export default {
               const place = results[0];
 
               this.model = {
+                text: place.formatted_address,
                 titleAddress: place.address_components[0].long_name,
                 address: place.formatted_address,
-                text: place.formatted_address,
-                lat: location.lat,
-                lng: location.lng
+                latitude: location.lat,
+                longitude: location.lng
               };
             }
           }
@@ -117,14 +117,11 @@ export default {
           titleAddress: place.name,
           address: place.formatted_address,
           text: `${place.formatted_address}`,
-          lat: location.lat,
-          lng: location.lng
+          latitude: location.lat,
+          longitude: location.lng
         };
 
-        this.markers = [];
-        this.markers.push({
-          position: location
-        });
+        this.markers = [{ position: location }];
 
         this.center = location;
       }
