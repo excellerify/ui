@@ -325,6 +325,10 @@ export default {
         </div>`;
       } else if (field.type === "date") {
         value = value ? moment(String(value)).format("YYYY-MM-DD") : "";
+      } else if (field.type === "time") {
+        value = value ? moment(String(value)).format("HH:mm") : "";
+      } else if (field.type === "datetime") {
+        value = value ? moment(String(value)).format("YYYY-MM-DD HH:mm") : "";
       } else if (field.type === "money") {
         value = value ? numeral(value).format("0,0.0") : 0.0;
       } else {

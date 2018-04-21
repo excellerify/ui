@@ -520,6 +520,12 @@ export default {
       var url = `${global.config.api + this.value}`;
       this.$refs.dropzone.manuallyAddFile({}, url);
     }
+
+    if (["select", "select2"].includes(this.field.type) && this.value) {
+      this.field.choices = this.field.choices || [
+        this.populateAutocompleteChoices(this.value)
+      ];
+    }
   },
 
   directives: { money: VMoney }
