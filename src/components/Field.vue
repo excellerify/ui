@@ -368,9 +368,11 @@ export default {
             "YYYY-MM-DD HH:mm"
           );
 
-          debugger;
-
-          return this.$emit("input", dateTime);
+          return this.$emit("input", dateTime.toDate());
+        } else if (["time"].indexOf(this.field.type) > -1) {
+          return this.$emit("input", val.time);
+        } else if (["date"].indexOf(this.field.type) > -1) {
+          return this.$emit("input", val.date);
         }
 
         return this.$emit("input", val);
