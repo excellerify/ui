@@ -9,7 +9,7 @@ div
 
     v-list(dense)
       template(v-for='item in menu')
-        v-list-group(v-if='item.items', v-bind:group='item')
+        v-list-group(v-if='item.items', v-bind:group='item', :key="item.title")
           v-list-tile(:to='item.href', slot='activator', :title="item.title")
             v-list-tile-action
               v-icon() {{ item.icon }}
