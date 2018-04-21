@@ -1,55 +1,55 @@
 <template lang="pug">
 div
-  div(v-if="readonly && ['table', 'map', 'select'].indexOf(field.type) === -1")
+  div(v-if="readonly && ['table', 'map', 'select'].indexOf(dataField.type) === -1")
     v-text-field(
-      :label="field.label"
+      :label="dataField.label"
       :value="typeof model === 'object' ? JSON.stringify(model) : model"
       readonly)
 
-  div(v-else-if="field.type === 'automatic'")
+  div(v-else-if="dataField.type === 'automatic'")
     v-text-field(
-      :label="field.label"
+      :label="dataField.label"
       :value="model || 'AUTO'"
       disabled)
 
-  div(v-else-if="field.disabled")
+  div(v-else-if="dataField.disabled")
     v-text-field(
-      :label="field.label"
+      :label="dataField.label"
       :value="model"
       disabled)
 
   div(v-else)
     //- if select2
-    div(v-if="['select', 'select2'].includes(field.type)")
+    div(v-if="['select', 'select2'].includes(dataField.type)")
       v-select(
-        v-if="!field.dataSource"
+        v-if="!dataField.dataSource"
         v-validate="validationRules"
         v-model="model"
-        v-bind="field"
+        v-bind="dataField"
         :name="name"
-        :items="field.choices"
+        :items="dataField.choices"
         :readonly="readonly")
 
       //- if autocomplete
       v-select(
-        v-else-if="field.dataSource"
+        v-else-if="dataField.dataSource"
         autocomplete
         v-validate="validationRules"
         v-model="model"
-        v-bind="field"
+        v-bind="dataField"
         browser-autocomplete="off"
         item-text="text"
         item-value="value"
         :loading="loading"
         :name="name"
         :search-input.sync="autoCompleteSync"
-        :items="field.choices"
+        :items="dataField.choices"
         :readonly="readonly")
 
     //- if map
-    template(v-else-if="['map'].indexOf(field.type) > -1")
+    template(v-else-if="['map'].indexOf(dataField.type) > -1")
       v-google-map(
-        v-bind="field"
+        v-bind="dataField"
         @input="(val) => {model = val}"
         :name="name"
         :value="model"
@@ -57,14 +57,14 @@ div
         :readonly="readonly")
 
     //- if radio
-    v-layout(v-else-if="['radios', 'radio'].indexOf(field.type) > -1", row)
+    v-layout(v-else-if="['radios', 'radio'].indexOf(dataField.type) > -1", row)
       div.input-group
-        label {{$t(field.label)}}
+        label {{$t(dataField.label)}}
         v-flex(xs12)
           v-radio-group(v-model="model", column, wrap, :readonly="readonly")
             v-radio(
               :name="name",
-              v-for="option in field.choices",
+              v-for="option in dataField.choices",
               :key="option.value",
               :label="option.text",
               :value="option.value",
@@ -72,16 +72,16 @@ div
               v-validate="validationRules")
 
     //- if checkboxes
-    template(v-else-if="['checkboxes'].indexOf(field.type) > -1")
+    template(v-else-if="['checkboxes'].indexOf(dataField.type) > -1")
       v-layout(row, wrap, class="input-group")
-        label {{$t(field.label)}}
-        v-flex(v-bind="{[field.width]: true}", xs12)
-          span(v-for='option in field.choices', :key="field.value")
+        label {{$t(dataField.label)}}
+        v-flex(v-bind="{[dataField.width]: true}", xs12)
+          span(v-for='option in dataField.choices', :key="dataField.value")
             component(
               :name="name",
               v-model="model",
               hide-details,
-              :is="field.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
+              :is="dataField.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
               :key='option.value',
               :value='option.value',
               :label='option.text',
@@ -89,11 +89,11 @@ div
               v-validate="validationRules")
 
     //- if input type is date or time
-    template(v-else-if="['date', 'time', 'datetime'].indexOf(field.type) > -1")
+    template(v-else-if="['date', 'time', 'datetime'].indexOf(dataField.type) > -1")
       v-flex(xs12 class="input-group" style="padding: 0")
-        label {{$t(field.label)}}
+        label {{$t(dataField.label)}}
         v-menu(
-          v-if="['date', 'datetime'].indexOf(field.type) > -1"
+          v-if="['date', 'datetime'].indexOf(dataField.type) > -1"
           ref="menuDate"
           v-model="menuShowTogle.date"
           :return-value.sync="model"
@@ -114,12 +114,12 @@ div
               v-btn(flat color="primary" @click="$refs.menuDate.save({time: model.time, date: model.date})") OK
 
         v-menu(
-          v-if="['time', 'datetime'].indexOf(field.type) > -1"
+          v-if="['time', 'datetime'].indexOf(dataField.type) > -1"
           ref="menuTime"
           v-model="menuShowTogle.time"
           :return-value.sync="model"
           :close-on-content-click="false")
-          v-text-field(
+          v-text-dataField(
             readonly
             slot='activator'
             prepend-icon="schedule"
@@ -135,35 +135,35 @@ div
               v-btn(flat color="primary" @click="$refs.menuTime.save({time: model.time, date: model.date})") OK
 
     //- if input type is html
-    div(:class="inputGroupClass",v-else-if="field.type == 'html'")
-      label {{$t(field.label)}}
+    div(:class="inputGroupClass",v-else-if="dataField.type == 'html'")
+      label {{$t(dataField.label)}}
       div.pt-2
         quill-editor(v-model='model', :options="editorOption")
 
     //- if input type is file
     //- TODO dropzone
-    div(:class="inputGroupClass", v-else-if="['file', 'pdf', 'image', 'video'].includes(field.type)")
-      label {{$t(field.label)}}
+    div(:class="inputGroupClass", v-else-if="['file', 'pdf', 'image', 'video'].includes(dataField.type)")
+      label {{$t(dataField.label)}}
       div.pt-2
         dropzone(
           :id="`dropzone_${name}`"
-          :options="getDropzoneOptions(field, model)"
+          :options="getDropzoneOptions(dataField, model)"
           ref="dropzone"
           @vdropzone-sending="onUploading"
           @vdropzone-success="onUploadSuccess")
           input(type="hidden" v-model="model" v-validate="validationRules")
 
     //- if hidden
-    input(v-else-if="field.type == 'hidden'", type='hidden', v-model='model', :name="name")
+    input(v-else-if="dataField.type == 'hidden'", type='hidden', v-model='model', :name="name")
 
     //- if table
-    template(v-else-if="['table'].indexOf(field.type) > -1")
+    template(v-else-if="['table'].indexOf(dataField.type) > -1")
       v-layout(row, wrap, class="input-group")
-        label {{field.label}}
+        label {{dataField.label}}
         v-grid(
-          type="field"
+          type="dataField"
           :name="name"
-          :resource="field.model || name"
+          :resource="dataField.model || name"
           :filterByFk="{ model: resource, value : resourceId }"
           :readonly="readonly"
           :onCreate="onGridCreate"
@@ -182,18 +182,18 @@ div
                 type="subForm"
                 :ParentData="parentData"
                 :id="currentItem ? currentItem.id.id : null"
-                :resource="field.model || name"
+                :resource="dataField.model || name"
                 @success="modalSubFormClose")
 
     //- password input
     v-text-field(
-      v-else-if="['password'].indexOf(field.type) > -1"
+      v-else-if="['password'].indexOf(dataField.type) > -1"
       :name="name"
       v-model='model'
-      v-bind="field"
+      v-bind="dataField"
       :readonly="readonly"
-      :label="$t(field.label)"
-      :placeholder="$t(field.placeholder)"
+      :label="$t(dataField.label)"
+      :placeholder="$t(dataField.placeholder)"
       v-validate="validationRules"
       :error="isError"
       :error-messages="errorMessage"
@@ -203,15 +203,15 @@ div
 
     //- money input
     v-text-field(
-      v-else-if="['money'].indexOf(field.type) > -1"
+      v-else-if="['money'].indexOf(dataField.type) > -1"
       :name="name"
       v-money="money"
       v-model='model'
-      v-bind='field'
+      v-bind='dataField'
       :readonly="readonly"
-      :label="$t(field.label)"
-      :placeholder="$t(field.placeholder)"
-      :type="field.type"
+      :label="$t(dataField.label)"
+      :placeholder="$t(dataField.placeholder)"
+      :type="dataField.type"
       v-validate="validationRules"
       :error="isError"
       :error-messages="errorMessage")
@@ -221,12 +221,12 @@ div
       v-else,
       :name="name"
       v-model.lazy='model'
-      v-bind='field'
+      v-bind='dataField'
       :readonly="readonly"
-      :label="$t(field.label)"
-      :placeholder="$t(field.placeholder)"
-      :type="field.type"
-      :multiLine="field.type == 'textarea'"
+      :label="$t(dataField.label)"
+      :placeholder="$t(dataField.placeholder)"
+      :type="dataField.type"
+      :multiLine="dataField.type == 'textarea'"
       v-validate="validationRules"
       :error="isError"
       :error-messages="errorMessage")
@@ -303,7 +303,8 @@ export default {
       menuShowTogle: {
         date: false,
         time: false
-      }
+      },
+      dataField: this.field
     };
   },
   watch: {
@@ -324,7 +325,7 @@ export default {
       if (val) {
         this.onAutoCompleteSync(val);
       } else if (this.model) {
-        this.field.choices = [this.populateAutocompleteChoices(this.model)];
+        this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
       }
     }
   },
@@ -342,14 +343,14 @@ export default {
           return date ? moment(String(date)).format("HH:mm") : null;
         };
 
-        if (["date"].indexOf(this.field.type) > -1) {
+        if (["date"].indexOf(this.dataField.type) > -1) {
           const date = formatDate(this.value);
           return { date };
         }
-        if (["time"].indexOf(this.field.type) > -1) {
+        if (["time"].indexOf(this.dataField.type) > -1) {
           const time = formatTime(this.value);
           return { time };
-        } else if (["datetime"].indexOf(this.field.type) > -1) {
+        } else if (["datetime"].indexOf(this.dataField.type) > -1) {
           const date = formatDate(this.value);
           const time = formatTime(this.value);
 
@@ -359,9 +360,9 @@ export default {
         return this.value;
       },
       set(val) {
-        if (["money"].indexOf(this.field.type) > -1) {
+        if (["money"].indexOf(this.dataField.type) > -1) {
           val = Number(val.replace(/[^0-9\.-]+/g, ""));
-        } else if (["datetime"].indexOf(this.field.type) > -1) {
+        } else if (["datetime"].indexOf(this.dataField.type) > -1) {
           const { date, time } = val;
           const dateTime = moment(
             `${date || "0000-00-00"} ${time || "00:00"}`,
@@ -369,9 +370,9 @@ export default {
           );
 
           return this.$emit("input", dateTime.toDate());
-        } else if (["time"].indexOf(this.field.type) > -1) {
+        } else if (["time"].indexOf(this.dataField.type) > -1) {
           return this.$emit("input", val.time);
-        } else if (["date"].indexOf(this.field.type) > -1) {
+        } else if (["date"].indexOf(this.dataField.type) > -1) {
           return this.$emit("input", val.date);
         }
 
@@ -380,9 +381,9 @@ export default {
     },
     validationRules() {
       const rules = {
-        required: !!this.field.required,
-        email: this.field.type
-          ? this.field.type.toLowerCase() === "email"
+        required: !!this.dataField.required,
+        email: this.dataField.type
+          ? this.dataField.type.toLowerCase() === "email"
           : false
       };
 
@@ -411,7 +412,7 @@ export default {
     },
     getDropzoneOptions(field, model) {
       const uploadUrl =
-        `${this.$store.state.config.api}${this.field.uploadUrl}` ||
+        `${this.$store.state.config.api}${this.dataField.uploadUrl}` ||
         `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`;
 
       return {
@@ -454,18 +455,20 @@ export default {
         this.loading = true;
 
         const data = await this.$store.dispatch("fetchAutoComplete", {
-          dataSource: this.field.dataSource,
+          dataSource: this.dataField.dataSource,
           searchVal: val
         });
 
         if (data.length > 0) {
-          this.field.choices = data.map(val =>
+          this.dataField.choices = data.map(val =>
             this.populateAutocompleteChoices(val)
           );
         } else if (this.model) {
-          this.field.choices = [this.populateAutocompleteChoices(this.model)];
+          this.dataField.choices = [
+            this.populateAutocompleteChoices(this.model)
+          ];
         } else {
-          this.field.choices = null;
+          this.dataField.choices = null;
         }
 
         this.loading = false;
@@ -478,10 +481,10 @@ export default {
     populateAutocompleteChoices: function(val) {
       let choice = "";
 
-      this.field.dataSource.searchParams.map((param, key) => {
+      this.dataField.dataSource.searchParams.map((param, key) => {
         choice += val[param];
 
-        if (key != this.field.dataSource.searchParams.length - 1) {
+        if (key != this.dataField.dataSource.searchParams.length - 1) {
           choice += " - ";
         }
       });
@@ -491,7 +494,7 @@ export default {
   },
   created() {
     if (
-      this.field.required &&
+      this.dataField.required &&
       !this.value &&
       ![
         "file",
@@ -506,25 +509,25 @@ export default {
         "hidden",
         "money",
         "map"
-      ].includes(this.field.type)
+      ].includes(this.dataField.type)
     ) {
       this.$emit("fieldError", {
         field: this.name,
         isError: true,
-        message: `The ${this.field.label} field is required.`
+        message: `The ${this.dataField.label} field is required.`
       });
+    }
+
+    if (["select", "select2"].includes(this.dataField.type) && this.model) {
+      this.dataField.choices = this.dataField.choices || [
+        this.populateAutocompleteChoices(this.model)
+      ];
     }
   },
   mounted() {
-    if (["image"].includes(this.field.type) && this.value) {
+    if (["image"].includes(this.dataField.type) && this.model) {
       var url = `${global.config.api + this.value}`;
       this.$refs.dropzone.manuallyAddFile({}, url);
-    }
-
-    if (["select", "select2"].includes(this.field.type) && this.value) {
-      this.field.choices = this.field.choices || [
-        this.populateAutocompleteChoices(this.value)
-      ];
     }
   },
 
