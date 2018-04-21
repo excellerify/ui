@@ -40,7 +40,7 @@
     "vue-timeago": "^3.4.2",
     "vue2-dropzone": "^3.0.3",
     "vue2-google-maps": "^0.8.12",
-    "vuetify": "^1.0.0",
+    "vuetify": "^1.0.16",
     "vuex": "^2.5.0",
     "webpack-merge": "^4.1.2",
     "yargs": "^11.0.0"
@@ -101,9 +101,5 @@
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ]
+  "browserslist": ["> 1%", "last 2 versions", "not ie <= 8"]
 }

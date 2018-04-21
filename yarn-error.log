@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/Cellar/node/9.8.0/bin/node /usr/local/bin/yarn start --apiUrl=http://localhost:3000
+  /usr/local/Cellar/node/9.8.0/bin/node /usr/local/bin/yarn upgrade
 
 PATH: 
   /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
@@ -56,7 +56,7 @@ npm manifest:
       "vue-timeago": "^3.4.2",
       "vue2-dropzone": "^3.0.3",
       "vue2-google-maps": "^0.8.12",
-      "vuetify": "^1.0.0",
+      "vuetify": "^1.0.16",
       "vuex": "^2.5.0",
       "webpack-merge": "^4.1.2",
       "yargs": "^11.0.0"
@@ -117,11 +117,7 @@ npm manifest:
       "node": ">= 4.0.0",
       "npm": ">= 3.0.0"
     },
-    "browserslist": [
-      "> 1%",
-      "last 2 versions",
-      "not ie <= 8"
-    ]
+    "browserslist": ["> 1%", "last 2 versions", "not ie <= 8"]
   }
 
 yarn manifest: 
@@ -8203,8 +8199,8 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.16.tgz#07edb75e8412aaeed871ebafa99f4672584a0085"
   
   vuetify@^1.0.0:
-    version "1.0.13"
-    resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-1.0.13.tgz#54a802932e1fda1f9d8d1d8586c477a09c179ef3"
+    version "1.0.16"
+    resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-1.0.16.tgz#e59a4c7f2fb51ecbe3912d83dd1e98256aa0d9a6"
   
   vuex@^2.5.0:
     version "2.5.0"
@@ -8521,16 +8517,14 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
 
 Trace: 
-  Error: Command failed.
-  Exit code: 1
-  Command: sh
-  Arguments: -c node build/dev-server.js --apiUrl=http://localhost:3000
-  Directory: /Users/sofyan.ahmad/Projects/mandalalabs/ui
-  Output:
-  
-      at ProcessTermError.MessageError (/usr/local/lib/node_modules/yarn/lib/cli.js:186:110)
-      at new ProcessTermError (/usr/local/lib/node_modules/yarn/lib/cli.js:226:113)
-      at ChildProcess.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:30281:17)
-      at ChildProcess.emit (events.js:180:13)
-      at maybeClose (internal/child_process.js:936:16)
-      at Process.ChildProcess._handle.onexit (internal/child_process.js:220:5)
+  Error: Outdated lockfile. Please run `yarn install` and try again.
+      at new MessageError (/usr/local/lib/node_modules/yarn/lib/cli.js:186:110)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:36620:19
+      at Generator.next (<anonymous>)
+      at step (/usr/local/lib/node_modules/yarn/lib/cli.js:98:30)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:116:14
+      at new Promise (<anonymous>)
+      at new F (/usr/local/lib/node_modules/yarn/lib/cli.js:23451:28)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:95:12
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:36660:25
+      at Array.map (<anonymous>)

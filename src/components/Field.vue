@@ -89,19 +89,50 @@ div
               v-validate="validationRules")
 
     //- if input type is date or time
-    template(v-else-if="['date', 'datetime', 'time'].indexOf(field.type) > -1")
-      v-menu
-        v-text-field(slot='activator', v-model='model', :label="$t(field.label)")
-        v-date-picker(
-          v-model='model',
-          no-title,
-          scrollable,
-          v-validate="validationRules")
-          template(slot-scope="{ save, cancel }")
+    template(v-else-if="['date', 'time', 'datetime'].indexOf(field.type) > -1")
+      v-flex(xs12 class="input-group" style="padding: 0")
+        label {{$t(field.label)}}
+        v-menu(
+          v-if="['date', 'datetime'].indexOf(field.type) > -1"
+          ref="menuDate"
+          v-model="menuShowTogle.date"
+          :return-value.sync="model"
+          :close-on-content-click="false")
+          v-text-field(
+            readonly
+            slot='activator'
+            prepend-icon="event"
+            v-model='model.date'
+            :label="$t('Date')")
+          v-date-picker(
+            scrollable
+            no-title
+            v-model="model.date"
+            v-validate="validationRules")
+              v-spacer
+              v-btn(flat color="primary" @click="menuShowTogle.date=false") Cancel
+              v-btn(flat color="primary" @click="$refs.menuDate.save({time: model.time, date: model.date})") OK
+
+        v-menu(
+          v-if="['time', 'datetime'].indexOf(field.type) > -1"
+          ref="menuTime"
+          v-model="menuShowTogle.time"
+          :return-value.sync="model"
+          :close-on-content-click="false")
+          v-text-field(
+            readonly
+            slot='activator'
+            prepend-icon="schedule"
+            v-model='model.time'
+            :label="$t('Time')")
+          v-time-picker(
+            scrollable
+            v-model="model.time"
+            v-validate="validationRules")
             v-card-actions
               v-spacer
-              v-btn(flat color="primary" @click="cancel") Cancel
-              v-btn(flat color="primary" @click="save") OK
+              v-btn(flat color="primary" @click="menuShowTogle.time=false") Cancel
+              v-btn(flat color="primary" @click="$refs.menuTime.save({time: model.time, date: model.date})") OK
 
     //- if input type is html
     div(:class="inputGroupClass",v-else-if="field.type == 'html'")
@@ -205,7 +236,7 @@ div
 <script>
 import { VMoney } from "v-money";
 import randomstring from "randomstring";
-import moment from "moment";
+import moment, { now } from "moment";
 import EventBus from "../eventBus.js";
 import config from "../config";
 
@@ -268,7 +299,11 @@ export default {
         masked: false /* doesn't work with directive */
       },
       loading: false,
-      autoCompleteSync: null
+      autoCompleteSync: null,
+      menuShowTogle: {
+        date: false,
+        time: false
+      }
     };
   },
   watch: {
@@ -299,16 +334,43 @@ export default {
     },
     model: {
       get() {
-        if (["date", "datetime"].indexOf(this.field.type) > -1) {
-          return this.value
-            ? moment(String(this.value)).format("YYYY-MM-DD")
-            : null;
+        const formatDate = date => {
+          return date ? moment(String(date)).format("YYYY-MM-DD") : null;
+        };
+
+        const formatTime = date => {
+          return date ? moment(String(date)).format("HH:mm") : null;
+        };
+
+        if (["date"].indexOf(this.field.type) > -1) {
+          const date = formatDate(this.value);
+          return { date };
         }
+        if (["time"].indexOf(this.field.type) > -1) {
+          const time = formatTime(this.value);
+          return { time };
+        } else if (["datetime"].indexOf(this.field.type) > -1) {
+          const date = formatDate(this.value);
+          const time = formatTime(this.value);
+
+          return { date, time };
+        }
+
         return this.value;
       },
       set(val) {
         if (["money"].indexOf(this.field.type) > -1) {
           val = Number(val.replace(/[^0-9\.-]+/g, ""));
+        } else if (["datetime"].indexOf(this.field.type) > -1) {
+          const { date, time } = val;
+          const dateTime = moment(
+            `${date || "0000-00-00"} ${time || "00:00"}`,
+            "YYYY-MM-DD HH:mm"
+          );
+
+          debugger;
+
+          return this.$emit("input", dateTime);
         }
 
         return this.$emit("input", val);
