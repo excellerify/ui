@@ -124,7 +124,7 @@ div
             slot='activator'
             prepend-icon="schedule"
             v-model='model.time'
-            :label="$t('Time')")
+            :label="inline? dataField.label : 'Time'")
           v-time-picker(
             scrollable
             v-model="model.time"

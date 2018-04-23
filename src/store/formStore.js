@@ -14,6 +14,7 @@ const store = {
 
     async fetchAutoComplete(_, { dataSource, searchVal }) {
       const search = {};
+
       dataSource.searchParams.map(param => {
         search[param] = {
           regexp: `/${searchVal}/i`,
@@ -24,7 +25,7 @@ const store = {
       });
 
       let { data } = await global.$http.get(dataSource.url, {
-        params: { filter: { where: search } }
+        params: { filter: { whereOr: search } }
       });
 
       if (data.items) {
