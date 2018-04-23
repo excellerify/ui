@@ -208,8 +208,10 @@ export default {
     },
     "$route.params": "refresh",
     pagination: {
-      handler() {
-        this.fetchData();
+      handler(val) {
+        if (this.columns.length > 0) {
+          this.fetchData();
+        }
       },
       deep: true
     }
@@ -304,15 +306,6 @@ export default {
     refresh: async function() {
       Object.assign(this.$data, getDefaultData());
       await this.fetchGrid();
-    },
-    fetch() {
-      if (this.columns.length <= 0) {
-        // fetch grid params from server: e.g. /crud/users/grid
-        this.fetchGrid();
-      } else {
-        // or define grid params manually
-        this.fetchData();
-      }
     },
     getColumnData(row, field) {
       let value = row[field.value];
@@ -465,7 +458,6 @@ export default {
       });
     }
   },
-
   computed: {
     totalPages() {
       return Math.ceil(
@@ -473,11 +465,10 @@ export default {
       );
     }
   },
-
-  mounted() {
-    this.refresh();
+  async mounted() {
+    await this.refresh();
+    await this.fetchData();
   },
-
   created() {
     EventBus.$on("gridRefresh", this.refresh);
   }

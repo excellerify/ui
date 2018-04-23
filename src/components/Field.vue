@@ -246,7 +246,7 @@ export default {
   props: {
     resourceId: {
       type: String,
-      default: "new"
+      default: "00000000-0000-0000-0000-000000000000"
     },
     field: {
       type: Object,
