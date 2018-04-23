@@ -31,8 +31,9 @@ div
         @onUpsert='onSubmit'
         @fieldError='updateFieldsError'
         v-model='model[name]'
-        :resourceId='id'
-        :key='name'
+        :inline="inline"
+        :resourceId="id"
+        :key="name"
         :name='field.label'
         :field='field'
         :readonly='readonly || field.readonly')

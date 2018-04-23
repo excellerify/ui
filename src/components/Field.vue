@@ -91,7 +91,7 @@ div
     //- if input type is date or time
     template(v-else-if="['date', 'time', 'datetime'].indexOf(dataField.type) > -1")
       v-flex(xs12 class="input-group" style="padding: 0")
-        label {{$t(dataField.label)}}
+        label(v-if="!inline") {{$t(dataField.label)}}
         v-menu(
           v-if="['date', 'datetime'].indexOf(dataField.type) > -1"
           ref="menuDate"
@@ -103,7 +103,7 @@ div
             slot='activator'
             prepend-icon="event"
             v-model='model.date'
-            :label="$t('Date')")
+            :label="inline? dataField.label : 'Date'")
           v-date-picker(
             scrollable
             no-title
@@ -264,6 +264,10 @@ export default {
       required: false
     },
     readonly: {
+      type: Boolean,
+      default: false
+    },
+    inline: {
       type: Boolean,
       default: false
     }
