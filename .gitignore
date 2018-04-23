@@ -5,3 +5,5 @@ build/
 
 # npm lock file
 package.lock
+
+yarn-error.log
