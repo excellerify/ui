@@ -9,19 +9,17 @@ div
 
     v-list(dense)
       template(v-for='item in menu')
-        v-list-group(v-if='item.items', v-bind:group='item', :key="item.title")
-          v-list-tile(:to='item.href', slot='activator', :title="item.title")
+        v-list-group(v-if='item.items', :key="item.title")
+          v-list-tile(slot='activator', :title="item.title")
             v-list-tile-action
-              v-icon() {{ item.icon }}
+              v-icon {{ item.icon }}
             v-list-tile-content
               v-list-tile-title {{ item.title }}
 
           v-list-tile(
-            ripple
             v-for='subItem in item.items'
             :key='subItem.href'
             :to='subItem.href'
-            v-bind:router='!subItem.target'
             v-bind:disabled='subItem.disabled'
             v-bind:target='subItem.target')
             v-list-tile-action(v-if='subItem.icon')

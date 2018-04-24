@@ -53,7 +53,6 @@ v-flex(xs12)
               )
             th(
               v-for="header in columns"
-              :key="header.text"
               :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
               align="left"
               @click="changeSort(header.value)"
