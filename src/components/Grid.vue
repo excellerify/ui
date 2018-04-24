@@ -306,6 +306,7 @@ export default {
     refresh: async function() {
       Object.assign(this.$data, getDefaultData());
       await this.fetchGrid();
+      await this.fetchData();
     },
     getColumnData(row, field) {
       let value = row[field.value];
@@ -467,7 +468,6 @@ export default {
   },
   async mounted() {
     await this.refresh();
-    await this.fetchData();
   },
   created() {
     EventBus.$on("gridRefresh", this.refresh);
