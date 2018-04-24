@@ -119,7 +119,7 @@ div
           v-model="menuShowTogle.time"
           :return-value.sync="model"
           :close-on-content-click="false")
-          v-text-dataField(
+          v-text-field(
             readonly
             slot='activator'
             prepend-icon="schedule"
