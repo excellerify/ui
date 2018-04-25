@@ -324,6 +324,8 @@ export default {
           this.$emit("success", result.data);
         }
 
+        this.id = result.data.id;
+
         if (cb) {
           cb(result.data);
         }
