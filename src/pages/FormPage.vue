@@ -33,19 +33,19 @@ export default {
     },
     isEdit() {
       return !!this.id;
-    },
+    }
   },
   methods: {
     onSuccess(data) {
-      this.$router.push({ name: 'grid', params: { resource: this.resource } });
-    },
+      this.$router.push({ name: "grid", params: { resource: this.resource } });
+    }
   },
   created() {
-    const pageTitle = this.isEdit ? 'Update' : 'Create';
-    this.$store.dispatch('checkPageTitle', {
+    const pageTitle = this.isEdit ? "Update" : "Create";
+    this.$store.dispatch("checkPageTitle", {
       path: this.$route.path,
-      action: pageTitle,
+      action: pageTitle
     });
-  },
+  }
 };
 </script>

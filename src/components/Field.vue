@@ -270,6 +270,9 @@ export default {
     inline: {
       type: Boolean,
       default: false
+    },
+    wizardIndex: {
+      type: Number
     }
   },
   data() {
@@ -317,10 +320,9 @@ export default {
         this.isError = val.length > 0;
         this.errorMessage = this.isError ? val[0].msg : [];
 
-        this.$emit("fieldError", {
-          field: this.name,
+        this.emitError({
           isError: this.isError,
-          message: this.isError ? val[0].msg : []
+          msg: val.length > 0 ? val[0].msg : ""
         });
       },
       deep: true
@@ -395,6 +397,16 @@ export default {
     }
   },
   methods: {
+    emitError({ isError, msg } = {}) {
+      this.$emit("fieldError", {
+        field: this.name,
+        wizardIndex: this.wizardIndex,
+        isError,
+        message: isError
+          ? msg || `The ${this.dataField.label} field is required.`
+          : []
+      });
+    },
     onUploading(file, xhr, formData) {
       const extension = file.name.split(".");
 
@@ -515,11 +527,7 @@ export default {
         "map"
       ].includes(this.dataField.type)
     ) {
-      this.$emit("fieldError", {
-        field: this.name,
-        isError: true,
-        message: `The ${this.dataField.label} field is required.`
-      });
+      this.emitError({ isError: true });
     }
 
     if (["select", "select2"].includes(this.dataField.type) && this.model) {

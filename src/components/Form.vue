@@ -24,29 +24,69 @@ div
               :field='field'
               :readonly='readonly || field.readonly')
 
-    v-layout(v-bind='{[inline? \'row\': \'column wrap\']: true}', v-if='!groupBy')
-      v-field.pr-1(
-        v-for='(field, name) in getFields'
-        @refresh='refresh'
-        @onUpsert='onSubmit'
-        @fieldError='updateFieldsError'
-        v-model='model[name]'
-        :inline="inline"
-        :resourceId="id"
-        :key="name"
-        :name='field.label'
-        :field='field'
-        :readonly='readonly || field.readonly')
+    template(v-if='(!groupBy && formType != "wizard") || inline')
+      v-layout(v-bind="{[inline? 'row':'column wrap']: true}")
+        v-field(v-bind:class="{[inline? 'pr-3':'']: true}")(
+          v-for='(field, name) in getFields'
+          @refresh='refresh'
+          @onUpsert='onSubmit'
+          @fieldError='updateFieldsError'
+          v-model='model[name]'
+          :inline="inline"
+          :resourceId="id"
+          :key="name"
+          :name='field.label'
+          :field='field'
+          :readonly='readonly || field.readonly')
 
       v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
         ul.px-3
           li(v-for='error in formErrors') {{error.message}}
 
-      v-layout
-        v-flex.mt-2.actions(xs12)
-          slot(name='buttons')
-            v-btn.mt-2(color='primary', dark, type='submit', small) {{$t(submitButtonText)}}
-              v-icon(right, dark) {{submitButtonIcon}}
+      v-flex.actions(xs12)
+        slot(name='buttons')
+          v-btn.mb-3(color='primary', dark, type='submit') {{$t(submitButtonText)}}
+            v-icon(right, dark) {{submitButtonIcon}}
+
+    v-layout(column, wrap, v-else-if='formType === "wizard"')
+      div(slot="buttons", class="my-4")
+          v-btn(dark, class="grey", @click.native="$root.back()")
+            v-icon(dark, left) chevron_left
+            span {{$t('Cancel')}}
+
+      v-stepper(v-model="wizardData.wizardStep" vertical)
+        template(v-for='(wizard, index) in wizardData.wizardContent')
+          v-stepper-step(:step="index + 1", :keys='index', :complete="wizardData.wizardStep > index") {{wizard.wizardTitle}}
+          v-stepper-content(:step="index + 1")
+            v-card
+              v-card-text
+                v-field(
+                  v-for='(field) in wizard.fields'
+                  @refresh='refresh'
+                  @onUpsert='onSubmit'
+                  @fieldError='updateFieldsError'
+                  v-model='model[field.name]'
+                  :wizardIndex='index'
+                  :inline="inline"
+                  :resourceId="id"
+                  :key="field.name"
+                  :name='field.label'
+                  :field='field'
+                  :readonly='readonly || field.readonly')
+
+                v-spacer
+                v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
+                  ul.px-3
+                    li(v-for='error in formErrors') {{error.message}}
+
+              v-card-actions
+                v-btn(v-if="index > 0", @click.native="wizardData.wizardStep = index ")
+                  v-icon(dark, left) chevron_left
+                  span Back
+                v-btn(color="primary" @click.native="wizardContinue(index)")
+                  span Continue
+                  v-icon(dark, left) chevron_right
+
 </template>
 
 <script>
@@ -112,7 +152,12 @@ export default {
       message: "",
       fieldErrors: [],
       rules: null,
-      formFields: null
+      formFields: null,
+      formType: "simple",
+      wizardData: {
+        wizardStep: 0,
+        wizardContent: []
+      }
     };
   },
 
@@ -173,7 +218,7 @@ export default {
     },
     model: {
       handler: function(val) {
-        this.formFields = this.togleFieldOptionalsOn();
+        this.formFields = this.filterFieldMode();
       },
       deep: true
     },
@@ -198,7 +243,7 @@ export default {
         }
 
         this.formFields = this.filterFieldByMode();
-        this.formFields = this.togleFieldOptionalsOn();
+        this.formFields = this.filterFieldMode();
 
         if (this.type === "subForm" && this.ParentData) {
           // resolve parent FK
@@ -249,7 +294,7 @@ export default {
 
       return filteredField;
     },
-    togleFieldOptionalsOn() {
+    filterFieldMode() {
       const filteredField = this._.pickBy(this.FormFields, (val, key) => {
         if (val.optionalsOn) {
           let isShow = false;
@@ -283,19 +328,47 @@ export default {
         this.model = data.model || {};
         this.rules = data.rules || {};
 
+        if (this.isCreate) {
+          this.formType = data.type || this.formType;
+        }
+
+        if (this.formType === "wizard") {
+          debugger;
+          const wizardContent = this._.chain(this.filterFieldMode())
+            .map((currentItem, key) => {
+              // transform object key into property name,
+              // to make fields can be stored in array
+              currentItem.name = key;
+              return currentItem;
+            })
+            .groupBy("wizardStepTitle")
+            .toPairs()
+            .map(currentItem => {
+              let title =
+                currentItem[0] != "undefined" ? currentItem[0] : "Final Step";
+
+              return {
+                wizardTitle: title,
+                fields: currentItem[1]
+              };
+            })
+            .value();
+
+          this.wizardData = { wizardContent };
+        }
+
         Promise.resolve(data);
       } catch (e) {
         this.error = e;
         Promise.reject(e);
       }
     },
-    getGroupedFields() {},
-    updateFieldsError({ field, isError, message }) {
+    updateFieldsError({ field, isError, message, wizardIndex }) {
       const index = this._.findIndex(this.fieldErrors, { field });
 
       if (isError) {
         if (index < 0) {
-          this.fieldErrors.push({ field, isError, message });
+          this.fieldErrors.push({ field, isError, message, wizardIndex });
         }
       } else {
         if (index > -1) {
@@ -303,24 +376,32 @@ export default {
         }
       }
     },
-    onSubmit: async function({ subForm, cb }) {
+    async onSubmit({ subForm, cb, index } = {}) {
       try {
         if (this.fieldErrors.length > 0) {
-          throw this.fieldErrors;
+          if (this.formType != "wizard") {
+            throw this.fieldErrors;
+          } else {
+            const checkFieldError = this._.filter(this.fieldErrors, {
+              wizardIndex: index
+            });
+
+            if (checkFieldError.length > 0) {
+              throw checkFieldError;
+            }
+          }
         }
 
         this.$emit("input", this.model);
 
         if (this.autoSubmit) {
           this.$emit("submit");
-          return Promise.resolve();
+          return;
         }
 
         const result = await this.$http[this.method](this.action, this.model);
 
-        this.fieldErrors = [];
-
-        if (!subForm) {
+        if (!subForm && this.formType != "wizard") {
           this.$emit("success", result.data);
         }
 
@@ -330,7 +411,7 @@ export default {
           cb(result.data);
         }
 
-        return Promise.resolve(result.data);
+        return result.data;
       } catch (e) {
         this.hasError = true;
 
@@ -349,10 +430,25 @@ export default {
 
         this.$emit("error", e);
 
-        this.$store.commit("submitError", { message: e });
+        console.error(e);
 
         Promise.reject(e);
       }
+    },
+    async wizardContinue(index) {
+      await this.onSubmit({
+        index,
+        cb: () => {
+          if (
+            this.wizardData.wizardStep < this.wizardData.wizardContent.length
+          ) {
+            this.wizardData.wizardStep = index + 2;
+            this.formErrors = [];
+          } else {
+            this.$emit("success", this.model);
+          }
+        }
+      });
     }
   },
   created() {
