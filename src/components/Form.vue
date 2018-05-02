@@ -54,16 +54,20 @@ div
             v-icon(dark, left) chevron_left
             span {{$t('Cancel')}}
 
-      v-stepper(v-model="wizardData.wizardStep" vertical)
+      v-stepper(v-model="wizardData.wizardStep" vertical :non-linear="isView || isEdit")
         template(v-for='(wizard, index) in wizardData.wizardContent')
-          v-stepper-step(:step="index + 1", :keys='index', :complete="wizardData.wizardStep > index") {{wizard.wizardTitle}}
+          v-stepper-step(
+            :step="index + 1"
+            :keys="index"
+            :editable="wizardData.wizardStep > index || isView || isEdit"
+            :complete="wizardData.wizardStep > index || isEdit") {{wizard.wizardTitle}}
           v-stepper-content(:step="index + 1")
             v-card
               v-card-text
                 v-field(
-                  v-for='(field) in wizard.fields'
-                  @refresh='refresh'
-                  @onUpsert='onSubmit'
+                  v-for="(field) in wizard.fields"
+                  @refresh="refresh"
+                  @onUpsert="onSubmit"
                   @fieldError='updateFieldsError'
                   v-model='model[field.name]'
                   :wizardIndex='index'
@@ -81,7 +85,7 @@ div
 
               v-card-actions
                 v-btn(v-if="index > 0", @click.native="wizardData.wizardStep = index ")
-                  v-icon(dark, left) chevron_left
+                  v-icon(left) chevron_left
                   span Back
                 v-btn(color="primary" @click.native="wizardContinue(index)")
                   span Continue
@@ -160,7 +164,6 @@ export default {
       }
     };
   },
-
   computed: {
     group() {
       if (!this.groupBy) {
@@ -192,11 +195,14 @@ export default {
         this.$route.query.method || (this.isEdit ? "patch" : "post")
       ).toLowerCase();
     },
+    isCreate() {
+      return !!!this.id;
+    },
     isEdit() {
       return !!this.id;
     },
-    isCreate() {
-      return !!!this.id;
+    isView() {
+      return this.readonly;
     },
     action() {
       if (this.$route.query.action) {
@@ -208,8 +214,7 @@ export default {
       }
     },
     getFields() {
-      this.formFields = this.filterFieldByMode();
-      return this.formFields;
+      return this.filterFieldByMode(this.formFields);
     }
   },
   watch: {
@@ -218,7 +223,7 @@ export default {
     },
     model: {
       handler: function(val) {
-        this.formFields = this.filterFieldMode();
+        this.formFields = this.filterFieldOptionalsOn();
       },
       deep: true
     },
@@ -242,8 +247,8 @@ export default {
           await this.fetchFormSchema();
         }
 
-        this.formFields = this.filterFieldByMode();
-        this.formFields = this.filterFieldMode();
+        this.formFields = this.filterFieldByMode(this.formFields);
+        this.formFields = this.filterFieldOptionalsOn();
 
         if (this.type === "subForm" && this.ParentData) {
           // resolve parent FK
@@ -276,9 +281,9 @@ export default {
         Promise.reject(e);
       }
     },
-    filterFieldByMode() {
+    filterFieldByMode(fields) {
       // Show only available mode
-      const filteredField = this._.pickBy(this.formFields, (val, key) => {
+      return this._.pickBy(fields, (val, key) => {
         if (val.mode) {
           if (this.isEdit) {
             return val.mode.indexOf("isEdit") > -1;
@@ -291,10 +296,8 @@ export default {
 
         return true;
       });
-
-      return filteredField;
     },
-    filterFieldMode() {
+    filterFieldOptionalsOn() {
       const filteredField = this._.pickBy(this.FormFields, (val, key) => {
         if (val.optionalsOn) {
           let isShow = false;
@@ -327,14 +330,11 @@ export default {
         this.FormFields = data.fields;
         this.model = data.model || {};
         this.rules = data.rules || {};
-
-        if (this.isCreate) {
-          this.formType = data.type || this.formType;
-        }
+        this.formType = data.type || this.formType;
 
         if (this.formType === "wizard") {
-          debugger;
-          const wizardContent = this._.chain(this.filterFieldMode())
+          const fields = this.filterFieldByMode(data.fields);
+          const wizardContent = this._.chain(fields)
             .map((currentItem, key) => {
               // transform object key into property name,
               // to make fields can be stored in array
