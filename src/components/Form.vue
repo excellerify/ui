@@ -4,25 +4,25 @@ div
     v-tabs(grow, scroll-bars, v-model='active', dark, v-if='groupBy')
       v-tabs-bar(slot='activators')
         v-tabs-item(
-          v-for='(field, key) in group.parents'
-          :key='key'
-          :href='\'tab-\' + key'
+          v-for="(field, key) in group.parents"
+          :key="key"
+          :href="'tab-' + key"
           ripple)
         v-tabs-slider
 
       v-tabs-content(
-        v-for='(getFields, key) in group.children'
-        :key='key'
-        :id='\'tab-\' + key')
+        v-for="(getFields, key) in group.children"
+        :key="key"
+        :id="'tab-' + key")
         v-card(flat)
           v-card-text
             v-field(
-              v-for='(field, name) in getFields'
-              v-model='model[name]'
-              :key='name'
-              :name='field.label'
-              :field='field'
-              :readonly='readonly || field.readonly')
+              v-for="(field, name) in getFields"
+              v-model="model[name]"
+              :key="name"
+              :name="field.label"
+              :field="field"
+              :readonly="readonly || field.readonly")
 
     template(v-if='(!groupBy && formType != "wizard") || inline')
       v-layout(v-bind="{[inline? 'row':'column wrap']: true}")
@@ -49,27 +49,26 @@ div
             v-icon(right, dark) {{submitButtonIcon}}
 
     v-layout(column, wrap, v-else-if='formType === "wizard"')
-      div(slot="buttons", class="my-4")
-          v-btn(dark, class="grey", @click.native="$root.back()")
-            v-icon(dark, left) chevron_left
-            span {{$t('Cancel')}}
-
       v-stepper(v-model="wizardData.wizardStep" vertical :non-linear="isView || isEdit")
         template(v-for='(wizard, index) in wizardData.wizardContent')
           v-stepper-step(
             :step="index + 1"
             :keys="index"
+            :rules="[()=> checkWizardStepError(index)]"
             :editable="wizardData.wizardStep > index || isView || isEdit"
             :complete="wizardData.wizardStep > index || isEdit") {{wizard.wizardTitle}}
+            small(v-if="!checkWizardStepError(index)") One or more fields have an error or empty
+
           v-stepper-content(:step="index + 1")
             v-card
               v-card-text
                 v-field(
                   v-for="(field) in wizard.fields"
+                  v-model="model[field.name]"
                   @refresh="refresh"
                   @onUpsert="onSubmit"
                   @fieldError='updateFieldsError'
-                  v-model='model[field.name]'
+                  :value='model[field.name]'
                   :wizardIndex='index'
                   :inline="inline"
                   :resourceId="id"
@@ -78,18 +77,30 @@ div
                   :field='field'
                   :readonly='readonly || field.readonly')
 
-                v-spacer
-                v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
+                v-alert.m-5(error
+                  v-model="formErrors.length > 0 && getWizardStepError(index).length > 0"
+                  style='width: 100%;')
                   ul.px-3
-                    li(v-for='error in formErrors') {{error.message}}
+                    li(v-for='error in getWizardStepError(index)') {{error.message}}
 
               v-card-actions
                 v-btn(v-if="index > 0", @click.native="wizardData.wizardStep = index ")
                   v-icon(left) chevron_left
                   span Back
-                v-btn(color="primary" @click.native="wizardContinue(index)")
+                v-btn(color="primary" @click.native="onWizardContinue({index})")
                   span Continue
                   v-icon(dark, left) chevron_right
+
+      v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
+        ul.px-3
+          li(v-for='error in formErrors') {{error.message}}
+
+      div(slot="buttons", class="my-4")
+          v-btn(dark, class="grey", @click.native="$root.back()")
+            v-icon(dark, left) chevron_left
+            span {{$t('Cancel')}}
+          v-btn(color='primary', dark, type='submit') {{$t(submitButtonText)}}
+            v-icon(right, dark) {{submitButtonIcon}}
 
 </template>
 
@@ -129,11 +140,11 @@ export default {
       type: Object,
       default: () => {}
     },
-    ParentData: {
+    parentData: {
       required: false,
       type: Object
     },
-    FormFields: {
+    formFields: {
       type: Object
     },
     autoSubmit: {
@@ -156,7 +167,7 @@ export default {
       message: "",
       fieldErrors: [],
       rules: null,
-      formFields: null,
+      dataFormFields: null,
       formType: "simple",
       wizardData: {
         wizardStep: 0,
@@ -172,8 +183,8 @@ export default {
       let parents = {};
       let children = {};
 
-      for (let k in this.formFields) {
-        let field = this.formFields[k];
+      for (let k in this.dataFormFields) {
+        let field = this.dataFormFields[k];
         let ref = field[this.groupBy];
         let parentKey = field.id;
 
@@ -214,7 +225,7 @@ export default {
       }
     },
     getFields() {
-      return this.filterFieldByMode(this.formFields);
+      return this.filterFieldByMode(this.dataFormFields);
     }
   },
   watch: {
@@ -223,7 +234,7 @@ export default {
     },
     model: {
       handler: function(val) {
-        this.formFields = this.filterFieldOptionalsOn();
+        this.dataFormFields = this.filterFieldOptionalsOn();
       },
       deep: true
     },
@@ -232,7 +243,7 @@ export default {
       this.hasError = false;
       this.refresh();
     },
-    FormFields() {
+    formFields() {
       this.refresh();
     }
   },
@@ -241,23 +252,23 @@ export default {
       try {
         this.fieldErrors = [];
 
-        if (this.FormFields) {
-          this.formFields = this.FormFields;
+        if (this.formFields) {
+          this.dataFormFields = this.formFields;
         } else {
           await this.fetchFormSchema();
         }
 
-        this.formFields = this.filterFieldByMode(this.formFields);
-        this.formFields = this.filterFieldOptionalsOn();
+        this.dataFormFields = this.filterFieldByMode(this.dataFormFields);
+        this.dataFormFields = this.filterFieldOptionalsOn();
 
-        if (this.type === "subForm" && this.ParentData) {
+        if (this.type === "subForm" && this.parentData) {
           // resolve parent FK
           this._.forEach(
-            this.formFields,
+            this.dataFormFields,
             function(val, key) {
               // if field is marked as FK, resolve FK data
               if (val.fk) {
-                this._.forEach(this.ParentData, (valData, keyData) => {
+                this._.forEach(this.parentData, (valData, keyData) => {
                   const fkData = valData[val.fk[keyData]];
 
                   // if FK data not found, raise error
@@ -275,10 +286,8 @@ export default {
             }.bind(this)
           );
         }
-
-        Promise.resolve();
       } catch (e) {
-        Promise.reject(e);
+        throw e;
       }
     },
     filterFieldByMode(fields) {
@@ -298,7 +307,7 @@ export default {
       });
     },
     filterFieldOptionalsOn() {
-      const filteredField = this._.pickBy(this.FormFields, (val, key) => {
+      const filteredField = this._.pickBy(this.formFields, (val, key) => {
         if (val.optionalsOn) {
           let isShow = false;
 
@@ -322,15 +331,18 @@ export default {
     fetchFormSchema: async function() {
       try {
         const data = await this.$store.dispatch("fetchFormSchema", {
+          id: this.id,
           resource: `${this.resource}`,
-          subResource: `${this.subResource || "form"}`,
-          id: this.id
+          subResource: `${this.subResource || "form"}`
         });
 
-        this.FormFields = data.fields;
+        this.formFields = data.fields;
         this.model = data.model || {};
         this.rules = data.rules || {};
-        this.formType = data.type || this.formType;
+
+        if (this.isCreate) {
+          this.formType = data.type || this.formType;
+        }
 
         if (this.formType === "wizard") {
           const fields = this.filterFieldByMode(data.fields);
@@ -352,15 +364,16 @@ export default {
                 fields: currentItem[1]
               };
             })
+            .orderBy("wizardTitle")
             .value();
 
           this.wizardData = { wizardContent };
         }
 
-        Promise.resolve(data);
+        return data;
       } catch (e) {
         this.error = e;
-        Promise.reject(e);
+        throw e;
       }
     },
     updateFieldsError({ field, isError, message, wizardIndex }) {
@@ -376,20 +389,10 @@ export default {
         }
       }
     },
-    async onSubmit({ subForm, cb, index } = {}) {
+    onSubmit: async function({ subForm, cb } = {}) {
       try {
         if (this.fieldErrors.length > 0) {
-          if (this.formType != "wizard") {
-            throw this.fieldErrors;
-          } else {
-            const checkFieldError = this._.filter(this.fieldErrors, {
-              wizardIndex: index
-            });
-
-            if (checkFieldError.length > 0) {
-              throw checkFieldError;
-            }
-          }
+          throw this.fieldErrors;
         }
 
         this.$emit("input", this.model);
@@ -401,11 +404,12 @@ export default {
 
         const result = await this.$http[this.method](this.action, this.model);
 
-        if (!subForm && this.formType != "wizard") {
+        if (!subForm) {
           this.$emit("success", result.data);
         }
 
         this.id = result.data.id;
+        this.model = result.data;
 
         if (cb) {
           cb(result.data);
@@ -429,26 +433,75 @@ export default {
         }
 
         this.$emit("error", e);
-
-        console.error(e);
-
-        Promise.reject(e);
       }
     },
-    async wizardContinue(index) {
-      await this.onSubmit({
-        index,
-        cb: () => {
-          if (
-            this.wizardData.wizardStep < this.wizardData.wizardContent.length
-          ) {
-            this.wizardData.wizardStep = index + 2;
-            this.formErrors = [];
-          } else {
-            this.$emit("success", this.model);
+    onWizardContinue: async function({ index, cb } = {}) {
+      try {
+        if (cb) {
+          cb();
+          return;
+        }
+        if (
+          this.wizardData.wizardStep >= this.wizardData.wizardContent.length
+        ) {
+          this.onSubmit();
+        }
+
+        if (this.fieldErrors.length > 0) {
+          const checkFieldError = this._.filter(this.fieldErrors, {
+            wizardIndex: index
+          });
+
+          if (checkFieldError.length > 0) {
+            throw checkFieldError;
           }
         }
+
+        this.$emit("input", this.model);
+
+        const result = await this.$http["post"](
+          `${this.resource}/draft`,
+          this.model
+        );
+
+        this.id = result.data.id;
+        this.model = result.data;
+
+        this.wizardData.wizardStep = index + 2;
+        this.formErrors = [];
+
+        return result.data;
+      } catch (e) {
+        this.hasError = true;
+
+        if (Array.isArray(e)) {
+          this.formErrors = e;
+        } else {
+          let err;
+
+          if (e.response && e.response.data) {
+            err = e.response.data.error || e.response.data;
+          } else {
+            err = e;
+          }
+          this.formErrors = [err];
+        }
+
+        this.$emit("error", e);
+
+        throw e;
+      }
+    },
+    checkWizardStepError(index) {
+      const errorStep = this.getWizardStepError(index);
+      return !(errorStep && errorStep.length > 0);
+    },
+    getWizardStepError(index) {
+      const errorStep = this._.filter(this.fieldErrors, {
+        wizardIndex: index
       });
+
+      return errorStep;
     }
   },
   created() {

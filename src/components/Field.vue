@@ -53,7 +53,7 @@ div
         @input="(val) => {model = val}"
         :name="name"
         :value="model"
-        :required="required"
+        :required="dataField.required"
         :readonly="readonly")
 
     //- if radio
@@ -180,7 +180,7 @@ div
               v-form(
                 v-bind="$data"
                 type="subForm"
-                :ParentData="parentData"
+                :parentData="parentData"
                 :id="currentItem ? currentItem.id.id : null"
                 :resource="dataField.model || name"
                 @success="modalSubFormClose")
@@ -204,15 +204,15 @@ div
     //- money input
     v-text-field(
       v-else-if="['money'].indexOf(dataField.type) > -1"
-      :name="name"
       v-money="money"
       v-model='model'
       v-bind='dataField'
+      v-validate="validationRules"
+      :name="name"
       :readonly="readonly"
       :label="$t(dataField.label)"
       :placeholder="$t(dataField.placeholder)"
       :type="dataField.type"
-      v-validate="validationRules"
       :error="isError"
       :error-messages="errorMessage")
 
@@ -333,6 +333,13 @@ export default {
       } else if (this.model) {
         this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
       }
+    },
+    value(val) {
+      this.emitError({ isError: !val });
+
+      if (["select", "select2"].includes(this.dataField.type) && this.model) {
+        this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
+      }
     }
   },
   computed: {
@@ -427,9 +434,9 @@ export default {
       this.model = `${config.api}Files/${this.resource}/download/${filename}`;
     },
     getDropzoneOptions(field, model) {
-      const uploadUrl =
-        `${this.$store.state.config.api}${this.dataField.uploadUrl}` ||
-        `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`;
+      const uploadUrl = this.dataField.uploadUrl
+        ? `${this.$store.state.config.api}${this.dataField.uploadUrl}`
+        : `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`;
 
       return {
         url: `${uploadUrl}`,
@@ -490,8 +497,7 @@ export default {
         this.loading = false;
       } catch (e) {
         this.loading = false;
-
-        Promise.reject(e);
+        throw e;
       }
     },
     populateAutocompleteChoices: function(val) {

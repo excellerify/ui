@@ -5,119 +5,123 @@ v-flex(xs12)
     icon="warning",
     :value="true") {{error.message}}
 
-  v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs12, style="margin-bottom: 15px")
-    v-expansion-panel
-      v-expansion-panel-content
-        div(slot="header")
-          v-icon search
-          span SEARCH
-        v-card(style="padding: 0 25px")
-          v-carrd-text
-            v-form.row.jr(
-              v-if="filters.fields",
-              v-model='filters.model',
-              :inline='true',
-              :FormFields='filters.fields',
-              :autoSubmit='true'
-              @submit='doSearch',
-              submitButtonText='Search',
-              submitButtonIcon='search')
+  v-layout
+    v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs8, sm8, md10, style="margin-bottom: 15px")
+      v-expansion-panel
+        v-expansion-panel-content
+          div(slot="header")
+            v-icon search
+            span SEARCH
+          v-card(style="padding: 0 25px")
+            v-carrd-text
+              v-form.row.jr(
+                v-if="filters.fields",
+                v-model='filters.model',
+                :inline='true',
+                :formFields='filters.fields',
+                :autoSubmit='true'
+                @submit='doSearch',
+                submitButtonText='Search',
+                submitButtonIcon='search')
 
-  v-card
-    div
-      v-btn(
+    v-flex(xs4, sm4, md2)
+      v-btn.green.right(
         v-if="options.create && !readonly"
-        class="green"
         @click.native="onCreate"
-        router, fab, absolute, top, right, dark)
+        router, dark, fab, small)
         v-icon add
+      v-btn.red.right(
+        v-if="options.create && !readonly"
+        @click.native=""
+        router, dark, fab, small)
+        v-icon delete
 
-      v-data-table(
-        v-model="selected"
-        class="elevation-1"
-        :headers="columns",
-        :items='items',
-        :total-items="pagination.totalItems",
-        :pagination.sync="pagination",
-        :loading="loading")
+  v-data-table(
+    v-model="selected"
+    class="elevation-1"
+    :headers="columns",
+    :items='items',
+    :total-items="pagination.totalItems",
+    :pagination.sync="pagination",
+    :loading="loading")
 
-        template(slot="headers" slot-scope="props")
-          tr
-            th
-              v-checkbox(
-                primary
-                hide-details
-                @click.native="toggleAll"
-                :input-value="props.all"
-                :indeterminate="props.indeterminate"
-              )
-            th(
-              v-for="header in columns"
-              :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
-              align="left"
-              @click="changeSort(header.value)"
-            )
-              b {{ header.text }}
-              v-icon(small) arrow_upward
-            th Action
+    template(slot="headers" slot-scope="props")
+      tr
+        th
+          v-checkbox(
+            primary
+            hide-details
+            @click.native="toggleAll"
+            :input-value="props.all"
+            :indeterminate="props.indeterminate"
+          )
+        th(
+          v-for="header in columns"
+          :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
+          align="left"
+          @click="changeSort(header.value)"
+        )
+          b {{ header.text }}
+          v-icon(small) arrow_upward
+        th Action
 
-        template(slot="items", slot-scope="props")
-          tr(:active="props.selected" @click="props.selected=!props.selected")
-            td
-              v-checkbox(
-                primary
-                hide-details
-                :input-value="props.selected")
+    template(slot="items", slot-scope="props")
+      tr(:active="props.selected" @click="props.selected=!props.selected")
+        td
+          v-checkbox(
+            primary
+            hide-details
+            :input-value="props.selected")
 
-            td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')"
-              v-for='column in columns')
-              span(v-html="getColumnData(props.item, column)")
+        td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')"
+          v-for='column in columns')
+          span(v-html="getColumnData(props.item, column)")
 
-            td(v-if="!readonly", :width='100', align="center")
-              v-menu(open-on-hover offset-y )
-                v-btn(icon slot="activator")
-                  v-icon more_vert
+        td(v-if="!readonly", :width='100', align="center")
+          v-menu(open-on-hover offset-y )
+            v-btn(icon slot="activator")
+              v-icon more_vert
 
-                v-list
-                  v-list-tile(v-if="options.view && onView", )
-                    v-list-tile-content
-                      v-btn(icon, dark, color="green", @click.native="onView({item:props.item})")
-                        v-icon visibility
+            v-list
+              v-list-tile(v-if="options.view && onView", )
+                v-list-tile-content
+                  v-btn(icon, dark, color="green", @click.native="onView({item:props.item})")
+                    v-icon visibility
 
-                  v-list-tile(v-if="options.update")
-                    v-list-tile-content
-                      v-btn(icon, dark, color="primary", @click.native="onUpdate({item:props.item})")
-                        v-icon edit
+              v-list-tile(v-if="options.update")
+                v-list-tile-content
+                  v-btn(icon, dark, color="primary", @click.native="onUpdate({item:props.item})")
+                    v-icon edit
 
-                  v-list-tile(v-if="options.delete")
-                    v-list-tile-content
-                      v-dialog(id="modal", v-model="deleteModal[props.item.id]", max-width="300px")
-                        v-btn(icon, slot="activator",  color="error")
-                          v-icon delete
-                        v-card
-                          v-toolbar(card dark color="primary")
-                            v-toolbar-title Delete
-                          v-card-text
-                            p(class="text-xs-center") Are you sure?
-                          v-card-actions
-                            v-spacer
-                            v-btn(@click.native="deleteModal = []") No
-                            v-btn(@click.native="remove(props.item.id)") Yes
+              v-list-tile(v-if="options.delete")
+                v-list-tile-content
+                  v-dialog(id="modal", v-model="deleteModal[props.item.id]", max-width="300px")
+                    v-btn(icon, slot="activator",  color="error")
+                      v-icon delete
+                    v-card
+                      v-toolbar(card dark color="primary")
+                        v-toolbar-title Delete
+                      v-card-text
+                        p(class="text-xs-center") Are you sure?
+                      v-card-actions
+                        v-spacer
+                        v-btn(@click.native="deleteModal = []") No
+                        v-btn(@click.native="remove(props.item.id)") Yes
 
-                  v-list-tile(v-if="typeof options.lock === 'object'")
-                    v-list-tile-content
-                      v-btn(icon, @click="lock(props.item)")
-                        v-icon lock
+              v-list-tile(v-if="typeof options.lock === 'object'")
+                v-list-tile-content
+                  v-btn(icon, @click="lock(props.item)")
+                    v-icon lock
 
-                  v-list-tile(v-if="typeof options.custom === 'object'")
-                    v-list-tile-content
-                      v-btn(icon, @click="customAction(options.custom, props.item)")
-                        v-icon {{options.custom.icon}}
+              v-list-tile(v-if="typeof options.custom === 'object'")
+                v-list-tile-content
+                  v-btn(icon, @click="customAction(options.custom, props.item)")
+                    v-icon {{options.custom.icon}}
 
-        template(slot="no-data")
-          tr
-            td(:colspan="2 + columns.length", align="center")
-              span Sorry, nothing to display here :(
+    template(slot="no-data")
+      tr
+        td(:colspan="2 + columns.length", align="center")
+          span Sorry, nothing to display here :(
 </template>
 
 <script>
