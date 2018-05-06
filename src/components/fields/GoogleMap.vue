@@ -18,8 +18,8 @@ v-layout(row wrap style="margin-bottom:26px")
       style="width: 100%; height: 200px"
     )
       gmap-marker(
-        :key="index"
         v-for="(m, index) in markers"
+        :key="index"
         :position="m.position"
         :clickable="true"
         :draggable="!readonly"
@@ -29,12 +29,18 @@ v-layout(row wrap style="margin-bottom:26px")
 </template>
 
 <script>
+const jakartaLocation = {
+  lat: -6.121435,
+  lng: 106.774124
+};
 export default {
   props: {
     value: {
       type: Object,
       required: false,
-      default: {}
+      default: function() {
+        return jakartaLocation;
+      }
     },
     name: {
       type: String,
@@ -55,18 +61,36 @@ export default {
     return {
       geocoder: new google.maps.Geocoder(),
       center: {
-        lat: this.value.latitude || -6.121435,
-        lng: this.value.longitude || 106.774124
+        lat: this.value.lat || jakartaLocation.lat,
+        lng: this.value.lng || jakartaLocation.lng
       },
       markers: [
         {
           position: {
-            lat: this.value.latitude || -6.121435,
-            lng: this.value.longitude || 106.774124
+            lat: this.value.lat || jakartaLocation.lat,
+            lng: this.value.lng || jakartaLocation.lng
           }
         }
       ]
     };
+  },
+  watch: {
+    value(val) {
+      if (val) {
+        this.center = {
+          lat: val.lat || jakartaLocation.lat,
+          lng: val.lng || jakartaLocation.lng
+        };
+        this.markers = [
+          {
+            position: {
+              lat: val.lat || jakartaLocation.lat,
+              lng: val.lng || jakartaLocation.lng
+            }
+          }
+        ];
+      }
+    }
   },
   computed: {
     model: {
@@ -98,8 +122,8 @@ export default {
                 text: place.formatted_address,
                 titleAddress: place.address_components[0].long_name,
                 address: place.formatted_address,
-                latitude: location.lat,
-                longitude: location.lng
+                lat: location.lat,
+                lng: location.lng
               };
             }
           }
@@ -117,8 +141,8 @@ export default {
           titleAddress: place.name,
           address: place.formatted_address,
           text: `${place.formatted_address}`,
-          latitude: location.lat,
-          longitude: location.lng
+          lat: location.lat,
+          lng: location.lng
         };
 
         this.markers = [{ position: location }];

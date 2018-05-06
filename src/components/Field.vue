@@ -168,7 +168,7 @@ div
           :readonly="readonly"
           :onCreate="onGridCreate"
           :onUpdate="onGridUpdate")
-
+      v-spacer
         v-dialog(v-model="isShowDialogForm", max-width="60%")
           v-card(v-if="isShowDialogForm")
             v-toolbar(style="flex: 0 0 auto;", dark, class="primary")
@@ -178,10 +178,9 @@ div
             v-spacer
             v-card-text
               v-form(
-                v-bind="$data"
                 type="subForm"
                 :parentData="parentData"
-                :id="currentItem ? currentItem.id.id : null"
+                :id="currentItem ? currentItem.id : null"
                 :resource="dataField.model || name"
                 @success="modalSubFormClose")
 
@@ -337,7 +336,11 @@ export default {
     value(val) {
       this.emitError({ isError: !val });
 
-      if (["select", "select2"].includes(this.dataField.type) && this.model) {
+      if (
+        ["select", "select2"].includes(this.dataField.type) &&
+        this.dataField.dataSource &&
+        this.model
+      ) {
         this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
       }
     }
@@ -456,16 +459,18 @@ export default {
         }
       };
     },
-    onGridCreate: function() {
-      this.$emit("onUpsert", { subForm: true, cb: this.onGridUpsertCb });
+    onGridCreate() {
+      this.prepareGridSubFormData();
     },
-    onGridUpdate: function({ item }) {
-      this.$emit("onUpsert", { subForm: true, cb: this.onGridUpsertCb });
+    onGridUpdate({ item }) {
       this.currentItem = item;
+      this.prepareGridSubFormData();
     },
-    onGridUpsertCb: function(parentData) {
-      this.parentData = {};
-      this.parentData[this.resource] = parentData;
+    prepareGridSubFormData() {
+      this.parentData[this.resource] = {
+        id: this.resourceId
+      };
+
       this.isShowDialogForm = true;
     },
     modalSubFormClose() {

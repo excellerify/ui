@@ -13,9 +13,9 @@ div.card
             v-btn(dark, class="grey", @click.native="$root.back()")
               v-icon(dark, left) chevron_left
               span {{$t('Back')}}
-            v-btn.orange(dark, @click.native="$root.back()") {{$t('Save as Draft')}}
+            v-btn.orange(v-if="isCreate" dark, @click.native="$root.back()") {{$t('Save as Draft')}}
               v-icon(dark, right) save
-            v-btn(color="primary", dark, type='submit') {{$t('Submit')}}
+            v-btn(color="primary", dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
               v-icon(right, dark) send
 </template>
 
@@ -33,6 +33,9 @@ export default {
     },
     subResource() {
       return this.$route.params.subResource;
+    },
+    isCreate() {
+      return !this.id;
     },
     isEdit() {
       return !!this.id;

@@ -13,7 +13,7 @@ v-flex(xs12)
             v-icon search
             span SEARCH
           v-card(style="padding: 0 25px")
-            v-carrd-text
+            v-card-text
               v-form.row.jr(
                 v-if="filters.fields",
                 v-model='filters.model',
@@ -41,7 +41,7 @@ v-flex(xs12)
           v-icon delete
         span Delete selected {{resource}}
 
-      v-tooltip(bottom, v-if="options.create && !readonly")
+      v-tooltip(bottom, v-if="onDraft")
         v-btn.amber.right(
           slot="activator"
           @click.native="onDraft"
@@ -200,7 +200,7 @@ export default {
     },
     onDraft: {
       type: Function,
-      required: true
+      required: false
     },
     onUpdate: {
       type: Function,

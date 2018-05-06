@@ -33,7 +33,7 @@ div
           @fieldError='updateFieldsError'
           v-model='model[name]'
           :inline="inline"
-          :resourceId="id"
+          :resourceId="model.id"
           :key="name"
           :name='field.label'
           :field='field'
@@ -50,7 +50,7 @@ div
 
     v-layout(column, wrap, v-else-if='formType === "wizard"')
       v-stepper(v-model="wizardData.wizardStep" vertical :non-linear="isView || isEdit")
-        template(v-for='(wizard, index) in wizardData.wizardContent')
+        template(v-for='(wizard, index) in getWizardContent')
           v-stepper-step(
             :step="index + 1"
             :keys="index"
@@ -71,7 +71,7 @@ div
                   :value='model[field.name]'
                   :wizardIndex='index'
                   :inline="inline"
-                  :resourceId="id"
+                  :resourceId="model.id"
                   :key="field.name"
                   :name='field.label'
                   :field='field'
@@ -225,18 +225,42 @@ export default {
       }
     },
     getFields() {
-      return this.filterFieldByMode(this.dataFormFields);
+      return this.filteredFields();
+    },
+    getWizardContent() {
+      if (this.formType === "wizard") {
+        const wizardContent = this._.chain(this.filteredFields())
+          .map((currentItem, key) => {
+            // transform object key into property name,
+            // to make fields can be stored in array
+            currentItem.name = key;
+            return currentItem;
+          })
+          .groupBy("wizardStepTitle")
+          .toPairs()
+          .map(currentItem => {
+            let title =
+              currentItem[0] != "undefined" ? currentItem[0] : "Final Step";
+
+            return {
+              wizardTitle: title,
+              fields: currentItem[1]
+            };
+          })
+          .orderBy("wizardTitle")
+          .value();
+
+        this.wizardData.wizardContent = wizardContent;
+
+        return wizardContent;
+      }
+
+      return [];
     }
   },
   watch: {
     value(val) {
       this.model = val;
-    },
-    model: {
-      handler: function(val) {
-        this.dataFormFields = this.filterFieldOptionalsOn();
-      },
-      deep: true
     },
     $route() {
       this.fieldErrors = [];
@@ -258,13 +282,10 @@ export default {
           await this.fetchFormSchema();
         }
 
-        this.dataFormFields = this.filterFieldByMode(this.dataFormFields);
-        this.dataFormFields = this.filterFieldOptionalsOn();
-
         if (this.type === "subForm" && this.parentData) {
           // resolve parent FK
           this._.forEach(
-            this.dataFormFields,
+            this.filteredFields(),
             function(val, key) {
               // if field is marked as FK, resolve FK data
               if (val.fk) {
@@ -290,9 +311,13 @@ export default {
         throw e;
       }
     },
-    filterFieldByMode(fields) {
+    filteredFields() {
+      if (!this.dataFormFields) return;
+
+      const fields = Object.assign(this.dataFormFields);
+
       // Show only available mode
-      return this._.pickBy(fields, (val, key) => {
+      let result = this._.pickBy(fields, (val, key) => {
         if (val.mode) {
           if (this.isEdit) {
             return val.mode.indexOf("isEdit") > -1;
@@ -305,11 +330,12 @@ export default {
 
         return true;
       });
-    },
-    filterFieldOptionalsOn() {
-      const filteredField = this._.pickBy(this.formFields, (val, key) => {
+
+      result = this._.pickBy(result, (val, key) => {
         if (val.optionalsOn) {
           let isShow = false;
+          debugger;
+          console.log(val);
 
           val.optionalsOn.map(optional => {
             isShow =
@@ -326,48 +352,23 @@ export default {
         return true;
       });
 
-      return filteredField;
+      return result;
     },
+
     fetchFormSchema: async function() {
       try {
         const data = await this.$store.dispatch("fetchFormSchema", {
-          id: this.id,
+          id: this.model ? this.model.id : this.id,
           resource: `${this.resource}`,
           subResource: `${this.subResource || "form"}`
         });
 
-        this.formFields = data.fields;
+        this.dataFormFields = data.fields;
         this.model = data.model || {};
         this.rules = data.rules || {};
 
         if (this.isCreate) {
           this.formType = data.type || this.formType;
-        }
-
-        if (this.formType === "wizard") {
-          const fields = this.filterFieldByMode(data.fields);
-          const wizardContent = this._.chain(fields)
-            .map((currentItem, key) => {
-              // transform object key into property name,
-              // to make fields can be stored in array
-              currentItem.name = key;
-              return currentItem;
-            })
-            .groupBy("wizardStepTitle")
-            .toPairs()
-            .map(currentItem => {
-              let title =
-                currentItem[0] != "undefined" ? currentItem[0] : "Final Step";
-
-              return {
-                wizardTitle: title,
-                fields: currentItem[1]
-              };
-            })
-            .orderBy("wizardTitle")
-            .value();
-
-          this.wizardData = { wizardContent };
         }
 
         return data;
@@ -408,8 +409,8 @@ export default {
           this.$emit("success", result.data);
         }
 
-        this.id = result.data.id;
         this.model = result.data;
+        this.model.id = result.data.id;
 
         if (cb) {
           cb(result.data);
@@ -464,8 +465,8 @@ export default {
           this.model
         );
 
-        this.id = result.data.id;
         this.model = result.data;
+        this.model.id = result.data.id;
 
         this.wizardData.wizardStep = index + 2;
         this.formErrors = [];
