@@ -95,14 +95,12 @@ div
         ul.px-3
           li(v-for='error in formErrors') {{error.message}}
 
-      div(slot="buttons", class="my-4")
-          v-btn.grey(dark, @click.native="$root.back()")
-            v-icon(dark, left) chevron_left
-            span {{$t('Cancel')}}
-          v-btn.amber(dark, @click.native="$root.back()") {{$t('Save as Draft')}}
-            v-icon(dark, right) save
-          v-btn.blue(dark, type='submit') {{$t(submitButtonText)}}
-            v-icon(right, dark) {{submitButtonIcon}}
+      slot(name="buttons", class="my-4")
+        v-btn.grey(dark, @click.native="$root.back()")
+          v-icon(dark, left) chevron_left
+          span {{$t('Cancel')}}
+        v-btn.blue(dark, type='submit') {{$t(submitButtonText)}}
+          v-icon(right, dark) {{submitButtonIcon}}
 
 </template>
 
