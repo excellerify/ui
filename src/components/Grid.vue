@@ -36,7 +36,7 @@ v-flex(xs12)
       v-tooltip(bottom, v-if="options.create && !readonly")
         v-btn.red.right(
           slot="activator"
-          @click.native=""
+          @click.native="onDeleteBulk"
           router, dark, fab, small)
           v-icon delete
         span Delete selected {{resource}}
@@ -444,6 +444,15 @@ export default {
     remove: async function(itemId) {
       await this.$http.delete(`${this.resource}/${itemId}`);
       this.refresh();
+    },
+    onDeleteBulk: async function() {
+      if (this.selected.length > 0) {
+        const itemIds = this.selected.map(item => item.id);
+        await this.$http.delete(
+          `${this.resource}/multi/${JSON.stringify(itemIds)}`
+        );
+        this.refresh();
+      }
     },
     next() {
       this.pagination.page++;
