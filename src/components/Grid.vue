@@ -25,21 +25,29 @@ v-flex(xs12)
                 submitButtonIcon='search')
 
     v-flex(xs4, sm4, md2)
-      v-btn.green.right(
-        v-if="options.create && !readonly"
-        @click.native="onCreate"
-        router, dark, fab, small)
-        v-icon add
-      v-btn.red.right(
-        v-if="options.create && !readonly"
-        @click.native=""
-        router, dark, fab, small)
-        v-icon delete
-      v-btn.amber.right(
-        v-if="options.create && !readonly"
-        @click.native="onDraft"
-        router, dark, fab, small)
-        v-icon folder_open
+      v-tooltip(bottom, v-if="options.create && !readonly")
+        v-btn.green.right(
+          slot="activator"
+          @click.native="onCreate"
+          router, dark, fab, small)
+          v-icon add
+        span Add new {{resource}}
+
+      v-tooltip(bottom, v-if="options.create && !readonly")
+        v-btn.red.right(
+          slot="activator"
+          @click.native=""
+          router, dark, fab, small)
+          v-icon delete
+        span Delete selected {{resource}}
+
+      v-tooltip(bottom, v-if="options.create && !readonly")
+        v-btn.amber.right(
+          slot="activator"
+          @click.native="onDraft"
+          router, dark, fab, small)
+          v-icon folder_open
+        span Open saved draft
 
   v-data-table(
     v-model="selected"
