@@ -84,10 +84,10 @@ div
                     li(v-for='error in getWizardStepError(index)') {{error.message}}
 
               v-card-actions
-                v-btn(v-if="index > 0", @click.native="wizardData.wizardStep = index ")
+                v-btn(v-if="index > 0", @click.native="wizardData.wizardStep -= 1 ")
                   v-icon(left) chevron_left
                   span Back
-                v-btn(color="primary" @click.native="onWizardContinue({index})")
+                v-btn(v-if="wizardData.wizardStep < getWizardContent.length" color="primary" @click.native="onWizardContinue({index})")
                   span Continue
                   v-icon(dark, left) chevron_right
 
@@ -334,8 +334,6 @@ export default {
       result = this._.pickBy(result, (val, key) => {
         if (val.optionalsOn) {
           let isShow = false;
-          debugger;
-          console.log(val);
 
           val.optionalsOn.map(optional => {
             isShow =

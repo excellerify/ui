@@ -12,7 +12,7 @@ div.card
           div(slot="buttons", class="my-4")
             v-btn(dark, class="grey", @click.native="$root.back()")
               v-icon(dark, left) chevron_left
-              span {{$t('Back')}}
+              span {{$t('Cancel')}}
             v-btn.orange(v-if="isCreate" dark, @click.native="$root.back()") {{$t('Save as Draft')}}
               v-icon(dark, right) save
             v-btn(color="primary", dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
