@@ -35,6 +35,11 @@ v-flex(xs12)
         @click.native=""
         router, dark, fab, small)
         v-icon delete
+      v-btn.amber.right(
+        v-if="options.create && !readonly"
+        @click.native="onDraft"
+        router, dark, fab, small)
+        v-icon folder_open
 
   v-data-table(
     v-model="selected"
@@ -182,6 +187,10 @@ export default {
       type: String
     },
     onCreate: {
+      type: Function,
+      required: true
+    },
+    onDraft: {
       type: Function,
       required: true
     },

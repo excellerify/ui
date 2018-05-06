@@ -13,8 +13,8 @@ function route(path, file, name, children = null, requiresAuth = true) {
     children,
     component,
     meta: {
-      requiresAuth: requiresAuth || false,
-    },
+      requiresAuth: requiresAuth || false
+    }
   };
 }
 
@@ -40,40 +40,29 @@ const router = new Router({
         route('/crud/:resource/create', 'FormPage', 'create'),
         route('/crud/:resource/:id/:action', 'FormPage', 'action'),
         route('/crud/:resource/:action', 'FormPage', 'indexAction'),
-        route(
-          '/crud/:resource/:subResource/:id/edit',
-          'FormPage',
-          'customActionForm',
-        ),
-        route(
-          '/crud/:resource/:subResource/:id',
-          'GridPage',
-          'customActionGrid',
-        ),
-        route('/settings', 'Settings', 'settings'),
+        route('/crud/:resource/:subResource/:id/edit', 'FormPage', 'customActionForm'),
+        route('/crud/:resource/:subResource/:id', 'GridPage', 'customActionGrid'),
+        route('/settings', 'Settings', 'settings')
       ],
-      true,
+      true
     ),
 
     // Global redirect for 404
     {
       path: '*',
       redirect: '/error',
-      query: { code: 404, message: 'Page Not Found.' },
-    },
-  ],
+      query: { code: 404, message: 'Page Not Found.' }
+    }
+  ]
 });
 
 router.beforeEach((to, from, next) => {
-  if (
-    to.matched.some(record => record.meta.requiresAuth) &&
-    !global.helper.ls.get('token')
-  ) {
+  if (to.matched.some(record => record.meta.requiresAuth) && !global.helper.ls.get('token')) {
     next({
       path: '/login',
       query: {
-        redirect: to.fullPath,
-      },
+        redirect: to.fullPath
+      }
     });
   } else {
     global.store.dispatch('checkPageTitle', { path: to.path });
@@ -82,8 +71,15 @@ router.beforeEach((to, from, next) => {
       ga('set', 'page', to.path);
       ga('send', 'pageview');
     }
+
+    global.store.commit('setGlobalLoading', { isLoading: true });
+
     next();
   }
+});
+
+router.afterEach(() => {
+  setTimeout(() => global.store.commit('setGlobalLoading', { isLoading: false }), 1000);
 });
 
 export default router;

@@ -6,6 +6,10 @@ const store = {
     pageTitle: 'Home',
     menu,
     config,
+    globalLoading: false
+  },
+  getters: {
+    getGlobalLoading: state => state.globalLoading
   },
   mutations: {
     setMenu(state, data) {
@@ -14,6 +18,9 @@ const store = {
     setPageTitle(state, data) {
       state.pageTitle = data;
     },
+    setGlobalLoading(state, { isLoading }) {
+      state.globalLoading = isLoading;
+    }
   },
   actions: {
     async checkPageTitle({ commit, state }, { path, action }) {
@@ -23,8 +30,8 @@ const store = {
           commit('setPageTitle', `${state.menu[k].title} ${action || ''}`);
         }
       });
-    },
-  },
+    }
+  }
 };
 
 export default store;
