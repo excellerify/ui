@@ -1,6 +1,5 @@
 <template lang="pug">
 div
-  span {{dataField.required}}
   div(v-if="readonly && ['table', 'map', 'select'].indexOf(dataField.type) === -1")
     v-text-field(
       :label="dataField.label"
