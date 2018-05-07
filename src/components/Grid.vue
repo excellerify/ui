@@ -6,7 +6,7 @@ v-flex(xs12)
     :value="true") {{error.message}}
 
   v-layout
-    v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs8, sm8, md10, style="margin-bottom: 15px")
+    v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs8, sm8, md9, style="margin-bottom: 15px")
       v-expansion-panel
         v-expansion-panel-content
           div(slot="header")
@@ -24,7 +24,7 @@ v-flex(xs12)
                 submitButtonText='Search',
                 submitButtonIcon='search')
 
-    v-flex(xs4, sm4, md2)
+    v-flex(xs4, sm4, md3)
       v-tooltip(bottom, v-if="options.create && !readonly")
         v-btn.green.right(
           slot="activator"
@@ -39,6 +39,7 @@ v-flex(xs12)
           @click.native="onDeleteBulk"
           router, dark, fab, small)
           v-icon delete
+
         span Delete selected {{resource}}
 
       v-tooltip(bottom, v-if="onDraft")

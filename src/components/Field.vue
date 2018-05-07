@@ -1,5 +1,6 @@
 <template lang="pug">
 div
+  span {{dataField.required}}
   div(v-if="readonly && ['table', 'map', 'select'].indexOf(dataField.type) === -1")
     v-text-field(
       :label="dataField.label"
@@ -334,7 +335,8 @@ export default {
       }
     },
     value(val) {
-      this.emitError({ isError: !val });
+      const isError = this.dataField.required && !val;
+      this.emitError({ isError });
 
       if (
         ["select", "select2"].includes(this.dataField.type) &&
