@@ -26,7 +26,7 @@ v-flex(xs12)
 
     v-flex(xs4, sm4, md3)
       v-tooltip(bottom, v-if="options.create && !readonly")
-        v-btn.green.right(
+        v-btn.green(
           slot="activator"
           @click.native="onCreate"
           router, dark, fab, small)
@@ -34,7 +34,7 @@ v-flex(xs12)
         span Add new {{resource}}
 
       v-tooltip(bottom, v-if="options.create && !readonly")
-        v-btn.red.right(
+        v-btn.red(
           slot="activator"
           @click.native="onDeleteBulk"
           router, dark, fab, small)
@@ -43,7 +43,7 @@ v-flex(xs12)
         span Delete selected {{resource}}
 
       v-tooltip(bottom, v-if="onDraft")
-        v-btn.amber.right(
+        v-btn.amber(
           slot="activator"
           @click.native="onDraft"
           router, dark, fab, small)
@@ -198,10 +198,6 @@ export default {
     onCreate: {
       type: Function,
       required: true
-    },
-    onDraft: {
-      type: Function,
-      required: false
     },
     onUpdate: {
       type: Function,
@@ -445,6 +441,33 @@ export default {
     remove: async function(itemId) {
       await this.$http.delete(`${this.resource}/${itemId}`);
       this.refresh();
+    },
+    onDraft: async function() {
+      try {
+        this.preFetch();
+
+        const result = await this.$http.get(`${this.resource}/draft`, {
+          params: this.$route.query
+        });
+
+        if (result.data.items) {
+          this.items = result.data.items;
+          this.pagination.totalItems = parseInt(result.data.totalCount);
+        } else {
+          this.items = result.data;
+          this.pagination.totalItems = parseInt(
+            result.headers["x-total-count"]
+          );
+        }
+
+        return {
+          items: this.items,
+          count: this.pagination.totalItems
+        };
+      } catch (err) {
+        this.error = err;
+        return err;
+      }
     },
     onDeleteBulk: async function() {
       if (this.selected.length > 0) {
