@@ -218,34 +218,34 @@ div
     //- default input
     v-text-field(
       v-else,
-      :name="name"
       v-model.lazy='model'
       v-bind='dataField'
+      v-validate="validationRules"
+      :name="name"
       :readonly="readonly"
       :label="$t(dataField.label)"
       :placeholder="$t(dataField.placeholder)"
       :type="dataField.type"
       :multiLine="dataField.type == 'textarea'"
-      v-validate="validationRules"
       :error="isError"
       :error-messages="errorMessage")
 
 </template>
 
 <script>
-import { VMoney } from "v-money";
-import randomstring from "randomstring";
-import moment, { now } from "moment";
-import EventBus from "../eventBus.js";
-import config from "../config";
+import { VMoney } from 'v-money';
+import randomstring from 'randomstring';
+import moment, { now } from 'moment';
+import EventBus from '../eventBus.js';
+import config from '../config';
 
-import "vue2-dropzone/dist/vue2Dropzone.css";
+import 'vue2-dropzone/dist/vue2Dropzone.css';
 
 export default {
   props: {
     resourceId: {
       type: String,
-      default: "00000000-0000-0000-0000-000000000000"
+      default: '00000000-0000-0000-0000-000000000000'
     },
     field: {
       type: Object,
@@ -276,16 +276,16 @@ export default {
   },
   data() {
     return {
-      inputGroupClass: "input-group input-group--dirty input-group--text-field",
+      inputGroupClass: 'input-group input-group--dirty input-group--text-field',
       editorOption: {
         modules: {
           toolbar: [
-            ["bold", "italic", "underline", "strike"], // toggled buttons
+            ['bold', 'italic', 'underline', 'strike'], // toggled buttons
             [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            ["blockquote", "code-block"],
+            ['blockquote', 'code-block'],
             [{ header: 1 }, { header: 2 }], // custom button values
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ indent: "-1" }, { indent: "+1" }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }],
             [{ align: [] }]
           ]
         }
@@ -299,9 +299,9 @@ export default {
       currentItem: null,
       parentData: {},
       money: {
-        decimal: ".",
-        thousands: ",",
-        precision: 2,
+        decimal: '.',
+        thousands: ',',
+        precision: 0,
         masked: false /* doesn't work with directive */
       },
       loading: false,
@@ -314,14 +314,14 @@ export default {
     };
   },
   watch: {
-    "errors.items": {
+    'errors.items': {
       handler(val) {
         this.isError = val.length > 0;
         this.errorMessage = this.isError ? val[0].msg : [];
 
         this.emitError({
           isError: this.isError,
-          msg: val.length > 0 ? val[0].msg : ""
+          msg: val.length > 0 ? val[0].msg : ''
         });
       },
       deep: true
@@ -338,7 +338,7 @@ export default {
       this.emitError({ isError });
 
       if (
-        ["select", "select2"].includes(this.dataField.type) &&
+        ['select', 'select2'].includes(this.dataField.type) &&
         this.dataField.dataSource &&
         this.model
       ) {
@@ -353,21 +353,21 @@ export default {
     model: {
       get() {
         const formatDate = date => {
-          return date ? moment(String(date)).format("YYYY-MM-DD") : null;
+          return date ? moment(String(date)).format('YYYY-MM-DD') : null;
         };
 
         const formatTime = date => {
-          return date ? moment(String(date)).format("HH:mm") : null;
+          return date ? moment(String(date)).format('HH:mm') : null;
         };
 
-        if (["date"].indexOf(this.dataField.type) > -1) {
+        if (['date'].indexOf(this.dataField.type) > -1) {
           const date = formatDate(this.value);
           return { date };
         }
-        if (["time"].indexOf(this.dataField.type) > -1) {
+        if (['time'].indexOf(this.dataField.type) > -1) {
           const time = formatTime(this.value);
           return { time };
-        } else if (["datetime"].indexOf(this.dataField.type) > -1) {
+        } else if (['datetime'].indexOf(this.dataField.type) > -1) {
           const date = formatDate(this.value);
           const time = formatTime(this.value);
 
@@ -377,31 +377,26 @@ export default {
         return this.value;
       },
       set(val) {
-        if (["money"].indexOf(this.dataField.type) > -1) {
-          val = Number(val.replace(/[^0-9\.-]+/g, ""));
-        } else if (["datetime"].indexOf(this.dataField.type) > -1) {
+        if (['money'].indexOf(this.dataField.type) > -1) {
+          val = Number(val.replace(/[^0-9\.-]+/g, ''));
+        } else if (['datetime'].indexOf(this.dataField.type) > -1) {
           const { date, time } = val;
-          const dateTime = moment(
-            `${date || "0000-00-00"} ${time || "00:00"}`,
-            "YYYY-MM-DD HH:mm"
-          );
+          const dateTime = moment(`${date || '0000-00-00'} ${time || '00:00'}`, 'YYYY-MM-DD HH:mm');
 
-          return this.$emit("input", dateTime.toDate());
-        } else if (["time"].indexOf(this.dataField.type) > -1) {
-          return this.$emit("input", val.time);
-        } else if (["date"].indexOf(this.dataField.type) > -1) {
-          return this.$emit("input", val.date);
+          return this.$emit('input', dateTime.toDate());
+        } else if (['time'].indexOf(this.dataField.type) > -1) {
+          return this.$emit('input', val.time);
+        } else if (['date'].indexOf(this.dataField.type) > -1) {
+          return this.$emit('input', val.date);
         }
 
-        return this.$emit("input", val);
+        return this.$emit('input', val);
       }
     },
     validationRules() {
       const rules = {
         required: !!this.dataField.required,
-        email: this.dataField.type
-          ? this.dataField.type.toLowerCase() === "email"
-          : false
+        email: this.dataField.type ? this.dataField.type.toLowerCase() === 'email' : false
       };
 
       return rules;
@@ -409,23 +404,19 @@ export default {
   },
   methods: {
     emitError({ isError, msg } = {}) {
-      this.$emit("fieldError", {
+      this.$emit('fieldError', {
         field: this.name,
         wizardIndex: this.wizardIndex,
         isError,
-        message: isError
-          ? msg || `The ${this.dataField.label} field is required.`
-          : []
+        message: isError ? msg || `The ${this.dataField.label} field is required.` : []
       });
     },
     onUploading(file, xhr, formData) {
-      const extension = file.name.split(".");
+      const extension = file.name.split('.');
 
-      formData.append("id", this.resourceId);
+      formData.append('id', this.resourceId);
 
-      file.upload.filename = `${randomstring.generate()}.${
-        extension[extension.length - 1]
-      }`;
+      file.upload.filename = `${randomstring.generate()}.${extension[extension.length - 1]}`;
     },
     onUploadSuccess(file, response) {
       if (response.url) {
@@ -447,12 +438,12 @@ export default {
         thumbnailWidth: 150,
         maxFilesize: 1024,
         acceptedFileTypes: field.acceptedFileTypes,
-        id: "dropzone_" + this.name,
+        id: 'dropzone_' + this.name,
         createThumbnailFromUrl: model,
         uploadMultiple: false,
         maxFiles: 1,
         init: function() {
-          this.on("addedfile", function(file) {
+          this.on('addedfile', function(file) {
             if (this.files.length > 1) {
               this.removeFile(this.files[0]);
             }
@@ -476,26 +467,22 @@ export default {
     },
     modalSubFormClose() {
       this.isShowDialogForm = false;
-      this.$emit("refresh");
-      EventBus.$emit("gridRefresh");
+      this.$emit('refresh');
+      EventBus.$emit('gridRefresh');
     },
     onAutoCompleteSync: async function(val) {
       try {
         this.loading = true;
 
-        const data = await this.$store.dispatch("fetchAutoComplete", {
+        const data = await this.$store.dispatch('fetchAutoComplete', {
           dataSource: this.dataField.dataSource,
           searchVal: val
         });
 
         if (data.length > 0) {
-          this.dataField.choices = data.map(val =>
-            this.populateAutocompleteChoices(val)
-          );
+          this.dataField.choices = data.map(val => this.populateAutocompleteChoices(val));
         } else if (this.model) {
-          this.dataField.choices = [
-            this.populateAutocompleteChoices(this.model)
-          ];
+          this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
         } else {
           this.dataField.choices = null;
         }
@@ -507,13 +494,13 @@ export default {
       }
     },
     populateAutocompleteChoices: function(val) {
-      let choice = "";
+      let choice = '';
 
       this.dataField.dataSource.searchParams.map((param, key) => {
         choice += val[param];
 
         if (key != this.dataField.dataSource.searchParams.length - 1) {
-          choice += " - ";
+          choice += ' - ';
         }
       });
 
@@ -525,31 +512,31 @@ export default {
       this.dataField.required &&
       !this.value &&
       ![
-        "file",
-        "pdf",
-        "image",
-        "video",
-        "table",
-        "array",
-        "date",
-        "datetime",
-        "time",
-        "hidden",
-        "money",
-        "map"
+        'file',
+        'pdf',
+        'image',
+        'video',
+        'table',
+        'array',
+        'date',
+        'datetime',
+        'time',
+        'hidden',
+        'money',
+        'map'
       ].includes(this.dataField.type)
     ) {
       this.emitError({ isError: true });
     }
 
-    if (["select", "select2"].includes(this.dataField.type) && this.model) {
+    if (['select', 'select2'].includes(this.dataField.type) && this.model) {
       this.dataField.choices = this.dataField.choices || [
         this.populateAutocompleteChoices(this.model)
       ];
     }
   },
   mounted() {
-    if (["image"].includes(this.dataField.type) && this.model) {
+    if (['image'].includes(this.dataField.type) && this.model) {
       var url = `${global.config.api + this.value}`;
       this.$refs.dropzone.manuallyAddFile({}, url);
     }

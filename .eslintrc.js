@@ -7,7 +7,7 @@ module.exports = {
   env: {
     browser: true,
   },
-  extends: ['standard', 'airbnb-base', 'plugin:vue/recommended'],
+  extends: ['standard', 'latest','airbnb-base', 'plugin:vue/recommended'],
   plugins: ['html', 'pug'],
   rules: {
     'linebreak-style': 0,

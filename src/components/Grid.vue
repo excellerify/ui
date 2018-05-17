@@ -6,24 +6,6 @@ v-flex(xs12)
     :value="true") {{error.message}}
 
   v-layout
-    v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs8, sm8, md9, style="margin-bottom: 15px")
-      v-expansion-panel
-        v-expansion-panel-content
-          div(slot="header")
-            v-icon search
-            span SEARCH
-          v-card(style="padding: 0 25px")
-            v-card-text
-              v-form.row.jr(
-                v-if="filters.fields",
-                v-model='filters.model',
-                :inline='true',
-                :formFields='filters.fields',
-                :autoSubmit='true'
-                @submit='doSearch',
-                submitButtonText='Search',
-                submitButtonIcon='search')
-
     v-flex(xs4, sm4, md3)
       v-tooltip(bottom, v-if="options.create && !readonly")
         v-btn.green(
@@ -49,6 +31,24 @@ v-flex(xs12)
           router, dark, fab, small)
           v-icon folder_open
         span Open saved draft
+        
+    v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs8, sm8, md9, style="margin-bottom: 24px")
+      v-expansion-panel
+        v-expansion-panel-content
+          div(slot="header")
+            v-icon search
+            span SEARCH
+          v-card
+            v-card-text
+              v-form.row.jr(
+                v-if="filters.fields",
+                v-model='filters.model',
+                :inline='true',
+                :formFields='filters.fields',
+                :autoSubmit='true'
+                @submit='doSearch',
+                submitButtonText='Search',
+                submitButtonIcon='search')
 
   v-data-table(
     v-model="selected"
@@ -139,11 +139,11 @@ v-flex(xs12)
 </template>
 
 <script>
-import moment from "moment";
-import numeral from "numeral";
+import moment from 'moment';
+import numeral from 'numeral';
 
-import EventBus from "../eventBus.js";
-import config from "../config";
+import EventBus from '../eventBus.js';
+import config from '../config';
 
 const getDefaultData = () => {
   return {
@@ -156,7 +156,7 @@ const getDefaultData = () => {
     columns: [], // fetch grid setup params from server if `columns` is empty
     actions: {},
     options: {
-      sort: "id",
+      sort: 'id',
       create: false,
       update: true,
       delete: false
@@ -164,7 +164,7 @@ const getDefaultData = () => {
     pagination: {
       page: 1,
       rowsPerPage: 10,
-      sortBy: "id",
+      sortBy: 'id',
       descending: true,
       totalItems: 0
     },
@@ -211,19 +211,19 @@ export default {
   data: getDefaultData,
 
   watch: {
-    "$i18n.locale"(val) {
+    '$i18n.locale'(val) {
       this.fetchGrid();
     },
-    "pagination.page"(val) {
+    'pagination.page'(val) {
       this.fetchData();
     },
-    "pagination.sortBy"(val) {
+    'pagination.sortBy'(val) {
       this.fetchData();
     },
-    "pagination.descending"(val) {
+    'pagination.descending'(val) {
       this.fetchData();
     },
-    "$route.params": "refresh",
+    '$route.params': 'refresh',
     pagination: {
       handler(val) {
         if (this.columns.length > 0) {
@@ -270,11 +270,11 @@ export default {
               return;
             }
 
-            if (key.indexOf(".") > -1) {
+            if (key.indexOf('.') > -1) {
               let nestedFilter = {
                 regexp: `/${val}/i`
               };
-              const splitedKey = key.split(".").reverse();
+              const splitedKey = key.split('.').reverse();
 
               this._.map(splitedKey, val => {
                 const prevNestedFilter = Object.assign(nestedFilter);
@@ -286,7 +286,7 @@ export default {
             } else {
               const column = this._.find(this.columns, { value: key });
 
-              if (column && column.type === "date") {
+              if (column && column.type === 'date') {
                 filters[key] = val;
               } else {
                 filters[key] = {
@@ -302,7 +302,7 @@ export default {
       const { sortBy, descending, page, rowsPerPage } = this.pagination;
 
       this.$route.query.filter = {
-        order: sortBy ? [`${sortBy} ${descending ? "DESC" : "ASC"}`] : null,
+        order: sortBy ? [`${sortBy} ${descending ? 'DESC' : 'ASC'}`] : null,
         where: filters,
         limit: rowsPerPage > 0 ? rowsPerPage : 0,
         offset: (page - 1) * rowsPerPage
@@ -328,23 +328,23 @@ export default {
     getColumnData(row, field) {
       let value = row[field.value];
 
-      if (field.type === "image") {
-        const image = value ? global.config.api + value : "static/noimage.png";
+      if (field.type === 'image') {
+        const image = value ? global.config.api + value : 'static/noimage.png';
 
         value = `<div class="avatar grey lighten-4" style="height: 36px; width: 36px;">
           <img src="${image}" alt="avatar">
         </div>`;
-      } else if (field.type === "date") {
-        value = value ? moment(String(value)).format("YYYY-MM-DD") : "";
-      } else if (field.type === "time") {
-        value = value ? moment(String(value)).format("HH:mm") : "";
-      } else if (field.type === "datetime") {
-        value = value ? moment(String(value)).format("YYYY-MM-DD HH:mm") : "";
-      } else if (field.type === "money") {
-        value = value ? numeral(value).format("0,0.0") : 0.0;
+      } else if (field.type === 'date') {
+        value = value ? moment(String(value)).format('YYYY-MM-DD') : '';
+      } else if (field.type === 'time') {
+        value = value ? moment(String(value)).format('HH:mm') : '';
+      } else if (field.type === 'datetime') {
+        value = value ? moment(String(value)).format('YYYY-MM-DD HH:mm') : '';
+      } else if (field.type === 'money') {
+        value = value ? numeral(value).format('0,0') : 0;
       } else {
         // process fields like `type.name`
-        const split = field.value.split(".");
+        const split = field.value.split('.');
 
         if (split.length > 0) {
           value = this._.get(row, field.value);
@@ -370,12 +370,12 @@ export default {
       try {
         this.loading = true;
 
-        const data = await this.$store.dispatch("fetchGridSchema", {
+        const data = await this.$store.dispatch('fetchGridSchema', {
           resource: this.resource,
           filter: this.filters
         });
 
-        if (!Array.isArray(data.columns) && typeof data.columns === "object") {
+        if (!Array.isArray(data.columns) && typeof data.columns === 'object') {
           data.columns = this.convertColumnObjToArray(data.columns);
         }
 
@@ -396,7 +396,7 @@ export default {
         this.options = data.options || {};
 
         if (this.options && this.options.sort) {
-          let sortData = this.options.sort.split("-");
+          let sortData = this.options.sort.split('-');
           let desc = sortData.length > 1;
           let sortField = sortData.pop();
 
@@ -424,9 +424,7 @@ export default {
           this.pagination.totalItems = parseInt(result.data.totalCount);
         } else {
           this.items = result.data;
-          this.pagination.totalItems = parseInt(
-            result.headers["x-total-count"]
-          );
+          this.pagination.totalItems = parseInt(result.headers['x-total-count']);
         }
 
         return {
@@ -455,9 +453,7 @@ export default {
           this.pagination.totalItems = parseInt(result.data.totalCount);
         } else {
           this.items = result.data;
-          this.pagination.totalItems = parseInt(
-            result.headers["x-total-count"]
-          );
+          this.pagination.totalItems = parseInt(result.headers['x-total-count']);
         }
 
         return {
@@ -472,9 +468,7 @@ export default {
     onDeleteBulk: async function() {
       if (this.selected.length > 0) {
         const itemIds = this.selected.map(item => item.id);
-        await this.$http.delete(
-          `${this.resource}/multi/${JSON.stringify(itemIds)}`
-        );
+        await this.$http.delete(`${this.resource}/multi/${JSON.stringify(itemIds)}`);
         this.refresh();
       }
     },
@@ -485,16 +479,16 @@ export default {
       const { resource } = this;
 
       let subResource,
-        name = "customAction";
+        name = 'customAction';
 
-      if (option.type === "form") {
+      if (option.type === 'form') {
         subResource = option.formUrl;
         name = `${name}Form`;
-      } else if (option.type === "grid") {
+      } else if (option.type === 'grid') {
         subResource = option.gridUrl;
         name = `${name}Grid`;
       } else {
-        throw new Error("Invalid action type");
+        throw new Error('Invalid action type');
       }
 
       this.$router.push({
@@ -507,23 +501,21 @@ export default {
         },
         query: {
           action: option.action || subResource,
-          method: option.method || "POST"
+          method: option.method || 'POST'
         }
       });
     }
   },
   computed: {
     totalPages() {
-      return Math.ceil(
-        this.pagination.totalItems / this.pagination.rowsPerPage
-      );
+      return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage);
     }
   },
   async mounted() {
     await this.refresh();
   },
   created() {
-    EventBus.$on("gridRefresh", this.refresh);
+    EventBus.$on('gridRefresh', this.refresh);
   }
 };
 </script>

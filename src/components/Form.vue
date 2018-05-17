@@ -45,7 +45,7 @@ div
 
       v-flex.actions(xs12)
         slot(name='buttons')
-          v-btn.mb-3(color='primary', dark, type='submit') {{$t(submitButtonText)}}
+          v-btn(color='primary', dark, type='submit') {{$t(submitButtonText)}}
             v-icon(right, dark) {{submitButtonIcon}}
 
     v-layout(column, wrap, v-else-if='formType === "wizard"')
@@ -128,12 +128,12 @@ export default {
     submitButtonText: {
       required: false,
       type: String,
-      default: "Submit"
+      default: 'Submit'
     },
     submitButtonIcon: {
       required: false,
       type: String,
-      default: "send"
+      default: 'send'
     },
     value: {
       required: false,
@@ -152,7 +152,7 @@ export default {
     },
     type: {
       type: String,
-      default: "form"
+      default: 'form'
     },
     readonly: {
       type: Boolean,
@@ -164,11 +164,11 @@ export default {
       model: this.value,
       hasError: false,
       formErrors: [],
-      message: "",
+      message: '',
       fieldErrors: [],
       rules: null,
       dataFormFields: null,
-      formType: "simple",
+      formType: 'simple',
       wizardData: {
         wizardStep: 0,
         wizardContent: []
@@ -202,9 +202,7 @@ export default {
       return { parents, children };
     },
     method() {
-      return (
-        this.$route.query.method || (this.isEdit ? "patch" : "post")
-      ).toLowerCase();
+      return (this.$route.query.method || (this.isEdit ? 'patch' : 'post')).toLowerCase();
     },
     isCreate() {
       return !!!this.id;
@@ -228,7 +226,7 @@ export default {
       return this.filteredFields();
     },
     getWizardContent() {
-      if (this.formType === "wizard") {
+      if (this.formType === 'wizard') {
         const wizardContent = this._.chain(this.filteredFields())
           .map((currentItem, key) => {
             // transform object key into property name,
@@ -236,18 +234,17 @@ export default {
             currentItem.name = key;
             return currentItem;
           })
-          .groupBy("wizardStepTitle")
+          .groupBy('wizardStepTitle')
           .toPairs()
           .map(currentItem => {
-            let title =
-              currentItem[0] != "undefined" ? currentItem[0] : "Final Step";
+            let title = currentItem[0] != 'undefined' ? currentItem[0] : 'Final Step';
 
             return {
               wizardTitle: title,
               fields: currentItem[1]
             };
           })
-          .orderBy("wizardTitle")
+          .orderBy('wizardTitle')
           .value();
 
         this.wizardData.wizardContent = wizardContent;
@@ -282,7 +279,7 @@ export default {
           await this.fetchFormSchema();
         }
 
-        if (this.type === "subForm" && this.parentData) {
+        if (this.type === 'subForm' && this.parentData) {
           // resolve parent FK
           this._.forEach(
             this.filteredFields(),
@@ -320,11 +317,11 @@ export default {
       let result = this._.pickBy(fields, (val, key) => {
         if (val.mode) {
           if (this.isEdit) {
-            return val.mode.indexOf("isEdit") > -1;
+            return val.mode.indexOf('isEdit') > -1;
           } else if (this.isView) {
-            return val.mode.indexOf("isView") > -1;
+            return val.mode.indexOf('isView') > -1;
           } else {
-            return val.mode.indexOf("isCreate") > -1;
+            return val.mode.indexOf('isCreate') > -1;
           }
         }
 
@@ -340,8 +337,7 @@ export default {
               !isShow &&
               this.model[optional.property] &&
               (this.model[optional.property] === optional.value ||
-                this.model[optional.property].toLowerCase() ===
-                  optional.value.toLowerCase());
+                this.model[optional.property].toLowerCase() === optional.value.toLowerCase());
           });
 
           return isShow;
@@ -355,10 +351,10 @@ export default {
 
     fetchFormSchema: async function() {
       try {
-        const data = await this.$store.dispatch("fetchFormSchema", {
+        const data = await this.$store.dispatch('fetchFormSchema', {
           id: this.model ? this.model.id : this.id,
           resource: `${this.resource}`,
-          subResource: `${this.subResource || "form"}`
+          subResource: `${this.subResource || 'form'}`
         });
 
         this.dataFormFields = data.fields;
@@ -394,17 +390,17 @@ export default {
           throw this.fieldErrors;
         }
 
-        this.$emit("input", this.model);
+        this.$emit('input', this.model);
 
         if (this.autoSubmit) {
-          this.$emit("submit");
+          this.$emit('submit');
           return;
         }
 
         const result = await this.$http[this.method](this.action, this.model);
 
         if (!subForm) {
-          this.$emit("success", result.data);
+          this.$emit('success', result.data);
         }
 
         this.model = result.data;
@@ -431,7 +427,7 @@ export default {
           this.formErrors = [err];
         }
 
-        this.$emit("error", e);
+        this.$emit('error', e);
       }
     },
     onWizardContinue: async function({ index, cb } = {}) {
@@ -440,9 +436,7 @@ export default {
           cb();
           return;
         }
-        if (
-          this.wizardData.wizardStep >= this.wizardData.wizardContent.length
-        ) {
+        if (this.wizardData.wizardStep >= this.wizardData.wizardContent.length) {
           this.onSubmit();
         }
 
@@ -456,12 +450,9 @@ export default {
           }
         }
 
-        this.$emit("input", this.model);
+        this.$emit('input', this.model);
 
-        const result = await this.$http["post"](
-          `${this.resource}/draft`,
-          this.model
-        );
+        const result = await this.$http['post'](`${this.resource}/draft`, this.model);
 
         this.model = result.data;
         this.model.id = result.data.id;
@@ -486,7 +477,7 @@ export default {
           this.formErrors = [err];
         }
 
-        this.$emit("error", e);
+        this.$emit('error', e);
 
         throw e;
       }
