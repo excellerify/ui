@@ -26,12 +26,14 @@ div
 
     template(v-if='(!groupBy && formType != "wizard") && inline')
       v-layout.row.wrap(style="padding: 8px")
-        v-flex(v-for='(field, name) in getFields' :key="name")
-          v-field.pr-3(
-            @refresh='refresh'
-            @onUpsert='onSubmit'
+        v-flex(v-for='(field, name, index) in getFields' :key="name")
+          v-field(
+            v-bind:class="{'pr-3': index != Object.keys(getFields).length-1}"
+            @refresh="refresh"
+            @onUpsert="onSubmit"
             @fieldError='updateFieldsError'
             v-model='model[name]'
+            hide-details
             :inline="inline"
             :resourceId="model.id"
             :name='field.label'

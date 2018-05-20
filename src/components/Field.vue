@@ -374,7 +374,6 @@ export default {
       },
       set(val) {
         if (['money', 'number'].indexOf(this.dataField.type) > -1) {
-          debugger;
           val = Number(val.replace(/[^0-9\.-]+/g, ''));
         } else if (['datetime'].indexOf(this.dataField.type) > -1) {
           const { date, time } = val;

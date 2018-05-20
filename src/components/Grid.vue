@@ -61,7 +61,7 @@ v-flex(xs12)
   v-data-table(
     v-model="selected"
     class="elevation-1"
-    :headers="[false, ...columns, false]",
+    :headers="[{}, ...columns, {}]",
     :items='items',
     :total-items="pagination.totalItems",
     :pagination.sync="pagination",
@@ -154,7 +154,7 @@ v-flex(xs12)
     template(slot="no-results")
       tr
         td(:colspan="2 + columns.length", align="center")
-          span Sorry, nothing to display here :(     
+          span Sorry, nothing to display here :(
 </template>
 
 <script>

@@ -45,8 +45,9 @@ Vue.directive('back', event => {
 
 helper.moneyFormatter = value =>
   (value
-    ? Number(value)
+    ? value
         .toString()
+        .replace(/[^0-9.,]/g, '')
         .replace(/(\d)(?=(\d{3})+(,|$))/g, '$1,')
     : null);
 
