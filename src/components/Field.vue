@@ -190,10 +190,10 @@ div
       :name="name"
       v-model='model'
       v-bind="dataField"
+      v-validate="validationRules"
       :readonly="readonly"
       :label="$t(dataField.label)"
       :placeholder="$t(dataField.placeholder)"
-      v-validate="validationRules"
       :error="isError"
       :error-messages="errorMessage"
       :append-icon="passwordInvisible ? 'visibility' : 'visibility_off'"
@@ -202,16 +202,15 @@ div
 
     //- money input
     v-text-field(
-      v-else-if="['money'].indexOf(dataField.type) > -1"
-      v-money="money"
+      v-else-if="['money', 'number'].indexOf(dataField.type) > -1"
       v-model='model'
       v-bind='dataField'
       v-validate="validationRules"
+      type="text"
       :name="name"
       :readonly="readonly"
       :label="$t(dataField.label)"
       :placeholder="$t(dataField.placeholder)"
-      :type="dataField.type"
       :error="isError"
       :error-messages="errorMessage")
 
@@ -233,11 +232,9 @@ div
 </template>
 
 <script>
-import { VMoney } from 'v-money';
 import randomstring from 'randomstring';
 import moment, { now } from 'moment';
 import EventBus from '../eventBus.js';
-import config from '../config';
 
 import 'vue2-dropzone/dist/vue2Dropzone.css';
 
@@ -298,12 +295,6 @@ export default {
       isShowDialogForm: false,
       currentItem: null,
       parentData: {},
-      money: {
-        decimal: '.',
-        thousands: ',',
-        precision: 0,
-        masked: false /* doesn't work with directive */
-      },
       loading: false,
       autoCompleteSync: null,
       menuShowTogle: {
@@ -352,8 +343,12 @@ export default {
     },
     model: {
       get() {
+        if (['money', 'number'].indexOf(this.dataField.type) > -1) {
+          return global.helper.moneyFormatter(this.value);
+        }
+
         const formatDate = date => {
-          return date ? moment(String(date)).format('YYYY-MM-DD') : null;
+          return date ? moment(String(date)).format(this.$store.state.config.format.date) : null;
         };
 
         const formatTime = date => {
@@ -377,11 +372,15 @@ export default {
         return this.value;
       },
       set(val) {
-        if (['money'].indexOf(this.dataField.type) > -1) {
+        if (['money', 'number'].indexOf(this.dataField.type) > -1) {
+          debugger;
           val = Number(val.replace(/[^0-9\.-]+/g, ''));
         } else if (['datetime'].indexOf(this.dataField.type) > -1) {
           const { date, time } = val;
-          const dateTime = moment(`${date || '0000-00-00'} ${time || '00:00'}`, 'YYYY-MM-DD HH:mm');
+          const dateTime = moment(
+            `${date || '0000-00-00'} ${time || '00:00'}`,
+            `${this.$store.state.config.date} ${this.$store.state.config.time}`
+          );
 
           return this.$emit('input', dateTime.toDate());
         } else if (['time'].indexOf(this.dataField.type) > -1) {
@@ -426,7 +425,7 @@ export default {
       }
 
       const filename = response.url || response.result.files.file[0].name;
-      this.model = `${config.api}Files/${this.resource}/download/${filename}`;
+      this.model = `${this.$store.state.config.api}Files/${this.resource}/download/${filename}`;
     },
     getDropzoneOptions(field, model) {
       const uploadUrl = this.dataField.uploadUrl
@@ -522,7 +521,6 @@ export default {
         'datetime',
         'time',
         'hidden',
-        'money',
         'map'
       ].includes(this.dataField.type)
     ) {
@@ -537,11 +535,9 @@ export default {
   },
   mounted() {
     if (['image'].includes(this.dataField.type) && this.model) {
-      var url = `${global.config.api + this.value}`;
+      var url = `${this.$store.state.config.api + this.value}`;
       this.$refs.dropzone.manuallyAddFile({}, url);
     }
-  },
-
-  directives: { money: VMoney }
+  }
 };
 </script>

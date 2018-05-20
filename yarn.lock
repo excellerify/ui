@@ -1668,8 +1668,8 @@ caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000843.tgz#4f7e8501f557dc9bcd37dd33ac85905c765efec2"
 
 caniuse-lite@^1.0.30000792, caniuse-lite@^1.0.30000805, caniuse-lite@^1.0.30000835:
-  version "1.0.30000842"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000842.tgz#7a198e3181a207f4b5749b8f5a1817685bf3d7df"
+  version "1.0.30000843"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000843.tgz#4fdec258dc641c385744cdd49d23c5459c3d4411"
 
 case-sensitive-paths-webpack-plugin@^2.1.2:
   version "2.1.2"
@@ -3358,8 +3358,8 @@ flush-write-stream@^1.0.0:
     readable-stream "^2.0.4"
 
 follow-redirects@^1.0.0, follow-redirects@^1.2.3:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.4.1.tgz#d8120f4518190f55aac65bb6fc7b85fcd666d6aa"
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.5.0.tgz#234f49cf770b7f35b40e790f636ceba0c3a0ab77"
   dependencies:
     debug "^3.1.0"
 
@@ -4921,8 +4921,8 @@ minimist@^1.2.0:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
 
 minipass@^2.2.1, minipass@^2.2.4:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/minipass/-/minipass-2.3.0.tgz#2e11b1c46df7fe7f1afbe9a490280add21ffe384"
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/minipass/-/minipass-2.3.1.tgz#4e872b959131a672837ab3cb554962bc84b1537d"
   dependencies:
     safe-buffer "^5.1.1"
     yallist "^3.0.0"
@@ -7687,10 +7687,6 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
 
-v-money@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/v-money/-/v-money-0.8.1.tgz#dc28cf3be915c5a6c52bfe1085075e1fe7ae9db5"
-
 validate-npm-package-license@^3.0.1:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/validate-npm-package-license/-/validate-npm-package-license-3.0.3.tgz#81643bcbef1bdfecd4623793dc4648948ba98338"
@@ -7848,11 +7844,11 @@ vue2-google-maps@^0.8.12:
     babel-runtime "^5.8.0"
     marker-clusterer-plus "^2.1.4"
 
-vue@^2.5.13, vue@^2.5.2:
+vue@^2.5.16, vue@^2.5.2:
   version "2.5.16"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.16.tgz#07edb75e8412aaeed871ebafa99f4672584a0085"
 
-vuetify@^1.0.16:
+vuetify@^1.0.18:
   version "1.0.18"
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-1.0.18.tgz#56289ba7c6e5eee3d4ee4dacd5e7dded4aee4c08"
 

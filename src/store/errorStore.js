@@ -1,16 +1,16 @@
 const store = {
   state: {
-    globalError: null,
+    globalError: null
   },
   getters: {
-    getGlobalError: state => state.globalError,
+    getGlobalError: state => state.globalError
   },
   mutations: {
     setGlobalError(state, errorMessage) {
       state.globalError = errorMessage;
-    },
+    }
   },
-  actions: {},
+  actions: {}
 };
 
 export default store;

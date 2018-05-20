@@ -5,7 +5,7 @@ import router from '../router';
 const store = {
   state: {
     user: {},
-    token: null,
+    token: null
   },
   mutations: {
     setAuth(state, { user, token, expireTime }) {
@@ -18,25 +18,28 @@ const store = {
       global.helper.ls.set('user', user);
       global.helper.ls.set('token', token);
       global.helper.ls.set('expireTime', expireTime);
-    },
+    }
   },
   actions: {
     checkAuth({ commit }) {
       const data = {
         user: global.helper.ls.get('user'),
         token: global.helper.ls.get('token'),
-        expireTime: global.helper.ls.get('expireTime'),
+        expireTime: global.helper.ls.get('expireTime')
       };
 
       commit('setAuth', data);
     },
     login: async ({ commit }, { username, password }) => {
-      const response = await global.$http.post('admins/login', { username, password });
+      const response = await global.$http.post('admins/login', {
+        username,
+        password
+      });
 
       commit('setAuth', {
         user: response.data.userId,
         token: response.data.id,
-        expireTime: response.data.ttl,
+        expireTime: response.data.ttl
       });
 
       router.push('/');
@@ -50,11 +53,11 @@ const store = {
       commit('setAuth', {
         user: null,
         token: null,
-        expireTime: null,
+        expireTime: null
       });
       router.push('/login');
-    },
-  },
+    }
+  }
 };
 
 export default store;

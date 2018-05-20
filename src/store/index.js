@@ -10,6 +10,12 @@ import errorStore from './errorStore';
 
 Vue.use(Vuex);
 
-const store = lodash.merge(mainStore, formStore, gridStore, authStore, errorStore);
+const store = lodash.merge(
+  mainStore,
+  formStore,
+  gridStore,
+  authStore,
+  errorStore
+);
 
 export default new Vuex.Store(store);

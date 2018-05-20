@@ -2,12 +2,12 @@ module.exports = {
   root: true,
   parserOptions: {
     sourceType: 'module',
-    ecmaVersion: 8,
+    ecmaVersion: 8
   },
   env: {
-    browser: true,
+    browser: true
   },
-  extends: ['standard', 'latest','airbnb-base', 'plugin:vue/recommended'],
+  extends: ['standard', 'airbnb-base', 'plugin:vue/recommended'],
   plugins: ['html', 'pug'],
   rules: {
     'linebreak-style': 0,
@@ -25,16 +25,16 @@ module.exports = {
       {
         anonymous: 'never',
         named: 'never',
-        asyncArrow: 'always',
-      },
+        asyncArrow: 'always'
+      }
     ],
     'comma-dangle': ['error', 'only-multiline'],
     'no-param-reassign': [
       'error',
       {
         props: true,
-        ignorePropertyModificationsFor: ['state', 'Vue', 'event'],
-      },
-    ],
-  },
+        ignorePropertyModificationsFor: ['state', 'Vue', 'event']
+      }
+    ]
+  }
 };

@@ -10,21 +10,20 @@ import * as VueGoogleMaps from 'vue2-google-maps';
 
 import 'vuetify/src/stylus/main.styl';
 import 'vuetify/src/stylus/settings/_colors.styl';
+import './styles/main.styl';
 
 import helper from './helper';
 import config from './config';
 import store from './store';
 import router from './router';
 import i18n from './i18n/';
+import http from './http';
 
 import App from './App.vue';
 import VGrid from './components/Grid.vue';
 import VForm from './components/Form.vue';
 import VField from './components/Field.vue';
 import VGoogleMap from './components/fields/GoogleMap.vue';
-
-import './styles/main.styl';
-import http from './http';
 
 Vue.prototype.$http = http;
 
@@ -55,7 +54,7 @@ Vue.component('dropzone', Dropzone);
 Vue.component('v-grid', VGrid);
 Vue.component('v-form', VForm);
 Vue.component('v-field', VField);
-Vue.component('v-google-map', VGoogleMap);
+Vue.component('v-field-google-map', VGoogleMap);
 
 const setupGoogleMap = async () => {
   await http.get(`${global.config.api}settings/googleApiKey`).then(

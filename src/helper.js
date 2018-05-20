@@ -26,7 +26,7 @@ helper.ls = {
       value = JSON.parse(value);
     }
     return value;
-  },
+  }
 };
 
 /**
@@ -42,5 +42,12 @@ helper.store = (key, value) => {
 Vue.directive('back', event => {
   event.onclick = () => window.history.go(-1);
 });
+
+helper.moneyFormatter = value =>
+  (value
+    ? Number(value)
+        .toString()
+        .replace(/(\d)(?=(\d{3})+(,|$))/g, '$1,')
+    : null);
 
 export default helper;

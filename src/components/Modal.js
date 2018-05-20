@@ -23,5 +23,5 @@ const modal = Vue => {
 };
 
 export default {
-  modal,
+  modal
 };

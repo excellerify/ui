@@ -40,8 +40,16 @@ const router = new Router({
         route('/crud/:resource/create', 'FormPage', 'create'),
         route('/crud/:resource/:id/:action', 'FormPage', 'action'),
         route('/crud/:resource/:action', 'FormPage', 'indexAction'),
-        route('/crud/:resource/:subResource/:id/edit', 'FormPage', 'customActionForm'),
-        route('/crud/:resource/:subResource/:id', 'GridPage', 'customActionGrid'),
+        route(
+          '/crud/:resource/:subResource/:id/edit',
+          'FormPage',
+          'customActionForm'
+        ),
+        route(
+          '/crud/:resource/:subResource/:id',
+          'GridPage',
+          'customActionGrid'
+        ),
         route('/settings', 'Settings', 'settings')
       ],
       true
@@ -57,7 +65,10 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth) && !global.helper.ls.get('token')) {
+  if (
+    to.matched.some(record => record.meta.requiresAuth) &&
+    !global.helper.ls.get('token')
+  ) {
     next({
       path: '/login',
       query: {
@@ -79,7 +90,10 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach(() => {
-  setTimeout(() => global.store.commit('setGlobalLoading', { isLoading: false }), 1000);
+  setTimeout(
+    () => global.store.commit('setGlobalLoading', { isLoading: false }),
+    1000
+  );
 });
 
 export default router;

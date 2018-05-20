@@ -1,8 +1,13 @@
 {
-"editor.formatOnSave": true,
-"prettier.eslintIntegration": true,
-"files.autoSave": "onFocusChange",
-"cSpell.words": [
-    "dropzone"
-]
+  "editor.formatOnSave": true,
+  "prettier.eslintIntegration": true,
+  "files.autoSave": "onFocusChange",
+  "cSpell.words": [
+    "dropzone",
+    "inflector",
+    "styl",
+    "timeago",
+    "vuetify"
+  ],
+  "editor.tabSize": 2
 }
