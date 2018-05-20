@@ -90,49 +90,50 @@ div
 
     //- if input type is date or time
     template(v-else-if="['date', 'time', 'datetime'].indexOf(dataField.type) > -1")
-      v-flex(xs12 class="input-group" style="padding: 0")
+      v-flex.xs12(class="input-group" style="padding: 0")
         label(v-if="!inline") {{$t(dataField.label)}}
-        v-menu(
-          v-if="['date', 'datetime'].indexOf(dataField.type) > -1"
-          ref="menuDate"
-          v-model="menuShowTogle.date"
-          :return-value.sync="model"
-          :close-on-content-click="false")
-          v-text-field(
-            readonly
-            slot='activator'
-            prepend-icon="event"
-            v-model='model.date'
-            :label="inline? dataField.label : 'Date'")
-          v-date-picker(
-            scrollable
-            no-title
-            v-model="model.date"
-            v-validate="validationRules")
-              v-spacer
-              v-btn(flat color="primary" @click="menuShowTogle.date=false") Cancel
-              v-btn(flat color="primary" @click="$refs.menuDate.save({time: model.time, date: model.date})") OK
+        v-layout.row.wrap
+          v-flex(v-if="['date', 'datetime'].indexOf(dataField.type) > -1")
+            v-menu(
+              ref="menuDate"
+              v-model="menuShowTogle.date"
+              :return-value.sync="model"
+              :close-on-content-click="false")
+              v-text-field.xs12(
+                readonly
+                slot='activator'
+                prepend-icon="event"
+                v-model='model.date'
+                :label="inline? dataField.label : 'Date'")
+              v-date-picker(
+                scrollable
+                no-title
+                v-model="model.date"
+                v-validate="validationRules")
+                  v-spacer
+                  v-btn(flat color="primary" @click="menuShowTogle.date=false") Cancel
+                  v-btn(flat color="primary" @click="$refs.menuDate.save({time: model.time, date: model.date})") OK
 
-        v-menu(
-          v-if="['time', 'datetime'].indexOf(dataField.type) > -1"
-          ref="menuTime"
-          v-model="menuShowTogle.time"
-          :return-value.sync="model"
-          :close-on-content-click="false")
-          v-text-field(
-            readonly
-            slot='activator'
-            prepend-icon="schedule"
-            v-model='model.time'
-            :label="inline? dataField.label : 'Time'")
-          v-time-picker(
-            scrollable
-            v-model="model.time"
-            v-validate="validationRules")
-            v-card-actions
-              v-spacer
-              v-btn(flat color="primary" @click="menuShowTogle.time=false") Cancel
-              v-btn(flat color="primary" @click="$refs.menuTime.save({time: model.time, date: model.date})") OK
+          v-flex(v-if="['time', 'datetime'].indexOf(dataField.type) > -1")
+            v-menu(
+              ref="menuTime"
+              v-model="menuShowTogle.time"
+              :return-value.sync="model"
+              :close-on-content-click="false")
+              v-text-field.xs12(
+                readonly
+                slot='activator'
+                prepend-icon="schedule"
+                v-model='model.time'
+                :label="inline? dataField.label : 'Time'")
+              v-time-picker(
+                scrollable
+                v-model="model.time"
+                v-validate="validationRules")
+                v-card-actions
+                  v-spacer
+                  v-btn(flat color="primary" @click="menuShowTogle.time=false") Cancel
+                  v-btn(flat color="primary" @click="$refs.menuTime.save({time: model.time, date: model.date})") OK
 
     //- if input type is html
     div(:class="inputGroupClass",v-else-if="dataField.type == 'html'")
