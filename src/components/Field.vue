@@ -48,7 +48,7 @@ div
 
     //- if map
     template(v-else-if="['map'].indexOf(dataField.type) > -1")
-      v-google-map(
+      v-field-google-map(
         v-bind="dataField"
         @input="(val) => {model = val}"
         :name="name"

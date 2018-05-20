@@ -24,9 +24,32 @@ div
               :field="field"
               :readonly="readonly || field.readonly")
 
-    template(v-if='(!groupBy && formType != "wizard") || inline')
-      v-layout(v-bind="{[inline? 'row':'column wrap']: true}")
-        v-field(v-bind:class="{[inline? 'pr-3':'']: true}")(
+    template(v-if='(!groupBy && formType != "wizard") && inline')
+      v-layout.row.wrap(style="padding: 8px")
+        v-flex(v-for='(field, name) in getFields' :key="name")
+          v-field.pr-3(
+            @refresh='refresh'
+            @onUpsert='onSubmit'
+            @fieldError='updateFieldsError'
+            v-model='model[name]'
+            :inline="inline"
+            :resourceId="model.id"
+            :name='field.label'
+            :field='field'
+            :readonly='readonly || field.readonly')
+
+      v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
+        ul.px-3
+          li(v-for='error in formErrors') {{error.message}}
+
+      v-flex.actions(xs12)
+        slot(name='buttons')
+          v-btn(color='primary', dark, type='submit') {{$t(submitButtonText)}}
+            v-icon(right, dark) {{submitButtonIcon}}
+
+    template(v-else-if='(!groupBy && formType != "wizard") && !inline')
+      v-layout.column.wrap
+        v-field(
           v-for='(field, name) in getFields'
           @refresh='refresh'
           @onUpsert='onSubmit'

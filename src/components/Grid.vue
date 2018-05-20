@@ -5,8 +5,8 @@ v-flex(xs12)
     icon="warning",
     :value="true") {{error.message}}
 
-  v-layout
-    v-flex(xs4, sm4, md3)
+  v-layout.row.wrap
+    v-flex.xs12(style="margin-bottom: 8px")
       v-tooltip(bottom, v-if="options.create && !readonly")
         v-btn.green(
           slot="activator"
@@ -24,7 +24,15 @@ v-flex(xs12)
 
         span Delete selected {{resource}}
 
-      v-tooltip(bottom, v-if="onDraft")
+      v-tooltip.right(bottom, v-if="onDraft")
+        v-btn.orange(
+          slot="activator"
+          @click.native="()=>{alert('will show deleted row on soft delete')}"
+          router, dark, fab, small)
+          v-icon delete_sweep
+        span Show deleted {{resource}}
+
+      v-tooltip.right(bottom, v-if="onDraft")
         v-btn.amber(
           slot="activator"
           @click.native="onDraft"
@@ -32,7 +40,7 @@ v-flex(xs12)
           v-icon folder_open
         span Open saved draft
 
-    v-flex(v-if="showSearch && !_.isEmpty(filters.fields)", xs8, sm8, md9, style="margin-bottom: 24px")
+    v-flex.xs12(v-if="showSearch && !_.isEmpty(filters.fields)" style="margin-bottom: 16px")
       v-expansion-panel
         v-expansion-panel-content
           div(slot="header")
@@ -40,7 +48,7 @@ v-flex(xs12)
             span SEARCH
           v-card
             v-card-text
-              v-form.row.jr(
+              v-form.row(
                 v-if="filters.fields",
                 v-model='filters.model',
                 :inline='true',
