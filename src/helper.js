@@ -49,6 +49,6 @@ helper.moneyFormatter = value =>
         .toString()
         .replace(/[^0-9.,]/g, '')
         .replace(/(\d)(?=(\d{3})+(,|$))/g, '$1,')
-    : null);
+    : 0);
 
 export default helper;
