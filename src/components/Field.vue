@@ -509,6 +509,8 @@ export default {
   created() {
     if (
       this.dataField.required &&
+      !this.dataField.disabled &&
+      !this.dataField.readonly &&
       !this.value &&
       ![
         'file',
