@@ -11,7 +11,7 @@ const config = {
   },
   api: apiBaseUrl,
   grid: {
-    limit: 10
+    limit: 25
   },
   format: {
     date: 'YYYY-MM-DD',

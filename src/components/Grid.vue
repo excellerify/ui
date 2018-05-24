@@ -1,5 +1,5 @@
 <template lang="pug">
-v-flex(xs12)
+v-flex(xs12, style="margin-bottom: 16px")
   v-alert(
     v-if="error",
     icon="warning",
@@ -71,7 +71,7 @@ v-flex(xs12)
       tr
         th
           v-checkbox(
-            primary
+            dark
             hide-details
             @click.native="toggleAll"
             :input-value="props.all"
@@ -182,7 +182,7 @@ const getDefaultData = () => {
     },
     pagination: {
       page: 1,
-      rowsPerPage: 10,
+      rowsPerPage: config.grid.limit,
       sortBy: 'id',
       descending: true,
       totalItems: 0
