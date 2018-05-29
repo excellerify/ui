@@ -61,14 +61,14 @@ export default {
     return {
       geocoder: new google.maps.Geocoder(),
       center: {
-        lat: this.value.lat || jakartaLocation.lat,
-        lng: this.value.lng || jakartaLocation.lng
+        lat: this.value ? this.value.lat : jakartaLocation.lat,
+        lng: this.value ? this.value.lng : jakartaLocation.lng
       },
       markers: [
         {
           position: {
-            lat: this.value.lat || jakartaLocation.lat,
-            lng: this.value.lng || jakartaLocation.lng
+            lat: this.value ? this.value.lat : jakartaLocation.lat,
+            lng: this.value ? this.value.lng : jakartaLocation.lng
           }
         }
       ]
@@ -98,7 +98,7 @@ export default {
         return this.value;
       },
       set(val) {
-        return this.$emit("input", val);
+        return this.$emit('input', val);
       }
     }
   },
@@ -115,7 +115,7 @@ export default {
             location
           },
           (results, status) => {
-            if (status === "OK") {
+            if (status === 'OK') {
               const place = results[0];
 
               this.model = {

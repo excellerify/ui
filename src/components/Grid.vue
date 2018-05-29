@@ -354,11 +354,15 @@ export default {
           <img src="${image}" alt="avatar">
         </div>`;
       } else if (field.type === 'date') {
-        value = value ? moment(String(value)).format('YYYY-MM-DD') : '';
+        value = value ? moment(String(value)).format(this.$store.state.config.format.date) : '';
       } else if (field.type === 'time') {
-        value = value ? moment(String(value)).format('HH:mm') : '';
+        value = value ? moment(String(value)).format(this.$store.state.config.format.time) : '';
       } else if (field.type === 'datetime') {
-        value = value ? moment(String(value)).format('YYYY-MM-DD HH:mm') : '';
+        value = value
+          ? moment(String(value)).format(
+              `${this.$store.state.config.format.date} ${this.$store.state.config.format.time}`
+            )
+          : '';
       } else if (['money', 'number'].indexOf(field.type) > -1) {
         value = value ? global.helper.moneyFormatter(value) : 0;
       } else {

@@ -379,7 +379,7 @@ export default {
           const { date, time } = val;
           const dateTime = moment(
             `${date || '0000-00-00'} ${time || '00:00'}`,
-            `${this.$store.state.config.date} ${this.$store.state.config.time}`
+            `${this.$store.state.config.format.date} ${this.$store.state.config.format.time}`
           );
 
           return this.$emit('input', dateTime.toDate());
