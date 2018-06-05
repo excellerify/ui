@@ -29,7 +29,7 @@ export default {
       list: [],
       message: '',
       showWarning: false,
-      maxLength: 6,
+      maxLength: 6
     };
   },
   methods: {
@@ -39,7 +39,7 @@ export default {
       }
       client.emit('message', this.message);
       this.message = '';
-    },
+    }
   },
   mounted() {
     client.connect((error, connected) => {
@@ -48,12 +48,12 @@ export default {
         return false;
         // do something
       }
-      console.log('connected: ', connected);
+      console.info('connected: ', connected);
       client.emit('message', 'hello');
       // all good
     });
     client.on('error', message => {
-      console.log(message);
+      console.info(message);
     });
     client.on('message', message => {
       this.list.push(message);
@@ -61,6 +61,6 @@ export default {
         this.list.shift();
       }
     });
-  },
+  }
 };
 </script>

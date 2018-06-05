@@ -306,28 +306,25 @@ export default {
 
         if (this.type === 'subForm' && this.parentData) {
           // resolve parent FK
-          this._.forEach(
-            this.filteredFields(),
-            function(val, key) {
-              // if field is marked as FK, resolve FK data
-              if (val.fk) {
-                this._.forEach(this.parentData, (valData, keyData) => {
-                  const fkData = valData[val.fk[keyData]];
+          this._.forEach(this.filteredFields(), (val, key) => {
+            // if field is marked as FK, resolve FK data
+            if (val.fk) {
+              this._.forEach(this.parentData, (valData, keyData) => {
+                const fkData = valData[val.fk[keyData]];
 
-                  // if FK data not found, raise error
-                  if (!fkData) {
-                    console.error(
-                      `Field "${val.fk}" \
+                // if FK data not found, raise error
+                if (!fkData) {
+                  console.error(
+                    `Field "${val.fk}" \
                       not found in parent data or table "${keyData}"`
-                    );
-                  }
+                  );
+                }
 
-                  // assign FK data, from parrent to form field
-                  this.model[key] = valData[val.fk[keyData]];
-                });
-              }
-            }.bind(this)
-          );
+                // assign FK data, from parrent to form field
+                this.model[key] = valData[val.fk[keyData]];
+              });
+            }
+          });
         }
       } catch (e) {
         throw e;

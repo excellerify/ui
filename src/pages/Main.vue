@@ -32,9 +32,9 @@ div
 
         v-subheader(v-else-if='item.header') {{ item.header }}
         v-divider(v-else-if='item.divider')
-        v-list-tile(v-else,:to='item.href', router, ripple, v-bind:disabled='item.disabled', :title="item.title")
+        v-list-tile(v-else, :to='item.href', router, ripple, v-bind:disabled='item.disabled', :title="item.title")
           v-list-tile-action
-            v-icon() {{ item.icon }}
+            v-icon {{ item.icon }}
           v-list-tile-content
             v-list-tile-title {{ $t(item.title) }}
           v-list-tile-action(v-if='item.subAction')
@@ -64,25 +64,25 @@ div
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex';
 
 export default {
   data() {
     return {
       dark: false,
-      theme: "primary",
+      theme: 'primary',
       mini: false,
       drawer: true,
-      locales: ["en-US"],
-      colors: ["blue", "green", "purple", "red"]
+      locales: ['en-US'],
+      colors: ['blue', 'green', 'purple', 'red']
     };
   },
   computed: {
-    ...mapState(["menu", "pageTitle"])
+    ...mapState(['menu', 'pageTitle'])
   },
   methods: {
     changeLocale(to) {
-      global.helper.ls.set("locale", to);
+      global.helper.ls.set('locale', to);
       this.$i18n.locale = to;
     }
   }

@@ -282,40 +282,48 @@ export default {
       }
 
       if (this.filters.model) {
-        this._.forEach(
-          this.filters.model,
-          function(val, key) {
-            if (!val) {
+        this._.forEach(this.filters.model, (val, key) => {
+          if (!val) {
+            return;
+          }
+
+          if (key.indexOf('.') > -1) {
+            let nestedFilter = {
+              regexp: `/${val}/i`
+            };
+            const splitedKey = key.split('.').reverse();
+
+            this._.map(splitedKey, val => {
+              const prevNestedFilter = Object.assign(nestedFilter);
+              nestedFilter = {};
+              nestedFilter[val] = prevNestedFilter;
+            });
+
+            this._.merge(filters, nestedFilter);
+          } else {
+            const column = this._.find(this.columns, { key });
+
+            if (!column) {
               return;
             }
 
-            if (key.indexOf('.') > -1) {
-              let nestedFilter = {
-                regexp: `/${val}/i`
-              };
-              const splitedKey = key.split('.').reverse();
+            let filterKey = key;
 
-              this._.map(splitedKey, val => {
-                const prevNestedFilter = Object.assign(nestedFilter);
-                nestedFilter = {};
-                nestedFilter[val] = prevNestedFilter;
-              });
-
-              this._.merge(filters, nestedFilter);
-            } else {
-              const column = this._.find(this.columns, { value: key });
-
-              if (column && column.type === 'date') {
-                filters[key] = val;
-              } else {
-                filters[key] = {
-                  regexp: `/${val}/i`,
-                  plain: val
-                };
-              }
+            const split = column.value.split('.');
+            if (split.length > 0) {
+              filterKey = split.join('.');
             }
-          }.bind(this)
-        );
+
+            if (column && column.type === 'date') {
+              filters[filterKey] = val;
+            } else {
+              filters[filterKey] = {
+                regexp: `/${val}/i`,
+                plain: val
+              };
+            }
+          }
+        });
       }
 
       const { sortBy, descending, page, rowsPerPage } = this.pagination;
@@ -344,33 +352,33 @@ export default {
       await this.fetchGrid();
       await this.fetchData();
     },
-    getColumnData(row, field) {
-      let value = row[field.value];
+    getColumnData(row, column) {
+      let value = row[column.value];
 
-      if (field.type === 'image') {
+      if (column.type === 'image') {
         const image = value ? global.config.api + value : 'static/noimage.png';
 
         value = `<div class="avatar grey lighten-4" style="height: 36px; width: 36px;">
-          <img src="${image}" alt="avatar">
-        </div>`;
-      } else if (field.type === 'date') {
+                  <img src="${image}" alt="avatar">
+                </div>`;
+      } else if (column.type === 'date') {
         value = value ? moment(String(value)).format(this.$store.state.config.format.date) : '';
-      } else if (field.type === 'time') {
+      } else if (column.type === 'time') {
         value = value ? moment(String(value)).format(this.$store.state.config.format.time) : '';
-      } else if (field.type === 'datetime') {
+      } else if (column.type === 'datetime') {
         value = value
           ? moment(String(value)).format(
               `${this.$store.state.config.format.date} ${this.$store.state.config.format.time}`
             )
           : '';
-      } else if (['money', 'number'].indexOf(field.type) > -1) {
+      } else if (['money', 'number'].indexOf(column.type) > -1) {
         value = value ? global.helper.moneyFormatter(value) : 0;
       } else {
-        // process fields like `type.name`
-        const split = field.value.split('.');
+        // process cpolumn with format like `type.name`
+        const split = column.value.split('.');
 
         if (split.length > 0) {
-          value = this._.get(row, field.value);
+          value = this._.get(row, column.value);
         }
       }
 
@@ -383,6 +391,8 @@ export default {
         if (!value.value) {
           value.value = key;
         }
+
+        value.key = key;
 
         columnsArr.push(value);
       });
@@ -455,6 +465,7 @@ export default {
           count: this.pagination.totalItems
         };
       } catch (err) {
+        console.error(err);
         this.error = err;
         return err;
       }
