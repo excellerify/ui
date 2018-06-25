@@ -75,14 +75,12 @@ v-flex(xs12, style="margin-bottom: 16px")
             hide-details
             @click.native="toggleAll"
             :input-value="props.all"
-            :indeterminate="props.indeterminate"
-          )
+            :indeterminate="props.indeterminate")
         th(
           v-for="header in columns"
           :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
           align="left"
-          @click="changeSort(header.value)"
-        )
+          @click="changeSort(header.value)")
           b {{ header.text }}
           v-icon(small) arrow_upward
         th Action
@@ -95,7 +93,7 @@ v-flex(xs12, style="margin-bottom: 16px")
             hide-details
             :input-value="props.selected")
 
-        td(:class="'text-xs-' + (column.align !== undefined? column.align  : 'center')"
+        td(:class="'limited text-xs-' + (column.align !== undefined? column.align  : 'center')"
           v-for='column in columns')
           span(v-html="getColumnData(props.item, column)")
 
@@ -379,6 +377,10 @@ export default {
 
         if (split.length > 0) {
           value = this._.get(row, column.value);
+        }
+
+        if (value.length > 100) {
+          value = `${value.substring(0, 96)}...`;
         }
       }
 

@@ -24,10 +24,13 @@ const store = {
   },
   actions: {
     async checkPageTitle({ commit, state }, { path, action }) {
-      const keys = Object.keys(state.menu);
-      keys.forEach(k => {
-        if (path.indexOf(state.menu[k].href) !== -1) {
-          commit('setPageTitle', `${state.menu[k].title} ${action || ''}`);
+      state.menu.forEach(k => {
+        if (path.indexOf(k.href) !== -1) {
+          const title = `${k.title} ${action || ''}`;
+
+          commit('setPageTitle', title);
+
+          document.title = title;
         }
       });
     }

@@ -20,7 +20,7 @@ export default {
   methods: {
     onCreate: function() {
       this.$router.push({
-        name: "create",
+        name: 'create',
         params: { resource: this.resource }
       });
     },
@@ -29,16 +29,16 @@ export default {
     },
     onUpdate: function({ item }) {
       this.$router.push({
-        name: "edit",
+        name: 'edit',
         params: { resource: this.resource, id: item.id }
       });
     },
     onView: function({ item }) {
-      this.$router.push({ name: "view", params: { id: item.id } });
+      this.$router.push({ name: 'view', params: { id: item.id } });
     }
   },
   created() {
-    this.$store.dispatch("checkPageTitle", { path: this.$route.path });
+    this.$store.dispatch('checkPageTitle', { path: this.$route.path });
   }
 };
 </script>
