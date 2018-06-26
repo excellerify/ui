@@ -379,7 +379,7 @@ export default {
           value = this._.get(row, column.value);
         }
 
-        if (value.length > 100) {
+        if (value && value.length > 100) {
           value = `${value.substring(0, 96)}...`;
         }
       }
