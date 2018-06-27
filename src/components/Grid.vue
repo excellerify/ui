@@ -299,16 +299,16 @@ export default {
 
             this._.merge(filters, nestedFilter);
           } else {
-            const column = this._.find(this.columns, { key });
-
-            if (!column) {
-              return;
-            }
+            console.log(this);
+            const column = this._.find(this.columns, { key }) || {
+              value: '',
+              type: ''
+            };
 
             let filterKey = key;
 
             const split = column.value.split('.');
-            if (split.length > 0) {
+            if (split.length > 1) {
               filterKey = split.join('.');
             }
 
