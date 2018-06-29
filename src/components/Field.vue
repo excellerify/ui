@@ -71,21 +71,33 @@ div
               :disabled="readonly",
               v-validate="validationRules")
 
-    //- if checkboxes
+    //- if checkbox
+    template(v-else-if="['checkbox'].indexOf(dataField.type) > -1")
+      v-layout(row, wrap, class="input-group")
+        v-checkbox(
+          :name="name",
+          :key='dataField.value',
+          :value='dataField.value',
+          :label='dataField.text',
+          :disabled="readonly",
+          v-model="model",
+          hide-details,
+          v-validate="validationRules")
+        label {{$t(dataField.label)}}
+
     template(v-else-if="['checkboxes'].indexOf(dataField.type) > -1")
       v-layout(row, wrap, class="input-group")
         label {{$t(dataField.label)}}
         v-flex(v-bind="{[dataField.width]: true}", xs12)
           span(v-for='option in dataField.choices', :key="dataField.value")
-            component(
+            v-checkbox(
               :name="name",
-              v-model="model",
-              hide-details,
-              :is="dataField.type == 'radios' || 'radio' ? 'v-radio' : 'v-checkbox'",
               :key='option.value',
               :value='option.value',
               :label='option.text',
               :disabled="readonly",
+              v-model="model",
+              hide-details,
               v-validate="validationRules")
 
     //- if input type is date or time
@@ -496,7 +508,7 @@ export default {
       let choice = '';
 
       this.dataField.dataSource.searchParams.map((param, key) => {
-        choice += val[param];
+        choice += this._.get(val, param);
 
         if (key != this.dataField.dataSource.searchParams.length - 1) {
           choice += ' - ';

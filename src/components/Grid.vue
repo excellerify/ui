@@ -299,7 +299,6 @@ export default {
 
             this._.merge(filters, nestedFilter);
           } else {
-            console.log(this);
             const column = this._.find(this.columns, { key }) || {
               value: '',
               type: ''

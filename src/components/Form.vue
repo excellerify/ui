@@ -321,7 +321,7 @@ export default {
                 }
 
                 // assign FK data, from parrent to form field
-                this.model[key] = valData[val.fk[keyData]];
+                this.model[key] = fkData;
               });
             }
           });
