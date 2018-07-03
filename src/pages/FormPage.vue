@@ -8,16 +8,8 @@ div.card
           :resource="resource"
           :subResource="subResource"
           :doSaveAsDraft="doSaveAsDraft"
-          :doSubmit="doSaveAsDraft"
+          :doSubmit="doSubmit"
           @success="onSuccess")
-          div(slot="buttons", class="my-4")
-            v-btn(dark, class="grey", @click.native="$root.back()")
-              v-icon(dark, left) chevron_left
-              span {{$t('Cancel')}}
-            v-btn.orange(dark, @click.native="$root.back()") {{$t('Save as Draft')}}
-              v-icon(dark, right) save
-            v-btn(color="primary", dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
-              v-icon(right, dark) send
 </template>
 
 <script>

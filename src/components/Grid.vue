@@ -33,12 +33,13 @@ v-flex(xs12, style="margin-bottom: 16px")
         span Show deleted {{resource}}
 
       v-tooltip.right(bottom, v-if="onDraft")
-        v-btn.amber(
+        v-btn(
+          v-bind:class="{ amber: !isShowDraft }"
           slot="activator"
           @click.native="onDraft"
           router, dark, fab, small)
           v-icon folder_open
-        span Open saved draft
+        span {{!isShowDraft ? 'Show saved draft': 'Hide saved draft'}}
 
     v-flex.xs12(v-if="showSearch && !_.isEmpty(filters.fields)" style="margin-bottom: 16px")
       v-expansion-panel
@@ -188,7 +189,8 @@ const getDefaultData = () => {
     foreignKey: {},
     items: [],
     error: null,
-    selected: []
+    selected: [],
+    isShowDraft: false
   };
 };
 
@@ -477,6 +479,14 @@ export default {
     },
     onDraft: async function() {
       try {
+        if (this.isShowDraft) {
+          this.isShowDraft = false;
+          this.refresh();
+          return;
+        }
+
+        this.isShowDraft = true;
+
         this.preFetch();
 
         const result = await this.$http.get(`${this.resource}/draft`, {

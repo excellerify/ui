@@ -70,8 +70,16 @@ div
 
       v-flex.actions(xs12)
         slot(name='buttons')
-          v-btn(color='primary', dark, type='submit') {{$t(submitButtonText)}}
-            v-icon(right, dark) {{submitButtonIcon}}
+          v-btn.grey(dark, @click.native="$root.back()")
+            v-icon(dark, left) chevron_left
+            span {{$t('Cancel')}}
+          v-btn.orange(dark, @click.native="onSaveAsDraft") {{$t('Save as Draft')}}
+            v-icon(dark, right) save
+          v-btn.primary(dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
+            v-icon(right, dark) send
+
+          // v-btn(color='primary', dark, type='submit') {{$t(submitButtonText)}}
+          //   v-icon(right, dark) {{submitButtonIcon}}
 
     v-layout(column, wrap, v-else-if='formType === "wizard"')
       v-stepper(v-model="wizardData.wizardStep" vertical :non-linear="isView || isEdit")
@@ -120,12 +128,15 @@ div
         ul.px-3
           li(v-for='error in formErrors') {{error.message}}
 
-      slot(name="buttons", class="my-4")
-        v-btn.grey(dark, @click.native="$root.back()")
-          v-icon(dark, left) chevron_left
-          span {{$t('Cancel')}}
-        v-btn.blue(dark, type='submit') {{$t(submitButtonText)}}
-          v-icon(right, dark) {{submitButtonIcon}}
+      v-flex.actions(xs12)
+        slot(name="buttons")
+          v-btn.grey(dark, @click.native="$root.back()")
+            v-icon(dark, left) chevron_left
+            span {{$t('Cancel')}}
+          v-btn.orange(dark, @click.native="onSaveAsDraft") {{$t('Save as Draft')}}
+            v-icon(dark, right) save
+          v-btn.primary(dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
+            v-icon(right, dark) send
 
 </template>
 
@@ -316,7 +327,7 @@ export default {
                 if (!fkData) {
                   console.error(
                     `Field "${val.fk}" \
-                      not found in parent data or table "${keyData}"`
+                    not found in parent data or table "${keyData}"`
                   );
                 }
 
@@ -420,6 +431,48 @@ export default {
         }
 
         const result = await this.$http[this.method](this.action, this.model);
+
+        if (!subForm) {
+          this.$emit('success', result.data);
+        }
+
+        this.model = result.data;
+        this.model.id = result.data.id;
+
+        if (cb) {
+          cb(result.data);
+        }
+
+        return result.data;
+      } catch (e) {
+        this.hasError = true;
+
+        if (Array.isArray(e)) {
+          this.formErrors = e;
+        } else {
+          let err;
+
+          if (e.response && e.response.data) {
+            err = e.response.data.error || e.response.data;
+          } else {
+            err = e;
+          }
+          this.formErrors = [err];
+        }
+
+        this.$emit('error', e);
+      }
+    },
+
+    onSaveAsDraft: async function({ subForm, cb } = {}) {
+      try {
+        if (this.fieldErrors.length > 0) {
+          throw this.fieldErrors;
+        }
+
+        this.$emit('input', this.model);
+
+        const result = await this.$http['post'](`${this.resource}/draft`, this.model);
 
         if (!subForm) {
           this.$emit('success', result.data);
