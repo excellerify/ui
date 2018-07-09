@@ -10,11 +10,13 @@ v-flex(xs10 offset-xs1 sm6 offset-sm3 md5 offset-md4 lg4 offset-lg4 style="margi
           submitButtonText="Login",
           :formFields='loginFields',
           :autoSubmit="true")
+          div(slot="buttons")
             small {{$t("* Indicates required field")}}
-
-    v-card-row
-      v-alert.py-2(error, v-model='hasError')
-        div {{error.message}}
+            v-alert.py-2(error, v-model='hasError')
+              div {{error.message}}
+            v-btn(dark, block, color="primary", @click.native="doLogin")
+              span {{$t('Login')}}
+      
 </template>
 
 <script>
@@ -24,22 +26,22 @@ export default {
       show: true,
       hasError: false,
       model: {
-        username: "",
-        password: ""
+        username: '',
+        password: ''
       },
       loginFields: {
-        username: { label: "Username", required: true },
-        password: { label: "Password", type: "password", required: true }
+        username: { label: 'Username', required: true },
+        password: { label: 'Password', type: 'password', required: true }
       },
       error: {
-        message: ""
+        message: ''
       }
     };
   },
   methods: {
     doLogin: async function() {
       try {
-        await this.$store.dispatch("login", {
+        await this.$store.dispatch('login', {
           username: this.model.username,
           password: this.model.password
         });
@@ -49,7 +51,7 @@ export default {
         const response = e.response;
 
         if (response.status === 401 || response.status === 403) {
-          this.error.message = "Invalid Username or Password";
+          this.error.message = 'Invalid Username or Password';
         } else {
           this.error.message = response.data.error;
         }
