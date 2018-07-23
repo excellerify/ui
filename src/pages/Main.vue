@@ -55,10 +55,11 @@ div
     //     v-icon(dark) format_paint
     //   v-list
     //     v-list-tile(v-for="n in colors", :key="n", :class="n",@mouseover.native="theme = n")
-  v-content.my-2
-    v-container(fluid)
-      v-slide-y-transition(mode='out-in')
-        router-view
+  main
+    v-content.my-2
+      v-container(fluid)
+        v-slide-y-transition(mode='out-in')
+          router-view
 </template>
 
 <script>

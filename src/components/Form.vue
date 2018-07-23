@@ -68,7 +68,7 @@ div
         ul.px-3
           li(v-for='error in formErrors') {{error.message}}
 
-      v-flex.actions(xs12)
+      v-flex.mt-5.actions(xs12)
         slot(name='buttons')
           v-btn.grey(dark, @click.native="$root.back()")
             v-icon(dark, left) chevron_left
@@ -144,56 +144,56 @@ div
 export default {
   props: {
     id: {
-      type: String
+      type: String,
     },
     resource: {
-      type: String
+      type: String,
     },
     subResource: {
-      type: String
+      type: String,
     },
     inline: {
       type: Boolean,
-      default: false
+      default: false,
     },
     groupBy: {
       required: false,
       type: String,
-      default: null
+      default: null,
     },
     submitButtonText: {
       required: false,
       type: String,
-      default: 'Submit'
+      default: 'Submit',
     },
     submitButtonIcon: {
       required: false,
       type: String,
-      default: 'send'
+      default: 'send',
     },
     value: {
       required: false,
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     parentData: {
       required: false,
-      type: Object
+      type: Object,
     },
     formFields: {
-      type: Object
+      type: Object,
     },
     autoSubmit: {
-      type: Boolean
+      type: Boolean,
     },
     type: {
       type: String,
-      default: 'form'
+      default: 'form',
     },
     readonly: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
@@ -207,8 +207,8 @@ export default {
       formType: 'simple',
       wizardData: {
         wizardStep: 0,
-        wizardContent: []
-      }
+        wizardContent: [],
+      },
     };
   },
   computed: {
@@ -238,7 +238,9 @@ export default {
       return { parents, children };
     },
     method() {
-      return (this.$route.query.method || (this.isEdit ? 'patch' : 'post')).toLowerCase();
+      return (
+        this.$route.query.method || (this.isEdit ? 'patch' : 'post')
+      ).toLowerCase();
     },
     isCreate() {
       return !!!this.id;
@@ -273,11 +275,12 @@ export default {
           .groupBy('wizardStepTitle')
           .toPairs()
           .map(currentItem => {
-            let title = currentItem[0] != 'undefined' ? currentItem[0] : 'Final Step';
+            let title =
+              currentItem[0] != 'undefined' ? currentItem[0] : 'Final Step';
 
             return {
               wizardTitle: title,
-              fields: currentItem[1]
+              fields: currentItem[1],
             };
           })
           .orderBy('wizardTitle')
@@ -289,7 +292,7 @@ export default {
       }
 
       return [];
-    }
+    },
   },
   watch: {
     value(val) {
@@ -302,7 +305,7 @@ export default {
     },
     formFields() {
       this.refresh();
-    }
+    },
   },
   methods: {
     refresh: async function() {
@@ -327,7 +330,7 @@ export default {
                 if (!fkData) {
                   console.error(
                     `Field "${val.fk}" \
-                    not found in parent data or table "${keyData}"`
+                    not found in parent data or table "${keyData}"`,
                   );
                 }
 
@@ -370,7 +373,8 @@ export default {
               !isShow &&
               this.model[optional.property] &&
               (this.model[optional.property] === optional.value ||
-                this.model[optional.property].toLowerCase() === optional.value.toLowerCase());
+                this.model[optional.property].toLowerCase() ===
+                  optional.value.toLowerCase());
           });
 
           return isShow;
@@ -387,7 +391,7 @@ export default {
         const data = await this.$store.dispatch('fetchFormSchema', {
           id: this.model ? this.model.id : this.id,
           resource: `${this.resource}`,
-          subResource: `${this.subResource || 'form'}`
+          subResource: `${this.subResource || 'form'}`,
         });
 
         this.dataFormFields = data.fields;
@@ -472,7 +476,10 @@ export default {
 
         this.$emit('input', this.model);
 
-        const result = await this.$http['post'](`${this.resource}/draft`, this.model);
+        const result = await this.$http['post'](
+          `${this.resource}/draft`,
+          this.model,
+        );
 
         if (!subForm) {
           this.$emit('success', result.data);
@@ -511,13 +518,15 @@ export default {
           cb();
           return;
         }
-        if (this.wizardData.wizardStep >= this.wizardData.wizardContent.length) {
+        if (
+          this.wizardData.wizardStep >= this.wizardData.wizardContent.length
+        ) {
           this.onSubmit();
         }
 
         if (this.fieldErrors.length > 0) {
           const checkFieldError = this._.filter(this.fieldErrors, {
-            wizardIndex: index
+            wizardIndex: index,
           });
 
           if (checkFieldError.length > 0) {
@@ -527,7 +536,10 @@ export default {
 
         this.$emit('input', this.model);
 
-        const result = await this.$http['post'](`${this.resource}/draft`, this.model);
+        const result = await this.$http['post'](
+          `${this.resource}/draft`,
+          this.model,
+        );
 
         this.model = result.data;
         this.model.id = result.data.id;
@@ -563,15 +575,15 @@ export default {
     },
     getWizardStepError(index) {
       const errorStep = this._.filter(this.fieldErrors, {
-        wizardIndex: index
+        wizardIndex: index,
       });
 
       return errorStep;
-    }
+    },
   },
   created() {
     this.refresh();
-  }
+  },
 };
 </script>
 

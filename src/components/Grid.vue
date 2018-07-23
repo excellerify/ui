@@ -59,9 +59,18 @@ v-flex(xs12, style="margin-bottom: 16px")
                 submitButtonText="Search"
                 submitButtonIcon="search")
 
+  v-layout(v-if="loading" flex align-center justify-center)
+    v-progress-circular(
+      :width="8"
+      :size="128"
+      color="primary"
+      style="margin-left:auto; margin-right:auto;"
+      indeterminate)
+
   v-data-table(
     v-model="selected"
     class="elevation-1"
+    v-if="!loading"
     :headers="[{}, ...columns, {}]"
     :items='items'
     :total-items="pagination.totalItems"
@@ -469,11 +478,12 @@ export default class Grid extends Vue {
         this.pagination.descending = desc;
       }
 
-      this.loading = false;
       return;
     } catch (err) {
       this.error = err;
       return err;
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -484,6 +494,8 @@ export default class Grid extends Vue {
 
   async fetchData() {
     try {
+      this.loading = true;
+
       let type: '' | 'draft' | 'deleted' = '';
 
       await this.$store.dispatch('checkPageTitle', { path: this.$route.path });
@@ -521,6 +533,8 @@ export default class Grid extends Vue {
       console.error(err);
       this.error = err;
       return err;
+    } finally {
+      this.loading = false;
     }
   }
 
