@@ -244,280 +244,292 @@ div
 
 </template>
 
-<script>
+<script lang="ts">
 import randomstring from 'randomstring';
 import moment, { now } from 'moment';
-import EventBus from '../eventBus.js';
+import EventBus from '../eventBus';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import { Prop, Watch } from 'vue-property-decorator';
+import { config } from '@/config';
 
 import 'vue2-dropzone/dist/vue2Dropzone.css';
 
-export default {
-  props: {
-    resourceId: {
-      type: String,
-      default: '00000000-0000-0000-0000-000000000000'
-    },
-    field: {
-      type: Object,
-      required: true
-    },
-    name: {
-      type: String,
-      required: false
-    },
-    value: {
-      required: false
-    },
-    width: {
-      type: Number,
-      required: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    inline: {
-      type: Boolean,
-      default: false
-    },
-    wizardIndex: {
-      type: Number
-    }
-  },
-  data() {
-    return {
-      inputGroupClass: 'input-group input-group--dirty input-group--text-field',
-      editorOption: {
-        modules: {
-          toolbar: [
-            ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            ['blockquote', 'code-block'],
-            [{ header: 1 }, { header: 2 }], // custom button values
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            [{ indent: '-1' }, { indent: '+1' }],
-            [{ align: [] }]
-          ]
-        }
-      },
-      passwordInvisible: true,
-      addSubdata: false,
-      tableForm: {},
-      isError: false,
-      errorMessage: [],
-      isShowDialogForm: false,
-      currentItem: null,
-      parentData: {},
-      loading: false,
-      autoCompleteSync: null,
-      menuShowTogle: {
-        date: false,
-        time: false
-      },
-      dataField: this.field
-    };
-  },
-  watch: {
-    'errors.items': {
-      handler(val) {
-        this.isError = val.length > 0;
-        this.errorMessage = this.isError ? val[0].msg : [];
+@Component({ name: 'Field' })
+export default class Field extends Vue {
+  @Prop({
+    type: String,
+    required: true,
+    default: '00000000-0000-0000-0000-000000000000',
+  })
+  resourceId!: string;
 
-        this.emitError({
-          isError: this.isError,
-          msg: val.length > 0 ? val[0].msg : ''
+  @Prop({
+    type: Object,
+    required: true,
+  })
+  field!: string;
+
+  @Prop({
+    type: String,
+  })
+  name!: string;
+
+  @Prop() value!: string;
+
+  @Prop({
+    type: Number,
+  })
+  width!: string;
+
+  @Prop({
+    type: Boolean,
+  })
+  readonly!: string;
+
+  @Prop({
+    type: Boolean,
+  })
+  inline!: string;
+
+  @Prop({
+    type: Number,
+  })
+  wizardIndex!: string;
+
+  // data() {
+  //   return {
+  inputGroupClass: string = 'input-group input-group--dirty input-group--text-field';
+  editorOption = {
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+        ['blockquote', 'code-block'],
+        [{ header: 1 }, { header: 2 }], // custom button values
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ indent: '-1' }, { indent: '+1' }],
+        [{ align: [] }],
+      ],
+    },
+  };
+  passwordInvisible: boolean = true;
+  addSubdata: boolean = false;
+  tableForm = {};
+  isError: boolean = false;
+  errorMessage = [];
+  isShowDialogForm: boolean = false;
+  currentItem = null;
+  parentData = {};
+  loading: boolean = false;
+  autoCompleteSync: null;
+  menuShowTogle: {
+    date: false;
+    time: false;
+  };
+  dataField = this.field;
+  // },
+  // watch: {
+  @Watch('errors.items', { deep: true })
+  onErrorItems(val) {
+    this.isError = val.length > 0;
+    this.errorMessage = this.isError ? val[0].msg : [];
+
+    this.emitError({
+      isError: this.isError,
+      msg: val.length > 0 ? val[0].msg : '',
+    });
+  }
+
+  @Watch('autoCompleteSync')
+  onAutoCompleteSync(val) {
+    if (val) {
+      this.doAutoCompleteSync(val);
+    } else if (this.model) {
+      this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
+    }
+  }
+
+  @Watch('value')
+  onValue(val) {
+    const isError = this.dataField.required && !val;
+    this.emitError({ isError });
+    if (
+      ['select', 'select2'].includes(this.dataField.type) &&
+      this.dataField.dataSource &&
+      this.model
+    ) {
+      this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
+    }
+  }
+
+  get resource() {
+    return this.$route.params.resource;
+  }
+
+  get model() {
+    if (['money', 'number'].indexOf(this.dataField.type) > -1) {
+      return global.helper.moneyFormatter(this.value);
+    }
+    const formatDate = date => {
+      return date ? moment(String(date)).format(config.format.date) : null;
+    };
+    const formatTime = date => {
+      return date ? moment(String(date)).format('HH:mm') : null;
+    };
+    if (['date'].indexOf(this.dataField.type) > -1) {
+      const date = formatDate(this.value);
+      return { date };
+    }
+    if (['time'].indexOf(this.dataField.type) > -1) {
+      const time = formatTime(this.value);
+      return { time };
+    } else if (['datetime'].indexOf(this.dataField.type) > -1) {
+      const date = formatDate(this.value);
+      const time = formatTime(this.value);
+      return { date, time };
+    }
+    return this.value;
+  }
+
+  set model(val) {
+    if (['money', 'number'].indexOf(this.dataField.type) > -1) {
+      val = Number(val.replace(/[^0-9\.-]+/g, ''));
+    } else if (['datetime'].indexOf(this.dataField.type) > -1) {
+      const { date, time } = val;
+      const dateTime = moment(
+        `${date || '0000-00-00'} ${time || '00:00'}`,
+        `${config.format.date} ${config.format.time}`,
+      );
+      return this.$emit('input', dateTime.toDate());
+    } else if (['time'].indexOf(this.dataField.type) > -1) {
+      return this.$emit('input', val.time);
+    } else if (['date'].indexOf(this.dataField.type) > -1) {
+      return this.$emit('input', val.date);
+    }
+    return this.$emit('input', val);
+  }
+
+  get validationRules() {
+    const rules = {
+      required: !!this.dataField.required,
+      email: this.dataField.type
+        ? this.dataField.type.toLowerCase() === 'email'
+        : false,
+    };
+    return rules;
+  }
+
+  emitError({ isError, msg } = {}) {
+    this.$emit('fieldError', {
+      field: this.name,
+      wizardIndex: this.wizardIndex,
+      isError,
+      message: isError
+        ? msg || `The ${this.dataField.label} field is required.`
+        : [],
+    });
+  }
+
+  onUploading(file, xhr, formData) {
+    const extension = file.name.split('.');
+    formData.append('id', this.resourceId);
+    file.upload.filename = `${randomstring.generate()}.${
+      extension[extension.length - 1]
+    }`;
+  }
+
+  onUploadSuccess(file, response) {
+    if (response.url) {
+      const filename = response.url;
+      this.model = `${response.url}`;
+      return;
+    }
+
+    const filename = response.url || response.result.files.file[0].name;
+    this.model = `${config.api}Files/${this.resource}/download/${filename}`;
+  }
+
+  getDropzoneOptions(field, model) {
+    const uploadUrl = this.dataField.uploadUrl
+      ? `${config.api}${this.dataField.uploadUrl}`
+      : `${config.ajaxUploadUrl}/${this.resource}/upload`;
+
+    return {
+      url: `${uploadUrl}`,
+      thumbnailWidth: 150,
+      maxFilesize: 1024,
+      acceptedFileTypes: field.acceptedFileTypes,
+      id: 'dropzone_' + this.name,
+      createThumbnailFromUrl: model,
+      uploadMultiple: false,
+      maxFiles: 1,
+      init: function() {
+        this.on('addedfile', function(file) {
+          if (this.files.length > 1) {
+            this.removeFile(this.files[0]);
+          }
         });
       },
-      deep: true
-    },
-    autoCompleteSync(val) {
-      if (val) {
-        this.onAutoCompleteSync(val);
+    };
+  }
+
+  onGridCreate() {
+    this.prepareGridSubFormData();
+  }
+
+  onGridUpdate({ item }) {
+    this.currentItem = item;
+    this.prepareGridSubFormData();
+  }
+
+  prepareGridSubFormData() {
+    this.parentData[this.resource] = {
+      id: this.resourceId,
+    };
+    this.isShowDialogForm = true;
+  }
+
+  modalSubFormClose() {
+    this.isShowDialogForm = false;
+    this.$emit('refresh');
+    EventBus.$emit('gridRefresh');
+  }
+
+  async doAutoCompleteSync(val) {
+    try {
+      this.loading = true;
+      const data = await this.$store.dispatch('fetchAutoComplete', {
+        dataSource: this.dataField.dataSource,
+        searchVal: val,
+      });
+      if (data.length > 0) {
+        this.dataField.choices = data.map(val =>
+          this.populateAutocompleteChoices(val),
+        );
       } else if (this.model) {
         this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
+      } else {
+        this.dataField.choices = null;
       }
-    },
-    value(val) {
-      const isError = this.dataField.required && !val;
-      this.emitError({ isError });
-
-      if (
-        ['select', 'select2'].includes(this.dataField.type) &&
-        this.dataField.dataSource &&
-        this.model
-      ) {
-        this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
-      }
+      this.loading = false;
+    } catch (e) {
+      this.loading = false;
+      throw e;
     }
-  },
-  computed: {
-    resource() {
-      return this.$route.params.resource;
-    },
-    model: {
-      get() {
-        if (['money', 'number'].indexOf(this.dataField.type) > -1) {
-          return global.helper.moneyFormatter(this.value);
-        }
+  }
 
-        const formatDate = date => {
-          return date ? moment(String(date)).format(this.$store.state.config.format.date) : null;
-        };
-
-        const formatTime = date => {
-          return date ? moment(String(date)).format('HH:mm') : null;
-        };
-
-        if (['date'].indexOf(this.dataField.type) > -1) {
-          const date = formatDate(this.value);
-          return { date };
-        }
-        if (['time'].indexOf(this.dataField.type) > -1) {
-          const time = formatTime(this.value);
-          return { time };
-        } else if (['datetime'].indexOf(this.dataField.type) > -1) {
-          const date = formatDate(this.value);
-          const time = formatTime(this.value);
-
-          return { date, time };
-        }
-
-        return this.value;
-      },
-      set(val) {
-        if (['money', 'number'].indexOf(this.dataField.type) > -1) {
-          val = Number(val.replace(/[^0-9\.-]+/g, ''));
-        } else if (['datetime'].indexOf(this.dataField.type) > -1) {
-          const { date, time } = val;
-          const dateTime = moment(
-            `${date || '0000-00-00'} ${time || '00:00'}`,
-            `${this.$store.state.config.format.date} ${this.$store.state.config.format.time}`
-          );
-
-          return this.$emit('input', dateTime.toDate());
-        } else if (['time'].indexOf(this.dataField.type) > -1) {
-          return this.$emit('input', val.time);
-        } else if (['date'].indexOf(this.dataField.type) > -1) {
-          return this.$emit('input', val.date);
-        }
-
-        return this.$emit('input', val);
+  populateAutocompleteChoices(val) {
+    let choice = '';
+    this.dataField.dataSource.searchParams.map((param, key) => {
+      choice += this._.get(val, param);
+      if (key != this.dataField.dataSource.searchParams.length - 1) {
+        choice += ' - ';
       }
-    },
-    validationRules() {
-      const rules = {
-        required: !!this.dataField.required,
-        email: this.dataField.type ? this.dataField.type.toLowerCase() === 'email' : false
-      };
+    });
+    return { value: val, text: choice };
+  }
 
-      return rules;
-    }
-  },
-  methods: {
-    emitError({ isError, msg } = {}) {
-      this.$emit('fieldError', {
-        field: this.name,
-        wizardIndex: this.wizardIndex,
-        isError,
-        message: isError ? msg || `The ${this.dataField.label} field is required.` : []
-      });
-    },
-    onUploading(file, xhr, formData) {
-      const extension = file.name.split('.');
-
-      formData.append('id', this.resourceId);
-
-      file.upload.filename = `${randomstring.generate()}.${extension[extension.length - 1]}`;
-    },
-    onUploadSuccess(file, response) {
-      if (response.url) {
-        const filename = response.url;
-        this.model = `${response.url}`;
-        return;
-      }
-
-      const filename = response.url || response.result.files.file[0].name;
-      this.model = `${this.$store.state.config.api}Files/${this.resource}/download/${filename}`;
-    },
-    getDropzoneOptions(field, model) {
-      const uploadUrl = this.dataField.uploadUrl
-        ? `${this.$store.state.config.api}${this.dataField.uploadUrl}`
-        : `${this.$store.state.config.ajaxUploadUrl}/${this.resource}/upload`;
-
-      return {
-        url: `${uploadUrl}`,
-        thumbnailWidth: 150,
-        maxFilesize: 1024,
-        acceptedFileTypes: field.acceptedFileTypes,
-        id: 'dropzone_' + this.name,
-        createThumbnailFromUrl: model,
-        uploadMultiple: false,
-        maxFiles: 1,
-        init: function() {
-          this.on('addedfile', function(file) {
-            if (this.files.length > 1) {
-              this.removeFile(this.files[0]);
-            }
-          });
-        }
-      };
-    },
-    onGridCreate() {
-      this.prepareGridSubFormData();
-    },
-    onGridUpdate({ item }) {
-      this.currentItem = item;
-      this.prepareGridSubFormData();
-    },
-    prepareGridSubFormData() {
-      this.parentData[this.resource] = {
-        id: this.resourceId
-      };
-
-      this.isShowDialogForm = true;
-    },
-    modalSubFormClose() {
-      this.isShowDialogForm = false;
-      this.$emit('refresh');
-      EventBus.$emit('gridRefresh');
-    },
-    onAutoCompleteSync: async function(val) {
-      try {
-        this.loading = true;
-
-        const data = await this.$store.dispatch('fetchAutoComplete', {
-          dataSource: this.dataField.dataSource,
-          searchVal: val
-        });
-
-        if (data.length > 0) {
-          this.dataField.choices = data.map(val => this.populateAutocompleteChoices(val));
-        } else if (this.model) {
-          this.dataField.choices = [this.populateAutocompleteChoices(this.model)];
-        } else {
-          this.dataField.choices = null;
-        }
-
-        this.loading = false;
-      } catch (e) {
-        this.loading = false;
-        throw e;
-      }
-    },
-    populateAutocompleteChoices: function(val) {
-      let choice = '';
-
-      this.dataField.dataSource.searchParams.map((param, key) => {
-        choice += this._.get(val, param);
-
-        if (key != this.dataField.dataSource.searchParams.length - 1) {
-          choice += ' - ';
-        }
-      });
-
-      return { value: val, text: choice };
-    }
-  },
   created() {
     if (
       this.dataField.required &&
@@ -535,7 +547,7 @@ export default {
         'datetime',
         'time',
         'hidden',
-        'map'
+        'map',
       ].includes(this.dataField.type)
     ) {
       this.emitError({ isError: true });
@@ -543,15 +555,16 @@ export default {
 
     if (['select', 'select2'].includes(this.dataField.type) && this.model) {
       this.dataField.choices = this.dataField.choices || [
-        this.populateAutocompleteChoices(this.model)
+        this.populateAutocompleteChoices(this.model),
       ];
     }
-  },
+  }
+
   mounted() {
     if (['image'].includes(this.dataField.type) && this.model) {
-      var url = `${this.$store.state.config.api + this.value}`;
+      var url = `${config.api + this.value}`;
       this.$refs.dropzone.manuallyAddFile({}, url);
     }
   }
-};
+}
 </script>

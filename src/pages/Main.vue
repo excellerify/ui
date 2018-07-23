@@ -2,8 +2,8 @@
 div
   v-navigation-drawer(v-model='drawer',:mini-variant="mini", persistent,enable-resize-watcher, :dark="dark", app)
     .pa-3.text-xs-center(v-show="!mini")
-      div(style="padding-left:5em")
-        v-switch(:label="(!dark ? 'Light' : 'Dark') + ' Theme'", v-model="dark", :dark="dark", hide-details)
+      // div(style="padding-left:5em")
+      //   v-switch(:label="(!dark ? 'Light' : 'Dark') + ' Theme'", v-model="dark", :dark="dark", hide-details)
     .pa-3.text-xs-center(v-show="mini")
       .display-2 A
 
@@ -50,17 +50,16 @@ div
       v-list
         v-list-tile(v-for="lang in locales" :key="lang",@mouseover.native="changeLocale(lang)")
           v-list-tile-title {{lang}}
-    v-menu(offset-y)
-      v-btn(icon, dark, slot="activator")
-        v-icon(dark) format_paint
-      v-list
-        v-list-tile(v-for="n in colors", :key="n", :class="n",@mouseover.native="theme = n")
+    // v-menu(offset-y)
+    //   v-btn(icon, dark, slot="activator")
+    //     v-icon(dark) format_paint
+    //   v-list
+    //     v-list-tile(v-for="n in colors", :key="n", :class="n",@mouseover.native="theme = n")
   main
-    v-content
+    v-content.my-2
       v-container(fluid)
-        .py-2
-          v-slide-y-transition(mode='out-in')
-            router-view
+        v-slide-y-transition(mode='out-in')
+          router-view
 </template>
 
 <script>
@@ -74,18 +73,17 @@ export default {
       mini: false,
       drawer: true,
       locales: ['en-US'],
-      colors: ['blue', 'green', 'purple', 'red']
+      colors: ['blue', 'green', 'purple', 'red'],
     };
   },
   computed: {
-    ...mapState(['menu', 'pageTitle'])
+    ...mapState(['menu', 'pageTitle']),
   },
   methods: {
     changeLocale(to) {
       global.helper.ls.set('locale', to);
-      this.$i18n.locale = to;
-    }
-  }
+    },
+  },
 };
 </script>
 

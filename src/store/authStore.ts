@@ -1,12 +1,16 @@
+import { helper } from '@/helper';
+import { http } from '@/http';
+import { router } from '@/router';
 import axios from 'axios';
+import { StoreOptions } from 'vuex';
 
-import router from '../router';
+export interface IAuthStore {
+  user?: object;
+  token?: string;
+  expireTime?: string;
+}
 
-const store = {
-  state: {
-    user: {},
-    token: null
-  },
+export const authStore: StoreOptions<IAuthStore> = {
   mutations: {
     setAuth(state, { user, token, expireTime }) {
       axios.defaults.headers.common.Authorization = token;
@@ -15,37 +19,37 @@ const store = {
       state.token = token;
       state.expireTime = expireTime;
 
-      global.helper.ls.set('user', user);
-      global.helper.ls.set('token', token);
-      global.helper.ls.set('expireTime', expireTime);
-    }
+      helper.ls.set('user', user);
+      helper.ls.set('token', token);
+      helper.ls.set('expireTime', expireTime);
+    },
   },
   actions: {
     checkAuth({ commit }) {
       const data = {
-        user: global.helper.ls.get('user'),
-        token: global.helper.ls.get('token'),
-        expireTime: global.helper.ls.get('expireTime')
+        user: helper.ls.get('user'),
+        token: helper.ls.get('token'),
+        expireTime: helper.ls.get('expireTime'),
       };
 
       commit('setAuth', data);
     },
     login: async ({ commit }, { username, password }) => {
-      const response = await global.$http.post('admins/login', {
+      const response = await http.post('admins/login', {
         username,
-        password
+        password,
       });
 
       commit('setAuth', {
         user: response.data.userId,
         token: response.data.id,
-        expireTime: response.data.ttl
+        expireTime: response.data.ttl,
       });
 
       router.push('/');
     },
     logout: async () => {
-      const result = await global.$http.post('admins/logout');
+      const result = await http.post('admins/logout');
 
       return result;
     },
@@ -53,11 +57,9 @@ const store = {
       commit('setAuth', {
         user: null,
         token: null,
-        expireTime: null
+        expireTime: null,
       });
       router.push('/login');
-    }
-  }
+    },
+  },
 };
-
-export default store;

@@ -2,10 +2,6 @@
   --sidebar-width: 200px;
 }
 
-.content {
-  background: #f9f9f9;
-}
-
 .jl {
   justify-content: flex-start;
 }
@@ -31,4 +27,14 @@
 
 .input-group label {
   font-size: 12px;
+}
+
+.toolbar--fixed {
+  z-index: 99;
+}
+
+.navigation-drawer--is-mobile,
+.navigation-drawer--temporary,
+.navigation-drawer {
+  z-index: 100;
 }
