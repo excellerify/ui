@@ -62,7 +62,7 @@ v-flex(xs12, style="margin-bottom: 16px")
   v-layout(v-if="loading" flex align-center justify-center)
     v-progress-circular(
       :width="8"
-      :size="128"
+      :size="96"
       color="primary"
       style="margin-left:auto; margin-right:auto;"
       indeterminate)

@@ -1,5 +1,13 @@
 <template lang='pug'>
 div
+  v-layout(v-if="loading" flex align-center justify-center)
+    v-progress-circular(
+      :width="8"
+      :size="96"
+      color="primary"
+      style="margin-left:auto; margin-right:auto;"
+      indeterminate)
+
   form(:action='action', @submit.prevent='onSubmit', novalidate)
     v-tabs(grow, scroll-bars, v-model='active', dark, v-if='groupBy')
       v-tabs-bar(slot='activators')
@@ -137,453 +145,469 @@ div
             v-icon(dark, right) save
           v-btn.primary(dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
             v-icon(right, dark) send
-
 </template>
 
-<script>
-export default {
-  props: {
-    id: {
-      type: String,
-    },
-    resource: {
-      type: String,
-    },
-    subResource: {
-      type: String,
-    },
-    inline: {
-      type: Boolean,
-      default: false,
-    },
-    groupBy: {
-      required: false,
-      type: String,
-      default: null,
-    },
-    submitButtonText: {
-      required: false,
-      type: String,
-      default: 'Submit',
-    },
-    submitButtonIcon: {
-      required: false,
-      type: String,
-      default: 'send',
-    },
-    value: {
-      required: false,
-      type: Object,
-      default: () => {},
-    },
-    parentData: {
-      required: false,
-      type: Object,
-    },
-    formFields: {
-      type: Object,
-    },
-    autoSubmit: {
-      type: Boolean,
-    },
-    type: {
-      type: String,
-      default: 'form',
-    },
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      model: this.value,
-      hasError: false,
-      formErrors: [],
-      message: '',
-      fieldErrors: [],
-      rules: null,
-      dataFormFields: null,
-      formType: 'simple',
-      wizardData: {
-        wizardStep: 0,
-        wizardContent: [],
-      },
-    };
-  },
-  computed: {
-    group() {
-      if (!this.groupBy) {
-        return null;
-      }
-      let parents = {};
-      let children = {};
+<script lang="ts">
+import Component from 'vue-class-component';
+import Vue from 'vue';
+import { Prop, Watch } from 'vue-property-decorator';
 
-      for (let k in this.dataFormFields) {
-        let field = this.dataFormFields[k];
-        let ref = field[this.groupBy];
-        let parentKey = field.id;
+@Component({ name: 'Form' })
+export default class Grid extends Vue {
+  @Prop({ type: String })
+  id!: string;
 
-        if (ref === null) {
-          // is parent
-          parents[parentKey] = field;
-        } else {
-          // is child
-          if (!children[ref]) {
-            children[ref] = {};
-          }
-          children[ref][k] = field;
-        }
-      }
-      return { parents, children };
-    },
-    method() {
-      return (
-        this.$route.query.method || (this.isEdit ? 'patch' : 'post')
-      ).toLowerCase();
-    },
-    isCreate() {
-      return !!!this.id;
-    },
-    isEdit() {
-      return !!this.id;
-    },
-    isView() {
-      return this.readonly;
-    },
-    action() {
-      if (this.$route.query.action) {
-        return `${this.resource}/${this.$route.query.action}`;
-      } else if (this.isEdit) {
-        return `${this.resource}/${this.id}`;
+  @Prop({ type: String })
+  resource!: string;
+
+  @Prop({ type: String })
+  subResource!: string;
+
+  @Prop({ type: Boolean, default: false })
+  inline!: boolean;
+
+  @Prop({ type: String })
+  groupBy!: string;
+
+  @Prop({ type: String, default: 'Submit' })
+  submitButtonText!: string;
+
+  @Prop({ type: String, default: 'send' })
+  submitButtonIcon!: string;
+
+  @Prop({ type: Object, default: () => {} })
+  value!: object;
+
+  @Prop({ type: Object, default: () => {} })
+  parentData!: object;
+
+  @Prop({ type: Object, default: () => {} })
+  formFields!: object;
+
+  @Prop({ type: Boolean })
+  autoSubmit!: boolean;
+
+  @Prop({ type: String, default: 'form' })
+  type!: string;
+
+  @Prop({ type: Boolean, default: false })
+  readonly!: string;
+
+  error: Error;
+
+  loading = false;
+
+  model = this.value;
+
+  hasError = false;
+
+  formErrors = [];
+
+  message = '';
+
+  fieldErrors = [];
+
+  rules = null;
+
+  dataFormFields = null;
+
+  formType = 'simple';
+
+  wizardData = {
+    wizardStep: 0,
+    wizardContent: [],
+  };
+
+  get group() {
+    if (!this.groupBy) {
+      return null;
+    }
+    let parents = {};
+    let children = {};
+
+    for (let k in this.dataFormFields) {
+      let field = this.dataFormFields[k];
+      let ref = field[this.groupBy];
+      let parentKey = field.id;
+
+      if (ref === null) {
+        // is parent
+        parents[parentKey] = field;
       } else {
-        return `${this.resource}`;
+        // is child
+        if (!children[ref]) {
+          children[ref] = {};
+        }
+        children[ref][k] = field;
       }
-    },
-    getFields() {
-      return this.filteredFields();
-    },
-    getWizardContent() {
-      if (this.formType === 'wizard') {
-        const wizardContent = this._.chain(this.filteredFields())
-          .map((currentItem, key) => {
-            // transform object key into property name,
-            // to make fields can be stored in array
-            currentItem.name = key;
-            return currentItem;
-          })
-          .groupBy('wizardStepTitle')
-          .toPairs()
-          .map(currentItem => {
-            let title =
-              currentItem[0] != 'undefined' ? currentItem[0] : 'Final Step';
+    }
+    return { parents, children };
+  }
 
-            return {
-              wizardTitle: title,
-              fields: currentItem[1],
-            };
-          })
-          .orderBy('wizardTitle')
-          .value();
+  get method() {
+    return (
+      this.$route.query.method || (this.isEdit ? 'patch' : 'post')
+    ).toLowerCase();
+  }
 
-        this.wizardData.wizardContent = wizardContent;
+  get isCreate() {
+    return !!!this.id;
+  }
 
-        return wizardContent;
-      }
+  get isEdit() {
+    return !!this.id;
+  }
 
-      return [];
-    },
-  },
-  watch: {
-    value(val) {
-      this.model = val;
-    },
-    $route() {
+  get isView() {
+    return this.readonly;
+  }
+
+  get action() {
+    if (this.$route.query.action) {
+      return `${this.resource}/${this.$route.query.action}`;
+    } else if (this.isEdit) {
+      return `${this.resource}/${this.id}`;
+    } else {
+      return `${this.resource}`;
+    }
+  }
+
+  get getFields() {
+    return this.filteredFields();
+  }
+
+  get getWizardContent() {
+    if (this.formType === 'wizard') {
+      const wizardContent = this._.chain(this.filteredFields())
+        .map((currentItem, key) => {
+          // transform object key into property name,
+          // to make fields can be stored in array
+          currentItem.name = key;
+          return currentItem;
+        })
+        .groupBy('wizardStepTitle')
+        .toPairs()
+        .map(currentItem => {
+          let title =
+            currentItem[0] != 'undefined' ? currentItem[0] : 'Final Step';
+
+          return {
+            wizardTitle: title,
+            fields: currentItem[1],
+          };
+        })
+        .orderBy('wizardTitle')
+        .value();
+
+      this.wizardData.wizardContent = wizardContent;
+
+      return wizardContent;
+    }
+
+    return [];
+  }
+
+  @Watch('value')
+  onValue(val: object) {
+    this.model = val;
+  }
+
+  @Watch('$route')
+  onRoute() {
+    this.fieldErrors = [];
+    this.hasError = false;
+    this.refresh();
+  }
+
+  @Watch('formFields')
+  onFormFields() {
+    this.refresh();
+  }
+
+  async refresh() {
+    try {
       this.fieldErrors = [];
-      this.hasError = false;
-      this.refresh();
-    },
-    formFields() {
-      this.refresh();
-    },
-  },
-  methods: {
-    refresh: async function() {
-      try {
-        this.fieldErrors = [];
 
-        if (this.formFields) {
-          this.dataFormFields = this.formFields;
-        } else {
-          await this.fetchFormSchema();
-        }
-
-        if (this.type === 'subForm' && this.parentData) {
-          // resolve parent FK
-          this._.forEach(this.filteredFields(), (val, key) => {
-            // if field is marked as FK, resolve FK data
-            if (val.fk) {
-              this._.forEach(this.parentData, (valData, keyData) => {
-                const fkData = valData[val.fk[keyData]];
-
-                // if FK data not found, raise error
-                if (!fkData) {
-                  console.error(
-                    `Field "${val.fk}" \
-                    not found in parent data or table "${keyData}"`,
-                  );
-                }
-
-                // assign FK data, from parrent to form field
-                this.model[key] = fkData;
-              });
-            }
-          });
-        }
-      } catch (e) {
-        throw e;
+      if (this.formFields) {
+        this.dataFormFields = this.formFields;
+      } else {
+        await this.fetchFormSchema();
       }
-    },
-    filteredFields() {
-      if (!this.dataFormFields) return;
 
-      const fields = Object.assign(this.dataFormFields);
+      if (this.type === 'subForm' && this.parentData) {
+        // resolve parent FK
+        this._.forEach(this.filteredFields(), (val, key) => {
+          // if field is marked as FK, resolve FK data
+          if (val.fk) {
+            this._.forEach(this.parentData, (valData, keyData) => {
+              const fkData = valData[val.fk[keyData]];
 
-      // Show only available mode
-      let result = this._.pickBy(fields, (val, key) => {
-        if (val.mode) {
-          if (this.isEdit) {
-            return val.mode.indexOf('isEdit') > -1;
-          } else if (this.isView) {
-            return val.mode.indexOf('isView') > -1;
-          } else {
-            return val.mode.indexOf('isCreate') > -1;
+              // if FK data not found, raise error
+              if (!fkData) {
+                console.error(
+                  `Field "${val.fk}" \
+                    not found in parent data or table "${keyData}"`,
+                );
+              }
+
+              // assign FK data, from parrent to form field
+              this.model[key] = fkData;
+            });
           }
+        });
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  filteredFields() {
+    if (!this.dataFormFields) return;
+
+    const fields = Object.assign(this.dataFormFields);
+
+    // Show only available mode
+    let result = this._.pickBy(fields, (val, key) => {
+      if (val.mode) {
+        if (this.isEdit) {
+          return val.mode.indexOf('isEdit') > -1;
+        } else if (this.isView) {
+          return val.mode.indexOf('isView') > -1;
+        } else {
+          return val.mode.indexOf('isCreate') > -1;
         }
+      }
 
-        return true;
-      });
+      return true;
+    });
 
-      result = this._.pickBy(result, (val, key) => {
-        if (val.optionalsOn) {
-          let isShow = false;
+    result = this._.pickBy(result, (val, key) => {
+      if (val.optionalsOn) {
+        let isShow = false;
 
-          val.optionalsOn.map(optional => {
-            isShow =
-              !isShow &&
-              this.model[optional.property] &&
-              (this.model[optional.property] === optional.value ||
-                this.model[optional.property].toLowerCase() ===
-                  optional.value.toLowerCase());
-          });
-
-          return isShow;
-        }
-
-        return true;
-      });
-
-      return result;
-    },
-
-    fetchFormSchema: async function() {
-      try {
-        const data = await this.$store.dispatch('fetchFormSchema', {
-          id: this.model ? this.model.id : this.id,
-          resource: `${this.resource}`,
-          subResource: `${this.subResource || 'form'}`,
+        val.optionalsOn.map(optional => {
+          isShow =
+            !isShow &&
+            this.model[optional.property] &&
+            (this.model[optional.property] === optional.value ||
+              this.model[optional.property].toLowerCase() ===
+                optional.value.toLowerCase());
         });
 
-        this.dataFormFields = data.fields;
-        this.model = data.model || {};
-        this.rules = data.rules || {};
-
-        if (this.isCreate) {
-          this.formType = data.type || this.formType;
-        }
-
-        return data;
-      } catch (e) {
-        this.error = e;
-        throw e;
+        return isShow;
       }
-    },
-    updateFieldsError({ field, isError, message, wizardIndex }) {
-      const index = this._.findIndex(this.fieldErrors, { field });
 
-      if (isError) {
-        if (index < 0) {
-          this.fieldErrors.push({ field, isError, message, wizardIndex });
-        }
-      } else {
-        if (index > -1) {
-          this.fieldErrors.splice(index, 1);
-        }
-      }
-    },
-    onSubmit: async function({ subForm, cb } = {}) {
-      try {
-        if (this.fieldErrors.length > 0) {
-          throw this.fieldErrors;
-        }
+      return true;
+    });
 
-        this.$emit('input', this.model);
+    return result;
+  }
 
-        if (this.autoSubmit) {
-          this.$emit('submit');
-          return;
-        }
+  async fetchFormSchema() {
+    try {
+      this.loading = true;
 
-        const result = await this.$http[this.method](this.action, this.model);
-
-        if (!subForm) {
-          this.$emit('success', result.data);
-        }
-
-        this.model = result.data;
-        this.model.id = result.data.id;
-
-        if (cb) {
-          cb(result.data);
-        }
-
-        return result.data;
-      } catch (e) {
-        this.hasError = true;
-
-        if (Array.isArray(e)) {
-          this.formErrors = e;
-        } else {
-          let err;
-
-          if (e.response && e.response.data) {
-            err = e.response.data.error || e.response.data;
-          } else {
-            err = e;
-          }
-          this.formErrors = [err];
-        }
-
-        this.$emit('error', e);
-      }
-    },
-
-    onSaveAsDraft: async function({ subForm, cb } = {}) {
-      try {
-        if (this.fieldErrors.length > 0) {
-          throw this.fieldErrors;
-        }
-
-        this.$emit('input', this.model);
-
-        const result = await this.$http['post'](
-          `${this.resource}/draft`,
-          this.model,
-        );
-
-        if (!subForm) {
-          this.$emit('success', result.data);
-        }
-
-        this.model = result.data;
-        this.model.id = result.data.id;
-
-        if (cb) {
-          cb(result.data);
-        }
-
-        return result.data;
-      } catch (e) {
-        this.hasError = true;
-
-        if (Array.isArray(e)) {
-          this.formErrors = e;
-        } else {
-          let err;
-
-          if (e.response && e.response.data) {
-            err = e.response.data.error || e.response.data;
-          } else {
-            err = e;
-          }
-          this.formErrors = [err];
-        }
-
-        this.$emit('error', e);
-      }
-    },
-    onWizardContinue: async function({ index, cb } = {}) {
-      try {
-        if (cb) {
-          cb();
-          return;
-        }
-        if (
-          this.wizardData.wizardStep >= this.wizardData.wizardContent.length
-        ) {
-          this.onSubmit();
-        }
-
-        if (this.fieldErrors.length > 0) {
-          const checkFieldError = this._.filter(this.fieldErrors, {
-            wizardIndex: index,
-          });
-
-          if (checkFieldError.length > 0) {
-            throw checkFieldError;
-          }
-        }
-
-        this.$emit('input', this.model);
-
-        const result = await this.$http['post'](
-          `${this.resource}/draft`,
-          this.model,
-        );
-
-        this.model = result.data;
-        this.model.id = result.data.id;
-
-        this.wizardData.wizardStep = index + 2;
-        this.formErrors = [];
-
-        return result.data;
-      } catch (e) {
-        this.hasError = true;
-
-        if (Array.isArray(e)) {
-          this.formErrors = e;
-        } else {
-          let err;
-
-          if (e.response && e.response.data) {
-            err = e.response.data.error || e.response.data;
-          } else {
-            err = e;
-          }
-          this.formErrors = [err];
-        }
-
-        this.$emit('error', e);
-
-        throw e;
-      }
-    },
-    checkWizardStepError(index) {
-      const errorStep = this.getWizardStepError(index);
-      return !(errorStep && errorStep.length > 0);
-    },
-    getWizardStepError(index) {
-      const errorStep = this._.filter(this.fieldErrors, {
-        wizardIndex: index,
+      const data = await this.$store.dispatch('fetchFormSchema', {
+        id: this.model ? this.model.id : this.id,
+        resource: `${this.resource}`,
+        subResource: `${this.subResource || 'form'}`,
       });
 
-      return errorStep;
-    },
-  },
+      this.dataFormFields = data.fields;
+      this.model = data.model || {};
+      this.rules = data.rules || {};
+
+      if (this.isCreate) {
+        this.formType = data.type || this.formType;
+      }
+
+      return data;
+    } catch (e) {
+      this.error = e;
+      throw e;
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  updateFieldsError({ field, isError, message, wizardIndex }) {
+    const index = this._.findIndex(this.fieldErrors, { field });
+
+    if (isError) {
+      if (index < 0) {
+        this.fieldErrors.push({ field, isError, message, wizardIndex });
+      }
+    } else {
+      if (index > -1) {
+        this.fieldErrors.splice(index, 1);
+      }
+    }
+  }
+
+  async onSubmit({ subForm, cb } = {}) {
+    try {
+      if (this.fieldErrors.length > 0) {
+        throw this.fieldErrors;
+      }
+
+      this.$emit('input', this.model);
+
+      if (this.autoSubmit) {
+        this.$emit('submit');
+        return;
+      }
+
+      const result = await this.$http[this.method](this.action, this.model);
+
+      if (!subForm) {
+        this.$emit('success', result.data);
+      }
+
+      this.model = result.data;
+      this.model.id = result.data.id;
+
+      if (cb) {
+        cb(result.data);
+      }
+
+      return result.data;
+    } catch (e) {
+      this.hasError = true;
+
+      if (Array.isArray(e)) {
+        this.formErrors = e;
+      } else {
+        let err;
+
+        if (e.response && e.response.data) {
+          err = e.response.data.error || e.response.data;
+        } else {
+          err = e;
+        }
+        this.formErrors = [err];
+      }
+
+      this.$emit('error', e);
+    }
+  }
+
+  async onSaveAsDraft({ subForm, cb } = {}) {
+    try {
+      if (this.fieldErrors.length > 0) {
+        throw this.fieldErrors;
+      }
+
+      this.$emit('input', this.model);
+
+      const result = await this.$http['post'](
+        `${this.resource}/draft`,
+        this.model,
+      );
+
+      if (!subForm) {
+        this.$emit('success', result.data);
+      }
+
+      this.model = result.data;
+      this.model.id = result.data.id;
+
+      if (cb) {
+        cb(result.data);
+      }
+
+      return result.data;
+    } catch (e) {
+      this.hasError = true;
+
+      if (Array.isArray(e)) {
+        this.formErrors = e;
+      } else {
+        let err;
+
+        if (e.response && e.response.data) {
+          err = e.response.data.error || e.response.data;
+        } else {
+          err = e;
+        }
+        this.formErrors = [err];
+      }
+
+      this.$emit('error', e);
+    }
+  }
+
+  async onWizardContinue({ index, cb } = {}) {
+    try {
+      if (cb) {
+        cb();
+        return;
+      }
+      if (this.wizardData.wizardStep >= this.wizardData.wizardContent.length) {
+        this.onSubmit();
+      }
+
+      if (this.fieldErrors.length > 0) {
+        const checkFieldError = this._.filter(this.fieldErrors, {
+          wizardIndex: index,
+        });
+
+        if (checkFieldError.length > 0) {
+          throw checkFieldError;
+        }
+      }
+
+      this.$emit('input', this.model);
+
+      const result = await this.$http['post'](
+        `${this.resource}/draft`,
+        this.model,
+      );
+
+      this.model = result.data;
+      this.model.id = result.data.id;
+
+      this.wizardData.wizardStep = index + 2;
+      this.formErrors = [];
+
+      return result.data;
+    } catch (e) {
+      this.hasError = true;
+
+      if (Array.isArray(e)) {
+        this.formErrors = e;
+      } else {
+        let err;
+
+        if (e.response && e.response.data) {
+          err = e.response.data.error || e.response.data;
+        } else {
+          err = e;
+        }
+        this.formErrors = [err];
+      }
+
+      this.$emit('error', e);
+
+      throw e;
+    }
+  }
+
+  checkWizardStepError(index) {
+    const errorStep = this.getWizardStepError(index);
+    return !(errorStep && errorStep.length > 0);
+  }
+
+  getWizardStepError(index) {
+    const errorStep = this._.filter(this.fieldErrors, {
+      wizardIndex: index,
+    });
+
+    return errorStep;
+  }
+
   created() {
     this.refresh();
-  },
-};
+  }
+}
 </script>
 

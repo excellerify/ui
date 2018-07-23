@@ -46,3 +46,7 @@
 .v-label {
   font-size: 14px;
 }
+
+.v-stepper {
+  box-shadow: none;
+}

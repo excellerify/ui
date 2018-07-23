@@ -314,19 +314,30 @@ export default class Field extends Vue {
     },
   };
   passwordInvisible: boolean = true;
+
   addSubdata: boolean = false;
+
   tableForm = {};
+
   isError: boolean = false;
+
   errorMessage = [];
+
   isShowDialogForm: boolean = false;
+
   currentItem = null;
+
   parentData = {};
+
   loading: boolean = false;
+
   autoCompleteSync = null;
+
   menuShowTogle = {
     date: false,
     time: false,
   };
+
   dataField = this.field;
 
   // },
