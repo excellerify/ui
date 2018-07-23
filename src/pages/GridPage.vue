@@ -1,5 +1,5 @@
 <template lang="pug">
-div.card
+div.card.bg-white
   v-card-text
     v-grid(
       :resource="resource",

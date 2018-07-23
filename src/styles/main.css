@@ -38,3 +38,11 @@
 .navigation-drawer {
   z-index: 100;
 }
+
+.bg-white {
+  background: #ffffff;
+}
+
+.v-label {
+  font-size: 14px;
+}

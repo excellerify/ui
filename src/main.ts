@@ -22,6 +22,7 @@ import { config } from '@/config';
 import { helper } from '@/helper';
 import { http } from '@/http';
 import { i18n } from '@/i18n/';
+import { IMenu } from '@/interfaces/menu.interface';
 import { router } from '@/router';
 import { store } from '@/store';
 
@@ -81,14 +82,22 @@ new Vue({
   i18n,
   router,
   async created() {
-    // setupGoogleMap();
+    setupGoogleMap();
 
     // utils.http = this.$http;
     // utils.t = this.$t;
 
     // fetch menu from server
-    await http.get('/settings/menu').then(({ data }) => {
+    await http.get('/settings/menu').then(({ data }: { data: IMenu[] }) => {
       this.$store.commit('setMenu', data);
+
+      const mainHeader = _.find(
+        data.map(val => {
+          return !!val.mainHeader && val.mainHeader;
+        }),
+      );
+
+      config.appTitle = mainHeader || 'MagiShift';
     });
 
     this.$store.dispatch('checkPageTitle', { path: this.$route.path });

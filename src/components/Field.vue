@@ -31,9 +31,9 @@ div
         :readonly="readonly")
 
       //- if autocomplete
-      v-select(
+      v-autocomplete(
+        placeholder="Start typing to Search"
         v-else-if="dataField.dataSource"
-        autocomplete
         v-validate="validationRules"
         v-model="model"
         v-bind="dataField"
@@ -322,12 +322,13 @@ export default class Field extends Vue {
   currentItem = null;
   parentData = {};
   loading: boolean = false;
-  autoCompleteSync: null;
-  menuShowTogle: {
-    date: false;
-    time: false;
+  autoCompleteSync = null;
+  menuShowTogle = {
+    date: false,
+    time: false,
   };
   dataField = this.field;
+
   // },
   // watch: {
   @Watch('errors.items', { deep: true })
@@ -342,7 +343,7 @@ export default class Field extends Vue {
   }
 
   @Watch('autoCompleteSync')
-  onAutoCompleteSync(val) {
+  onAutoCompleteSync(val: string) {
     if (val) {
       this.doAutoCompleteSync(val);
     } else if (this.model) {

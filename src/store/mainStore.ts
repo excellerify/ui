@@ -1,3 +1,4 @@
+import { config } from '@/config';
 import { IMenu, IMenuItems } from '@/interfaces/menu.interface';
 import { StoreOptions } from 'vuex';
 
@@ -29,7 +30,7 @@ export const mainStore: StoreOptions<IMainStoreState> = {
     },
     setPageTitle(state, title: string) {
       state.pageTitle = title;
-      document.title = title;
+      document.title = `${config.appTitle} ${title}`;
     },
     setGlobalLoading(state, { isLoading }) {
       state.globalLoading = isLoading;

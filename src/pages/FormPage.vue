@@ -1,5 +1,5 @@
 <template lang="pug">
-div.card
+div.card.bg-white
   v-card-text
     v-layout
       v-flex(xs12)
@@ -32,21 +32,21 @@ export default {
     },
     isEdit() {
       return !!this.id;
-    }
+    },
   },
   methods: {
     onSuccess(data) {
       this.$router.push({ name: 'grid', params: { resource: this.resource } });
     },
     doSaveAsDraft() {},
-    doSubmit() {}
+    doSubmit() {},
   },
   created() {
     const pageTitle = this.isEdit ? 'Update' : 'Create';
     this.$store.dispatch('checkPageTitle', {
       path: this.$route.path,
-      action: pageTitle
+      action: pageTitle,
     });
-  }
+  },
 };
 </script>

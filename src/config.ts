@@ -6,6 +6,7 @@ const apiBaseUrl =
   process.env.API_URL || `http://localhost:3000/api${apiVersion}`;
 
 export const config = {
+  appTitle: '',
   locale: 'en-US', // en-US, zh-CN
   ajaxUploadUrl: apiBaseUrl + 'files',
   debug: {
