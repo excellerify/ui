@@ -5,7 +5,6 @@ div.bg-white
       :resource="resource",
       :onCreate="onCreate",
       :onUpdate="onUpdate",
-      :onView="onView"
     )
 </template>
 

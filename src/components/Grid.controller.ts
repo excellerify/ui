@@ -31,9 +31,6 @@ export default class Grid extends Vue {
   @Prop({ type: Function, required: true })
   public onUpdate!: object;
 
-  @Prop({ type: Function, required: true })
-  public onView!: object;
-
   public filters = {
     model: {},
     limit: config.grid.limit,

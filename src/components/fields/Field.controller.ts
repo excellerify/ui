@@ -163,22 +163,21 @@ export default class Field extends Vue {
   set model(val) {
     if (['money', 'number'].indexOf(this.dataField.type) > -1) {
       val = Number(val.replace(/[^0-9\.-]+/g, ''));
+      this.$emit('input', val);
     } else if (['datetime'].indexOf(this.dataField.type) > -1) {
       const { date, time } = val;
       const dateTime = moment(
         `${date || '0000-00-00'} ${time || '00:00'}`,
         `${config.format.date} ${config.format.time}`,
       );
-      return this.$emit('input', dateTime.toDate());
+      this.$emit('input', dateTime.toDate());
     } else if (['time'].indexOf(this.dataField.type) > -1) {
-      return this.$emit('input', val.time);
+      this.$emit('input', val.time);
     } else if (['date'].indexOf(this.dataField.type) > -1) {
-      return this.$emit('input', val.date);
+      this.$emit('input', val.date);
+    } else {
+      this.$emit('input', val);
     }
-
-    this.value = val;
-
-    return this.$emit('input', val);
   }
 
   get validationRules() {
