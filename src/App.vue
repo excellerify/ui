@@ -18,29 +18,7 @@
 </template>
 
 <script lang="ts">
-import Component from 'vue-class-component';
-import Vue from 'vue';
-import { Watch } from 'vue-property-decorator';
-import { mapGetters } from 'vuex';
-import { Getter } from 'vuex-class';
-
-@Component({})
-export default class App extends Vue {
-  public timeout: number = 3000;
-
-  @Getter('getGlobalLoading') globalLoading!: boolean;
-
-  @Getter('getGlobalError') globalError!: string;
-
-  public snackbar: boolean = false;
-
-  @Watch('globalError')
-  public onGlobalError(value: string) {
-    this.snackbar = !!value;
-
-    setTimeout(() => this.$store.commit('setGlobalError', ''), this.timeout);
-  }
-}
+export { default } from './App.controller';
 </script>
 
 <style>

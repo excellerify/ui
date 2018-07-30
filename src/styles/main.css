@@ -29,13 +29,13 @@
   font-size: 12px;
 }
 
-.toolbar--fixed {
+.v-toolbar--fixed {
   z-index: 99;
 }
 
-.navigation-drawer--is-mobile,
-.navigation-drawer--temporary,
-.navigation-drawer {
+.v-navigation-drawer--is-mobile,
+.v-navigation-drawer--temporary,
+.v-navigation-drawer {
   z-index: 100;
 }
 
@@ -49,4 +49,37 @@
 
 .v-stepper {
   box-shadow: none;
+}
+
+.v-list--dense .v-list__tile,
+table.v-table tbody td {
+  font-size: 12px;
+}
+
+table.v-table tbody td:first-child,
+table.v-table tbody td:not(:first-child),
+table.v-table tbody th:first-child,
+table.v-table tbody th:not(:first-child),
+table.v-table thead td:first-child,
+table.v-table thead td:not(:first-child),
+table.v-table thead th:first-child,
+table.v-table thead th:not(:first-child),
+.v-list__tile {
+  padding: 0 8px;
+}
+
+input,
+optgroup,
+select,
+textarea {
+  font-size: 13px;
+}
+
+.container {
+  padding: 12px;
+}
+
+.v-list__tile__action,
+.v-list__tile__avatar {
+  min-width: 32px;
 }

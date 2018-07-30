@@ -5,10 +5,12 @@
     "datetime",
     "dropzone",
     "inflector",
+    "randomstring",
     "snackbar",
     "styl",
     "timeago",
-    "vuetify"
+    "vuetify",
+    "vuex"
   ],
   "editor.tabSize": 2,
   "files.associations": {

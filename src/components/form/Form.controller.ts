@@ -1,219 +1,78 @@
-<template lang='pug'>
-div
-  v-layout(v-if="loading" flex align-center justify-center)
-    v-progress-circular(
-      :width="8"
-      :size="96"
-      color="primary"
-      style="margin-left:auto; margin-right:auto;"
-      indeterminate)
-
-  form(:action='action', @submit.prevent='onSubmit', novalidate)
-    v-tabs(grow, scroll-bars, v-model='active', dark, v-if='groupBy')
-      v-tabs-bar(slot='activators')
-        v-tabs-item(
-          v-for="(field, key) in group.parents"
-          :key="key"
-          :href="'tab-' + key"
-          ripple)
-        v-tabs-slider
-
-      v-tabs-content(
-        v-for="(getFields, key) in group.children"
-        :key="key"
-        :id="'tab-' + key")
-        v-card(flat)
-          v-card-text
-            v-field(
-              v-for="(field, name) in getFields"
-              v-model="model[name]"
-              :key="name"
-              :name="field.label"
-              :field="field"
-              :readonly="readonly || field.readonly")
-
-    template(v-if='(!groupBy && formType != "wizard") && inline')
-      v-layout.row.wrap(style="padding: 8px")
-        v-flex(v-for='(field, name, index) in getFields' :key="name")
-          v-field(
-            v-bind:class="{'pr-3': index != Object.keys(getFields).length-1}"
-            @refresh="refresh"
-            @onUpsert="onSubmit"
-            @fieldError='updateFieldsError'
-            v-model='model[name]'
-            hide-details
-            :inline="inline"
-            :resourceId="model.id"
-            :name='field.label'
-            :field='field'
-            :readonly='readonly || field.readonly')
-
-      v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
-        ul.px-3
-          li(v-for='error in formErrors') {{error.message}}
-
-      v-flex.actions(xs12)
-        slot(name='buttons')
-          v-btn(color='primary', dark, type='submit') {{$t(submitButtonText)}}
-            v-icon(right, dark) {{submitButtonIcon}}
-
-    template(v-else-if='(!groupBy && formType != "wizard") && !inline')
-      v-layout.column.wrap
-        v-field(
-          v-for='(field, name) in getFields'
-          @refresh='refresh'
-          @onUpsert='onSubmit'
-          @fieldError='updateFieldsError'
-          v-model='model[name]'
-          :inline="inline"
-          :resourceId="model.id"
-          :key="name"
-          :name='field.label'
-          :field='field'
-          :readonly='readonly || field.readonly')
-
-      v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
-        ul.px-3
-          li(v-for='error in formErrors') {{error.message}}
-
-      v-flex.mt-5.actions(xs12)
-        slot(name='buttons')
-          v-btn.grey(dark, @click.native="$root.back()")
-            v-icon(dark, left) chevron_left
-            span {{$t('Cancel')}}
-          v-btn.orange(dark, @click.native="onSaveAsDraft") {{$t('Save as Draft')}}
-            v-icon(dark, right) save
-          v-btn.primary(dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
-            v-icon(right, dark) send
-
-          // v-btn(color='primary', dark, type='submit') {{$t(submitButtonText)}}
-          //   v-icon(right, dark) {{submitButtonIcon}}
-
-    v-layout(column, wrap, v-else-if='formType === "wizard"')
-      v-stepper(v-model="wizardData.wizardStep" vertical :non-linear="isView || isEdit")
-        template(v-for='(wizard, index) in getWizardContent')
-          v-stepper-step(
-            :step="index + 1"
-            :keys="index"
-            :rules="[()=> checkWizardStepError(index)]"
-            :editable="wizardData.wizardStep > index || isView || isEdit"
-            :complete="wizardData.wizardStep > index || isEdit") {{wizard.wizardTitle}}
-            small(v-if="!checkWizardStepError(index)") One or more fields have an error or empty
-
-          v-stepper-content(:step="index + 1")
-            v-card
-              v-card-text
-                v-field(
-                  v-for="(field) in wizard.fields"
-                  v-model="model[field.name]"
-                  @refresh="refresh"
-                  @onUpsert="onSubmit"
-                  @fieldError='updateFieldsError'
-                  :value='model[field.name]'
-                  :wizardIndex='index'
-                  :inline="inline"
-                  :resourceId="model.id"
-                  :key="field.name"
-                  :name='field.label'
-                  :field='field'
-                  :readonly='readonly || field.readonly')
-
-                v-alert.m-5(error
-                  v-model="formErrors.length > 0 && getWizardStepError(index).length > 0"
-                  style='width: 100%;')
-                  ul.px-3
-                    li(v-for='error in getWizardStepError(index)') {{error.message}}
-
-              v-card-actions
-                v-btn(v-if="index > 0", @click.native="wizardData.wizardStep -= 1 ")
-                  v-icon(left) chevron_left
-                  span Back
-                v-btn(v-if="wizardData.wizardStep < getWizardContent.length" color="primary" @click.native="onWizardContinue({index})")
-                  span Continue
-                  v-icon(dark, left) chevron_right
-
-      v-alert.m-5(error, v-model='formErrors.length > 0', style='width: 100%;')
-        ul.px-3
-          li(v-for='error in formErrors') {{error.message}}
-
-      v-flex.actions(xs12)
-        slot(name="buttons")
-          v-btn.grey(dark, @click.native="$root.back()")
-            v-icon(dark, left) chevron_left
-            span {{$t('Cancel')}}
-          v-btn.orange(dark, @click.native="onSaveAsDraft") {{$t('Save as Draft')}}
-            v-icon(dark, right) save
-          v-btn.primary(dark, type='submit') {{$t(isCreate? 'Submit': 'Save')}}
-            v-icon(right, dark) send
-</template>
-
-<script lang="ts">
-import Component from 'vue-class-component';
 import Vue from 'vue';
+import Component from 'vue-class-component';
 import { Prop, Watch } from 'vue-property-decorator';
 
 @Component({ name: 'Form' })
-export default class Grid extends Vue {
+export default class Form extends Vue {
   @Prop({ type: String })
-  id!: string;
+  public id!: string;
 
   @Prop({ type: String })
-  resource!: string;
+  public resource!: string;
 
   @Prop({ type: String })
-  subResource!: string;
+  public subResource!: string;
 
   @Prop({ type: Boolean, default: false })
-  inline!: boolean;
+  public inline!: boolean;
 
   @Prop({ type: String })
-  groupBy!: string;
+  public groupBy!: string;
 
   @Prop({ type: String, default: 'Submit' })
-  submitButtonText!: string;
+  public submitButtonText!: string;
 
   @Prop({ type: String, default: 'send' })
-  submitButtonIcon!: string;
+  public submitButtonIcon!: string;
 
-  @Prop({ type: Object, default: () => {} })
-  value!: object;
+  @Prop({
+    type: Object,
+    default: null,
+  })
+  public value!: { id: string };
 
-  @Prop({ type: Object, default: () => {} })
-  parentData!: object;
+  @Prop({
+    type: Object,
+    default: null,
+  })
+  public parentData!: object;
 
-  @Prop({ type: Object, default: () => {} })
-  formFields!: object;
+  @Prop({
+    type: Object,
+    default: null,
+  })
+  public formFields!: object;
 
   @Prop({ type: Boolean })
-  autoSubmit!: boolean;
+  public autoSubmit!: boolean;
 
   @Prop({ type: String, default: 'form' })
-  type!: string;
+  public type!: string;
 
   @Prop({ type: Boolean, default: false })
-  readonly!: string;
+  public readonly!: string;
 
-  error: Error;
+  public error: Error;
 
-  loading = false;
+  public loading = false;
 
-  model = this.value;
+  public model = this.value;
 
-  hasError = false;
+  public hasError = false;
 
-  formErrors = [];
+  public formErrors = [];
 
-  message = '';
+  public message = '';
 
-  fieldErrors = [];
+  public fieldErrors = [];
 
-  rules = null;
+  public rules = null;
 
-  dataFormFields = null;
+  public dataFormFields = null;
 
-  formType = 'simple';
+  public formType = 'simple';
 
-  wizardData = {
+  public wizardData = {
     wizardStep: 0,
     wizardContent: [],
   };
@@ -222,13 +81,13 @@ export default class Grid extends Vue {
     if (!this.groupBy) {
       return null;
     }
-    let parents = {};
-    let children = {};
+    const parents = {};
+    const children = {};
 
-    for (let k in this.dataFormFields) {
-      let field = this.dataFormFields[k];
-      let ref = field[this.groupBy];
-      let parentKey = field.id;
+    for (const k in this.dataFormFields) {
+      const field = this.dataFormFields[k];
+      const ref = field[this.groupBy];
+      const parentKey = field.id;
 
       if (ref === null) {
         // is parent
@@ -278,7 +137,8 @@ export default class Grid extends Vue {
 
   get getWizardContent() {
     if (this.formType === 'wizard') {
-      const wizardContent = this._.chain(this.filteredFields())
+      const wizardContent = this._
+        .chain(this.filteredFields())
         .map((currentItem, key) => {
           // transform object key into property name,
           // to make fields can be stored in array
@@ -288,8 +148,8 @@ export default class Grid extends Vue {
         .groupBy('wizardStepTitle')
         .toPairs()
         .map(currentItem => {
-          let title =
-            currentItem[0] != 'undefined' ? currentItem[0] : 'Final Step';
+          const title =
+            currentItem[0] !== 'undefined' ? currentItem[0] : 'Final Step';
 
           return {
             wizardTitle: title,
@@ -308,23 +168,23 @@ export default class Grid extends Vue {
   }
 
   @Watch('value')
-  onValue(val: object) {
+  public onValue(val: object) {
     this.model = val;
   }
 
   @Watch('$route')
-  onRoute() {
+  public onRoute() {
     this.fieldErrors = [];
     this.hasError = false;
     this.refresh();
   }
 
   @Watch('formFields')
-  onFormFields() {
+  public onFormFields() {
     this.refresh();
   }
 
-  async refresh() {
+  public async refresh() {
     try {
       this.fieldErrors = [];
 
@@ -361,8 +221,10 @@ export default class Grid extends Vue {
     }
   }
 
-  filteredFields() {
-    if (!this.dataFormFields) return;
+  public filteredFields() {
+    if (!this.dataFormFields) {
+      return;
+    }
 
     const fields = Object.assign(this.dataFormFields);
 
@@ -403,7 +265,7 @@ export default class Grid extends Vue {
     return result;
   }
 
-  async fetchFormSchema() {
+  public async fetchFormSchema() {
     try {
       this.loading = true;
 
@@ -430,7 +292,7 @@ export default class Grid extends Vue {
     }
   }
 
-  updateFieldsError({ field, isError, message, wizardIndex }) {
+  public updateFieldsError({ field, isError, message, wizardIndex }): void {
     const index = this._.findIndex(this.fieldErrors, { field });
 
     if (isError) {
@@ -444,7 +306,7 @@ export default class Grid extends Vue {
     }
   }
 
-  async onSubmit({ subForm, cb } = {}) {
+  public async onSubmit({ subForm, cb } = {}) {
     try {
       if (this.fieldErrors.length > 0) {
         throw this.fieldErrors;
@@ -491,7 +353,13 @@ export default class Grid extends Vue {
     }
   }
 
-  async onSaveAsDraft({ subForm, cb } = {}) {
+  public async onSaveAsDraft({
+    subForm,
+    cb,
+  }: {
+    subForm: boolean;
+    cb: (data: object) => {};
+  }) {
     try {
       if (this.fieldErrors.length > 0) {
         throw this.fieldErrors;
@@ -499,7 +367,7 @@ export default class Grid extends Vue {
 
       this.$emit('input', this.model);
 
-      const result = await this.$http['post'](
+      const result = await this.$http.post(
         `${this.resource}/draft`,
         this.model,
       );
@@ -536,7 +404,13 @@ export default class Grid extends Vue {
     }
   }
 
-  async onWizardContinue({ index, cb } = {}) {
+  public async onWizardContinue({
+    index,
+    cb,
+  }: {
+    index: number;
+    cb: () => {};
+  }) {
     try {
       if (cb) {
         cb();
@@ -558,7 +432,7 @@ export default class Grid extends Vue {
 
       this.$emit('input', this.model);
 
-      const result = await this.$http['post'](
+      const result = await this.$http.post(
         `${this.resource}/draft`,
         this.model,
       );
@@ -592,12 +466,12 @@ export default class Grid extends Vue {
     }
   }
 
-  checkWizardStepError(index) {
+  public checkWizardStepError(index: number) {
     const errorStep = this.getWizardStepError(index);
     return !(errorStep && errorStep.length > 0);
   }
 
-  getWizardStepError(index) {
+  public getWizardStepError(index: number) {
     const errorStep = this._.filter(this.fieldErrors, {
       wizardIndex: index,
     });
@@ -605,9 +479,7 @@ export default class Grid extends Vue {
     return errorStep;
   }
 
-  created() {
+  public created() {
     this.refresh();
   }
 }
-</script>
-

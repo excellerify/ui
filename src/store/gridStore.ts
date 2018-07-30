@@ -1,5 +1,5 @@
+import { http } from '@/http';
 import { StoreOptions } from 'vuex';
-import { http } from '../http';
 
 export const gridStore: StoreOptions<{}> = {
   state: {},

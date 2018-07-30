@@ -1,16 +1,16 @@
 import { helper } from '@/helper';
+import { store } from '@/store';
+import Error from 'pages/Error.vue';
+import FormPage from 'pages/formPage/FormPage.vue';
+import GridPage from 'pages/GridPage.vue';
+import Home from 'pages/Home.vue';
+import Login from 'pages/Login.vue';
+import Logout from 'pages/Logout.vue';
+import Main from 'pages/Main.vue';
+import Settings from 'pages/Settings.vue';
+import ViewPage from 'pages/ViewPage.vue';
 import Vue from 'vue';
 import Router, { Route, RouteConfig, RouterOptions } from 'vue-router';
-import Error from './pages/Error.vue';
-import FormPage from './pages/FormPage.vue';
-import GridPage from './pages/GridPage.vue';
-import Home from './pages/Home.vue';
-import Login from './pages/Login.vue';
-import Logout from './pages/Logout.vue';
-import Main from './pages/Main.vue';
-import Settings from './pages/Settings.vue';
-import ViewPage from './pages/ViewPage.vue';
-import { store } from './store';
 
 Vue.use(Router);
 

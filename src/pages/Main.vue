@@ -1,7 +1,7 @@
 <template lang="pug">
 div
-  v-navigation-drawer(v-model='drawer',:mini-variant="mini", persistent,enable-resize-watcher, :dark="dark", app)
-    .pa-3.text-xs-center(v-show="!mini")
+  v-navigation-drawer(v-model='drawer', width="256" :mini-variant="mini", persistent, enable-resize-watcher, :dark="dark", app)
+    .pa-2.text-xs-center(v-show="!mini")
       // div(style="padding-left:5em")
       //   v-switch(:label="(!dark ? 'Light' : 'Dark') + ' Theme'", v-model="dark", :dark="dark", hide-details)
     .pa-3.text-xs-center(v-show="mini")

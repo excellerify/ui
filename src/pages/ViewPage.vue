@@ -1,5 +1,5 @@
 <template lang="pug">
-div.card
+div.bg-white
   v-card-text
     v-layout
       v-flex(xs12)

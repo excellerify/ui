@@ -21,16 +21,16 @@ import './styles/main.css';
 import { config } from '@/config';
 import { helper } from '@/helper';
 import { http } from '@/http';
-import { i18n } from '@/i18n/';
+import { i18n } from '@/i18n';
 import { IMenu } from '@/interfaces/menu.interface';
 import { router } from '@/router';
 import { store } from '@/store';
 
 import App from '@/App.vue';
-import VField from './components/Field.vue';
-import VGoogleMap from './components/fields/GoogleMap.vue';
-import VForm from './components/Form.vue';
-import VGrid from './components/Grid.vue';
+import VField from 'components/fields/Field.vue';
+import VGoogleMap from 'components/fields/GoogleMap.vue';
+import VForm from 'components/form/Form.vue';
+import VGrid from 'components/Grid.vue';
 
 Vue.prototype.$http = http;
 
@@ -82,7 +82,7 @@ new Vue({
   i18n,
   router,
   async created() {
-    setupGoogleMap();
+    // setupGoogleMap();
 
     // utils.http = this.$http;
     // utils.t = this.$t;
