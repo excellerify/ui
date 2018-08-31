@@ -1,11 +1,13 @@
 import { config } from '@/config';
 import { store } from '@/store';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
-export const http = axios.create({
+export const http: AxiosInstance = axios.create({
   baseURL: config.api,
   timeout: 10000,
-  // headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+  headers: {
+    Authorization: JSON.parse(localStorage.getItem('token') || '"anonymous"'),
+  },
 });
 
 http.interceptors.request.use(

@@ -1,8 +1,8 @@
 import { helper } from '@/helper';
 import { http } from '@/http';
 import { router } from '@/router';
-import axios from 'axios';
 import { StoreOptions } from 'vuex';
+import createPersistedState from 'vuex-persistedstate';
 
 export interface IAuthStore {
   user?: object;
@@ -11,9 +11,10 @@ export interface IAuthStore {
 }
 
 export const authStore: StoreOptions<IAuthStore> = {
+  plugins: [createPersistedState()],
   mutations: {
     setAuth(state, { user, token, expireTime }) {
-      axios.defaults.headers.common.Authorization = token;
+      http.defaults.headers.Authorization = token;
 
       state.user = user;
       state.token = token;
@@ -22,6 +23,13 @@ export const authStore: StoreOptions<IAuthStore> = {
       helper.ls.set('user', user);
       helper.ls.set('token', token);
       helper.ls.set('expireTime', expireTime);
+    },
+    clearAuth(state) {
+      delete http.defaults.headers.common.Authorization;
+
+      delete state.user;
+      delete state.token;
+      delete state.expireTime;
     },
   },
   actions: {
@@ -35,7 +43,7 @@ export const authStore: StoreOptions<IAuthStore> = {
       commit('setAuth', data);
     },
     login: async ({ commit }, { username, password }) => {
-      const response = await http.post('admins/login', {
+      const response = await http.post('admin/login', {
         username,
         password,
       });
@@ -49,16 +57,12 @@ export const authStore: StoreOptions<IAuthStore> = {
       router.push('/');
     },
     logout: async () => {
-      const result = await http.post('admins/logout');
+      const result = await http.post('admin/logout');
 
       return result;
     },
     clearAuth({ commit }) {
-      commit('setAuth', {
-        user: null,
-        token: null,
-        expireTime: null,
-      });
+      commit('clearAuth');
       router.push('/login');
     },
   },

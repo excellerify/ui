@@ -5,6 +5,7 @@
     "datetime",
     "dropzone",
     "inflector",
+    "persistedstate",
     "randomstring",
     "snackbar",
     "styl",

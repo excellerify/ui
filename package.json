@@ -16,12 +16,14 @@
     "adonis-websocket-client": "^1.0.2",
     "axios": "^0.18.0",
     "errorhandler": "^1.5.0",
+    "filestack-js": "^1.5.1",
     "flow": "^0.2.3",
     "indicative": "^2.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "natural": "^0.6.1",
     "numeral": "^2.0.6",
+    "pdfjs-dist": "^2.0.489",
     "randomstring": "^1.1.5",
     "vee-validate": "^2.0.3",
     "vue": "^2.5.16",
@@ -39,7 +41,8 @@
     "vue2-google-maps": "^0.8.12",
     "vuetify": "^1.1.7",
     "vuex": "^3.0.1",
-    "vuex-class": "^0.3.1"
+    "vuex-class": "^0.3.1",
+    "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
     "@poi/plugin-typescript": "^10.2.0",
@@ -53,6 +56,7 @@
     "@types/randomstring": "^1.1.6",
     "@types/yargs": "^11.1.0",
     "css-loader": "^1.0.0",
+    "debug": "^3.1.0",
     "fs": "^0.0.1-security",
     "node-sass": "^4.5.3",
     "poi": "^10.2.9",

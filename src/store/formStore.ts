@@ -1,19 +1,17 @@
 import { http } from '@/http';
 import { StoreOptions } from 'vuex';
 
-export class FormStoreState {}
-
-export const formStore: StoreOptions<FormStoreState> = {
+export const formStore: StoreOptions<{}> = {
   mutations: {},
   actions: {
     async fetchFormSchema(_, { resource, subResource, id }) {
       const url = `${resource}/${subResource || 'form'}`;
 
-      const data = await http.get(url, {
+      const { data } = await http.get(url, {
         params: { id },
       });
 
-      return data.data.schema;
+      return data && data.schema;
     },
 
     async fetchAutoComplete(_, { dataSource, searchVal }) {
@@ -24,19 +22,13 @@ export const formStore: StoreOptions<FormStoreState> = {
           regexp: `/${searchVal}/i`,
           plain: searchVal,
         };
-
-        return search;
       });
 
-      let { data } = await http.get(dataSource.url, {
-        params: { filter: { whereOr: search } },
+      const { data } = await http.get(dataSource.url, {
+        params: { filter: { where: search } },
       });
 
-      if (data.items) {
-        data = data.items;
-      }
-
-      return data;
+      return data && data.items;
     },
   },
 };

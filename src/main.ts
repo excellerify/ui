@@ -27,18 +27,18 @@ import { router } from '@/router';
 import { store } from '@/store';
 
 import App from '@/App.vue';
-import VField from 'components/fields/Field.vue';
+import VField from 'components/Field.vue';
 import VGoogleMap from 'components/fields/GoogleMap.vue';
-import VForm from 'components/form/Form.vue';
+import VForm from 'components/Form.vue';
 import VGrid from 'components/Grid.vue';
 
 Vue.prototype.$http = http;
 
-// tslint:disable
+/* tslint:disable */
 global.helper = helper;
 global.config = config;
 global.store = store;
-// tslint:enable
+/* tslint:enable */
 
 import * as en from 'vue-timeago/locales/en-US.json';
 const configLocale = import(`vue-timeago/locales/${config.locale}.json`);
